@@ -1,0 +1,38 @@
+Rough Timeline
+---------------
+Work breakdown:
+	- Scott: design
+	- Vivek: GUI
+	- Tyler: Audio stream
+	- Jerry: Porting
+
+
+week 1 (Sunday. 2016-02-21)
+	- Functionalities for minimum product (Server, client)
+	- Rough timeline for minumum product
+	- Weekly meeting time: Monday, during 1 hr break
+	- figuring out library
+	- Basic client GUi psuedocode 
+
+week 2 (Sunday, 2016-02-28)
+	- Port back-end functionality for UDP-TCP client & server
+	- Multicast 
+	- Learn GUi
+	- Start design
+	- look into audio stream
+
+week 3 (Sunday, 2016-03-06)
+	- Finalize design 
+		- Psuedocode
+		- Statechart 
+		- Work break down
+		- Timeline	
+	- Simple GUi
+	- File transfering 
+	- Play audio from a stream
+
+week 4 (Sunday, 2016-03-13)
+	- Minimum viable product should be done
+
+week 5 (Sunday, 2016-03-20)
+	- buffer week

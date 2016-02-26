@@ -1,0 +1,11 @@
+#pragma once
+#include <iostream>
+#include <sstream>
+#include <math.h>
+#include <limits.h>
+#include <WinSock2.h>
+#include <windows.h>
+#include <stdio.h>
+#include <iostream>
+#include <commctrl.h>
+#include <time.h>
