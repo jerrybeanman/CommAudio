@@ -10,7 +10,7 @@ struct CircularBuffer
     int         ElementSize;	/* size of each item in the buffer			*/
     void	*	Front;			/* pointer to Front							*/
     void	*	Rear;			/* pointer to Rear							*/
-    int		BytesRECV;          /* Number of bytes recieved					*/
+    int         BytesRECV;      /* Number of bytes recieved					*/
 };
 
 

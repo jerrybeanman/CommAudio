@@ -14,7 +14,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    circularbuffer.cpp
+    circularbuffer.cpp \
+    Server/s_tcp.cpp
 
 HEADERS  += mainwindow.h \
     circularbuffer.h \
