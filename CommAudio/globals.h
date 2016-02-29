@@ -12,6 +12,8 @@
 
 #define DATA_BUFSIZE 2000
 
+#include "circularbuffer.h"
+
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION
 {
