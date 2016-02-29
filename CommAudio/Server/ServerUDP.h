@@ -1,12 +1,13 @@
-#ifndef SERVER_H
-#define SERVER_H
-#include "globals.h"
+#ifndef SERVERUDP_H
+#define SERVERUDP_H
+#include "Server.h"
 
-class Server
+class ServerUDP : public Server
     {
         public:
-            Server(){}
-            ~Server(){}
+
+            ServerUDP(){}
+            ~ServerUDP(){}
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	InitializeSocket
             --
@@ -21,7 +22,7 @@ class Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual int InitializeSocket(short port) = 0;
+            int InitializeSocket(short port);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -37,7 +38,7 @@ class Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual void Broadcast(char * message) = 0;
+            void Broadcast(char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send
@@ -46,15 +47,15 @@ class Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	virtual void Send(LPSOCKET_INFORMATION sockinfo) = 0;
-            --						~sockinfo   : Pointer to the socket information structure
-            --                      ~message    : Message to send
+            -- INTERFACE:	void Broadcast(LPSOCKET_INFORMATION SocketInfo, char * message);
+            --                      ~SocketInfo : Pointer to Socket Information structure
+            --						~message    : message to send
             --
             -- RETURNS: void
             --
             -- NOTES: Sends a message to a specific connected client
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual void Send(LPSOCKET_INFORMATION SocketInfo, char * message) = 0;
+            void Send(LPSOCKET_INFORMATION SocketInfo, char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	RoutineManager
@@ -63,25 +64,18 @@ class Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	virtual void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags) = 0;
+            -- INTERFACE:	void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
             --                      ~Error				: Error code
             --                      ~BytesTransffered	: Total bytes recieved from packet
             --                      ~Overlapped			: Overlapped structure
             --                      ~InFlags            : Modification flags
             -- RETURNS: void
             --
-            -- NOTES: Callback completion routine for recv when a packet has been recieved.
+            -- NOTES: Callback completion routine for recvfrom when a packet has been recieved.
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags) = 0;
+            void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
 
-        protected:
-            SOCKET  ServerSocket;
+        private:
 
-            WSADATA		wsaData;            // Session info
-
-            CircularBuffer  CircularBuff;   // Circular buffer for server data processing
-
-            SOCKADDR_IN    InternetAddr;    // Server address structure
     };
-
-#endif // SERVER_H
+#endif // SERVERUDP_H

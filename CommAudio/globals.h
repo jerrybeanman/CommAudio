@@ -10,7 +10,9 @@
 #include <commctrl.h>
 #include <time.h>
 
+#define MAX_CLIENTS  10
 #define DATA_BUFSIZE 2000
+#define DEFAULT_PORT 7000
 
 #include "circularbuffer.h"
 

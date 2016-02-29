@@ -31,15 +31,14 @@ class ServerTCP : public Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	int Accept(LPSOCKET_INFORMATION * sockinfo);
-            --						~player: port number of peer host
+            -- INTERFACE:	int Accept(void);
             --
             -- RETURNS: void
             --
             -- NOTES:  Calls accept on a player's socket. Sets the returning socket and client address structure to the player.
                 Add connected player to the list of players
             --------------------------------------------------------------------------------------------------------------------*/
-            int Accept(LPSOCKET_INFORMATION player);
+            int Accept(void);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -48,14 +47,15 @@ class ServerTCP : public Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	virtual void Broadcast(char * message) = 0;
-            --						~message: message content
+            -- INTERFACE:	virtual void Broadcast(LPSOCKET_INFORMATION SocketInfor, char * message) = 0;
+            --                      ~SocketInfo : Pointer to Socket Information structure
+            --						~message    : message content
             --
             -- RETURNS: void
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            void Broadcast(char * message);
+            void Broadcast(LPSOCKET_INFORMATION SocketInfo, char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send
@@ -71,7 +71,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Sends a message to a specific connected client
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual void Send(LPSOCKET_INFORMATION sockinfo) = 0;
+            void Send(LPSOCKET_INFORMATION sockinfo);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	RoutineManager
@@ -80,7 +80,7 @@ class ServerTCP : public Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	virtual void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags) = 0;
+            -- INTERFACE:	void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
             --                      ~Error				: Error code
             --                      ~BytesTransffered	: Total bytes recieved from packet
             --                      ~Overlapped			: Overlapped structure
@@ -89,9 +89,9 @@ class ServerTCP : public Server
             --
             -- NOTES: Callback completion routine for recv when a packet has been recieved.
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags) = 0;
+             void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
 
         private:
-
+            SOCKET  AcceptedSocket;
     };
 #endif // TCP_SERVER_H
