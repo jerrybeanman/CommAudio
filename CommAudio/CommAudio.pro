@@ -15,10 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     circularbuffer.cpp \
-    Server/s_tcp.cpp
+    Server/ServerTCP.cpp \
+    Server/Server.cpp
 
 HEADERS  += mainwindow.h \
     circularbuffer.h \
-    globals.h
+    globals.h \
+    Server/ServerTCP.h \
+    Server/Server.h
 
 FORMS    += mainwindow.ui
