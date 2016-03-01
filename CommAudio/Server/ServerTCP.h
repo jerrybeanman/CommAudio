@@ -22,7 +22,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            int InitializeSocket(short port);
+            int InitializeSocket();
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Accept

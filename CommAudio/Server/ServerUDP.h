@@ -1,6 +1,7 @@
 #ifndef SERVERUDP_H
 #define SERVERUDP_H
 #include "Server.h"
+#include <ws2tcpip.h>
 
 class ServerUDP : public Server
     {
@@ -22,7 +23,22 @@ class ServerUDP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            int InitializeSocket(short port);
+            int InitializeSocket();
+
+            /*------------------------------------------------------------------------------------------------------------------
+            -- FUNCTION:	InitializeSocket
+            --
+            -- DATE:		Febuary 28th, 2016          REVISIONS:
+            --
+            -- DESIGNER:	Ruoqi Jia, Scott Plummer	PROGRAMMER:	Ruoqi Jia, Scott Plummer
+            --
+            -- INTERFACE:	virtual int MulticastSettings(short port) = 0;
+            --
+            -- RETURNS: void
+            --
+            -- NOTES: Set time to live, multicast address, and disabled loop back
+            --------------------------------------------------------------------------------------------------------------------*/
+            int MulticastSettings();
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -76,6 +92,8 @@ class ServerUDP : public Server
             void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
 
         private:
-
+            u_long           TimeToLive = 1;
+            struct ip_mreq   MulticastAddress;
+            SOCKADDR_IN      DestinationAddress;
     };
 #endif // SERVERUDP_H

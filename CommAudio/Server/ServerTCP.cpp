@@ -14,7 +14,7 @@
 --
 -- NOTES: Initialize socket, server address to lookup to, and connect to the server
 --------------------------------------------------------------------------------------------------------------------*/
-int ServerTCP::InitializeSocket(short port)
+int ServerTCP::InitializeSocket()
 {
     // Create a WSA v2.2 session
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -33,7 +33,7 @@ int ServerTCP::InitializeSocket(short port)
     // Initialize address structure
     InternetAddr.sin_family = AF_INET;
     InternetAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    InternetAddr.sin_port = htons(port);
+    InternetAddr.sin_port = htons(DEFAULT_PORT);
 
     // Bind address to the listening socket
     if (bind(ServerSocket, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
