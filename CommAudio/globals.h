@@ -10,7 +10,12 @@
 #include <commctrl.h>
 #include <time.h>
 
+#define DEFAULT_IP   "192.168.0.1"
+#define MAX_CLIENTS  10
 #define DATA_BUFSIZE 2000
+#define DEFAULT_PORT 7000
+
+#include "circularbuffer.h"
 
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION
