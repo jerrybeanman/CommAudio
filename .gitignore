@@ -23,8 +23,7 @@ moc_*.cpp
 qrc_*.cpp
 ui_*.h
 Makefile*
-*build-*
-build-CommAudio-Desktop_Qt_5_5_1_MinGW_32bit-Debug/*
+*build-*/*
 # QtCreator
 
 *.autosave
