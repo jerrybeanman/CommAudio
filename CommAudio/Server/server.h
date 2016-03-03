@@ -1,6 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 #include "globals.h"
+
 class Server
     {
         public:
