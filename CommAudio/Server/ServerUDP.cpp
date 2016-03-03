@@ -1,18 +1,18 @@
 #include "ServerUDP.h"
-int ServerUDP::InitializeSocket()
+bool ServerUDP::InitializeSocket()
 {
     // Create a WSA v2.2 session
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
         printf("WSAStartup failed with error %d\n", WSAGetLastError());
-        return -1;
+        return false;
     }
 
     // Create socket for listening
     if ((ServerSocket = WSASocket(AF_INET,SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED) == INVALID_SOCKET))
     {
         printf("WSASocket() failed with error %d\n", WSAGetLastError());
-        return -1;
+        return false;
     }
 
     // Initialize address structure
@@ -24,9 +24,9 @@ int ServerUDP::InitializeSocket()
     if (bind(ServerSocket, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
     {
         printf("bind() failed with error %d\n", WSAGetLastError());
-        return -1;
+        return false;
     }
-    return 0;
+    return true;
 }
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ int ServerUDP::InitializeSocket()
 --
 -- NOTES: Set time to live, multicast address, and disabled loop back
 --------------------------------------------------------------------------------------------------------------------*/
-int ServerUDP::MulticastSettings()
+bool ServerUDP::MulticastSettings()
 {
     BOOL LoopBackFlag = false;
     //TODO replace with local ip address
@@ -53,19 +53,19 @@ int ServerUDP::MulticastSettings()
     if(setsockopt(ServerSocket, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&TimeToLive, sizeof(TimeToLive)) == SOCKET_ERROR)
     {
         printf("setsockopt() failed with error on time to live%d\n", WSAGetLastError());
-        return -1;
+        return false;
     }
 
     if(setsockopt(ServerSocket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&MulticastAddress, sizeof(MulticastAddress)) == SOCKET_ERROR)
     {
         printf("setsockopt() failed with error on multicast address%d\n", WSAGetLastError());
-        return -1;
+        return false;
     }
 
     if(setsockopt(ServerSocket, IPPROTO_IP, IP_MULTICAST_LOOP, (char *)&LoopBackFlag, sizeof(LoopBackFlag)) == SOCKET_ERROR)
     {
         printf("Setsocketopt() failed with error on loop back%d\n", WSAGetLastError());
-        return -1;
+        return false;
     }
 
     DestinationAddress.sin_family       =      AF_INET;
@@ -73,7 +73,7 @@ int ServerUDP::MulticastSettings()
     DestinationAddress.sin_addr.s_addr  = inet_addr(DEFAULT_IP);
     DestinationAddress.sin_port         =        htons(DEFAULT_PORT);
 
-    return 0;
+    return true;
 }
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -91,26 +91,6 @@ int ServerUDP::MulticastSettings()
 -- NOTES: Sends a message to all the connected clients
 --------------------------------------------------------------------------------------------------------------------*/
 void ServerUDP::Broadcast(char * message)
-{
-
-}
-
-/*------------------------------------------------------------------------------------------------------------------
--- FUNCTION:	Send
---
--- DATE:		Febuary 28th, 2016		REVISIONS:
---
--- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
---
--- INTERFACE:	void Broadcast(LPSOCKET_INFORMATION SocketInfo, char * message);
---                      ~SocketInfo : Pointer to Socket Information structure
---						~message    : message to send
---
--- RETURNS: void
---
--- NOTES: Sends a message to a specific connected client
---------------------------------------------------------------------------------------------------------------------*/
-void ServerUDP::Send(LPSOCKET_INFORMATION SocketInfo, char * message)
 {
 
 }

@@ -9,13 +9,13 @@ class Client
         Client();
         ~Client();
 
-        virtual int InitializeSocket(const char* name, short port) = 0;
+        virtual bool InitializeSocket(const char* name, short port) = 0;
 
         virtual void * Recv() = 0;
 
-        virtual int Send(char * message, int size) = 0;
+        virtual bool Send(char * message, int size) = 0;
 
-        int Init_SockAddr(const char* hostname, short hostport);
+        bool Init_SockAddr(const char* hostname, short hostport);
 
         char* GetData();
 

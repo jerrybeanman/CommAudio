@@ -21,7 +21,7 @@ class Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual int InitializeSocket() = 0;
+            virtual bool InitializeSocket() = 0;
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast

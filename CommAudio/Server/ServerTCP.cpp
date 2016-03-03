@@ -14,20 +14,20 @@
 --
 -- NOTES: Initialize socket, server address to lookup to, and connect to the server
 --------------------------------------------------------------------------------------------------------------------*/
-int ServerTCP::InitializeSocket()
+bool ServerTCP::InitializeSocket()
 {
     // Create a WSA v2.2 session
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
         printf("WSAStartup failed with error %d\n", WSAGetLastError());
-        return -1;
+    return false;
     }
 
     // Create socket for listening
     if ((ServerSocket = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP) == INVALID_SOCKET))
     {
         printf("WSASocket() failed with error %d\n", WSAGetLastError());
-        return -1;
+        return false;
     }
 
     // Initialize address structure
@@ -39,19 +39,19 @@ int ServerTCP::InitializeSocket()
     if (bind(ServerSocket, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
     {
         printf("bind() failed with error %d\n", WSAGetLastError());
-        return -1;
+        return false;
     }
 
     // listens for only 1 connection
     if (listen(ServerSocket, MAX_CLIENTS) == SOCKET_ERROR)
     {
         printf("listen() failed with error %d\n", WSAGetLastError());
-        return -1;
+        return false;
     }
-    return 0;
+    return true;
 }
 
-int ServerTCP::Accept(void)
+bool ServerTCP::Accept(void)
 {
 
 }
