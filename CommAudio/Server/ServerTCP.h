@@ -22,7 +22,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            int InitializeSocket(short port);
+            bool InitializeSocket();
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Accept
@@ -38,7 +38,7 @@ class ServerTCP : public Server
             -- NOTES:  Calls accept on a player's socket. Sets the returning socket and client address structure to the player.
                 Add connected player to the list of players
             --------------------------------------------------------------------------------------------------------------------*/
-            int Accept(void);
+            bool Accept(void);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast

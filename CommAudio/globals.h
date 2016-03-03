@@ -10,6 +10,10 @@
 #include <commctrl.h>
 #include <time.h>
 
+<<<<<<< HEAD
+=======
+#define DEFAULT_IP   "192.168.0.1"
+>>>>>>> 0febc20486465f324a487855456c8ed0b4679533
 #define MAX_CLIENTS  10
 #define DATA_BUFSIZE 2000
 #define DEFAULT_PORT 7000

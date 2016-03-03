@@ -21,7 +21,7 @@ class Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual int InitializeSocket(short port) = 0;
+            virtual bool InitializeSocket() = 0;
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -81,7 +81,8 @@ class Server
 
             CircularBuffer  CircularBuff;   // Circular buffer for server data processing
 
-            SOCKADDR_IN    InternetAddr;    // Server address structure
+            SOCKADDR_IN    InternetAddr;    // Server address structures
+
     };
 
 #endif // SERVER_H
