@@ -51,7 +51,7 @@ private:
     QAudioOutput* m_audioOutput;
     QAudioDeviceInfo m_device;
     QSlider *m_volumeSlider;
-    QFile m_file;
+    QFile* m_file;
     bool m_pullMode;
 };
 

@@ -37,18 +37,21 @@ void MainWindow::on_volumeSlider_sliderMoved(int position)
 
 void MainWindow::on_startButton_clicked()
 {
+    //Bad practice, need a check for QFileDialog succeeds or not.
+    m_file = 0;
+
     // Get the file name using a QFileDialog
-    m_file(QFileDialog::getOpenFileName(this, tr("Upload a file")));
-    file.open(QIODevice::ReadOnly);
-    bool test = (bool)file.fileName().isEmpty();
+    m_file = new QFile(QFileDialog::getOpenFileName(this, tr("Upload a file")));
+    m_file->open(QIODevice::ReadOnly);
+    bool test = (bool)m_file->fileName().isEmpty();
     // If the selected file is valid, continue with the upload
     if (!test) {
         //Skip the wav file header
-        file.seek(44);
+        m_file->seek(44);
 
         // Read the file and transform the output to a QByteArray
-        m_buffer = file.read(file.size()/2);
-
+        m_buffer = m_file->readAll();
+        m_file->close();
         mediaStream = new QBuffer(&m_buffer);
         qDebug() << mediaStream->size();
         //begin_pain(NULL);
@@ -77,33 +80,29 @@ void MainWindow::begin_pain(QString filename)
 {
     m_pullMode = true;
 
-    m_format.setSampleSize(8);
-    m_format.setSampleRate(11205);
+    m_format.setSampleRate(11025);
     m_format.setChannelCount(1);
+    m_format.setSampleSize(8);
     m_format.setCodec("audio/pcm");
-    m_format.setByteOrder(QAudioFormat::BigEndian);
+    m_format.setByteOrder(QAudioFormat::LittleEndian);
     m_format.setSampleType(QAudioFormat::UnSignedInt);
 
-    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
-    if (!info.isFormatSupported(m_format)) {
-        qWarning() << "Default format not supported - trying to use nearest";
-        m_format = info.nearestFormat(m_format);
-    }
+
+    qDebug() << m_device.deviceName();
 
     /*m_decoder = new QAudioDecoder();
     m_decoder->setAudioFormat(m_format);
     m_decoder->setSourceFilename(filename);*/
 
-    delete m_audioOutput;
-    m_audioOutput = 0;
-    m_audioOutput = new QAudioOutput(m_device, m_format, this);
-
-    qDebug() << m_device.deviceName();
 
     if(!m_device.isFormatSupported(m_format))
     {
         qWarning()<<"raw audio format not supported by backend, cannot play audio.";
+        return;
     }
+
+    m_audioOutput = 0;
+    m_audioOutput = new QAudioOutput(m_device, m_format, this);
 
     mediaStream->open(QIODevice::ReadOnly);
     m_audioOutput->start(mediaStream);
