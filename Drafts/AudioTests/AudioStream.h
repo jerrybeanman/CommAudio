@@ -12,8 +12,35 @@
 #include <QSlider>
 
 namespace Ui {
+
+class Generator;
+
 class MainWindow;
 }
+
+class DataGenerator : public QIODevice
+{
+    Q_OBJECT
+
+public:
+    DataGenerator(QObject *parent);
+    ~DataGenerator();
+
+    void start();
+    void stop();
+
+    qint64 readData(char *data, qint64 maxlen);
+    qint64 writeData(const char *data, qint64 len);
+    qint64 bytesAvailable() const;
+    void RemoveBufferedData();
+    void AddMoreDataToBufferFromFile(QFile* file, qint64 len);
+    void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);
+
+private:
+    qint64 dg_pos;
+    qint64 dg_max;
+    QByteArray dg_buffer;
+};
 
 class MainWindow : public QMainWindow
 {
@@ -25,6 +52,9 @@ public:
 
 
 private slots:
+
+    void handleAudioStateChanged(QAudio::State);
+
     void on_programSlider_sliderMoved(int position);
 
     void on_volumeSlider_sliderMoved(int position);
@@ -41,6 +71,8 @@ private slots:
 
     void on_pushButton_clicked();
 
+    QAudioFormat OptimizeWavFile(QFile* file);
+
 private:
     Ui::MainWindow *ui;
     QMediaPlayer* player;
@@ -52,6 +84,8 @@ private:
     QAudioDeviceInfo m_device;
     QSlider *m_volumeSlider;
     QFile* m_file;
+    DataGenerator* m_generator;
+    char* data;
     bool m_pullMode;
 };
 

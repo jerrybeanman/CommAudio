@@ -1,10 +1,11 @@
 #include "AudioStream.h"
 #include "ui_mainwindow.h"
 
-const int DurationSeconds = 1;
-const int ToneSampleRateHz = 600;
-const int DataSampleRateHz = 44100;
-const int BufferSize      = 32768;
+const int DurationSeconds   = 1;
+const int ToneSampleRateHz  = 600;
+const int DataSampleRateHz  = 44100;
+const int BufferSize        = 32768;
+const qint64 ZERO           = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -22,6 +23,32 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::handleAudioStateChanged(QAudio::State newState)
+{
+    /*qDebug() << "State: " << newState;
+    switch (newState) {
+    case QAudio::IdleState:
+        // Finished playing
+        m_audioOutput->stop();
+        qDebug() << "STOPPED!";
+        break;
+
+    case QAudio::StoppedState:
+        // Stopped for other
+        qDebug() << "STOPPED!";
+        if (mAudioOut->error() != QAudio::NoError) {
+            // Error handling
+            qDebug() << "STOPPED ERROR!";
+        }
+        break;
+
+    default:
+        // ... other cases as appropriate
+        qDebug() << "DEFAULT!";
+        break;
+    }*/
 }
 
 void MainWindow::on_programSlider_sliderMoved(int position)
@@ -42,7 +69,15 @@ void MainWindow::on_startButton_clicked()
 
     // Get the file name using a QFileDialog
     m_file = new QFile(QFileDialog::getOpenFileName(this, tr("Upload a file")));
+
     m_file->open(QIODevice::ReadOnly);
+    delete m_generator;
+    m_generator = new DataGenerator(this);
+
+
+
+    /*
+    //OptimizeWavFile(m_file);
     bool test = (bool)m_file->fileName().isEmpty();
     // If the selected file is valid, continue with the upload
     if (!test) {
@@ -51,11 +86,13 @@ void MainWindow::on_startButton_clicked()
 
         // Read the file and transform the output to a QByteArray
         m_buffer = m_file->readAll();
-        m_file->close();
+
+
+
         mediaStream = new QBuffer(&m_buffer);
         qDebug() << mediaStream->size();
         //begin_pain(NULL);
-    }
+    }*/
     /*player->setMedia(QUrl::fromLocalFile("C:/Users/Tyler/Desktop/CommAudio/Drafts/AudioTests/Test.mp3"));
     player->play();
     qDebug() << player->errorString();*/
@@ -104,19 +141,204 @@ void MainWindow::begin_pain(QString filename)
     m_audioOutput = 0;
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
 
-    mediaStream->open(QIODevice::ReadOnly);
-    m_audioOutput->start(mediaStream);
-    m_audioOutput->setVolume(qreal(100.0f/100.0f));
-    //Check the audiooutput project on how it gets outputed.
+    connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(handleAudioStateChanged(QAudio::State)));
 
-    /*QEventLoop loop;
-    QObject::connect(&output, SIGNAL(stateChanged(QAudio::State)), &loop, SLOT(quit()));
-    do {
-        loop.exec();
-    } while(output.state() == QAudio::ActiveState);*/
+    //mediaStream->open(QIODevice::ReadOnly); //original test.
+
+    //File is already opened btw
+    //m_file->open(QIODevice::ReadOnly);
+
+    //skip the header of the WAV file
+    m_file->seek(44);
+    //m_generator->AddMoreDataToBufferFromFile(m_file, m_file->size() - 44); //works
+
+    /* Purpose, split the file in half and read it in portions */
+    qint64 size = m_file->size() - 44; //Size of the file minus the header.
+    QByteArray array = m_file->read(size/2);
+    m_generator->AddMoreDataToBufferFromQByteArray(array, size/2);
+
+    array = m_file->read(size/2);
+    //m_generator->AddMoreDataToBufferFromQByteArray(array, size/2);
+
+    m_generator->start();
+
+    m_audioOutput->start(m_generator);
+    m_audioOutput->setVolume(qreal(100.0f/100.0f));
 }
 
 void MainWindow::on_pushButton_clicked()
 {
     begin_pain(NULL);
+}
+
+DataGenerator::DataGenerator(QObject *parent)
+    :   QIODevice(parent), dg_pos(0), dg_max(0)
+{
+    if(dg_pos == 0)
+    {
+
+    }
+}
+
+DataGenerator::~DataGenerator()
+{
+
+}
+
+void DataGenerator::start()
+{
+    open(QIODevice::ReadOnly);
+}
+
+void DataGenerator::stop()
+{
+    dg_pos = 0;
+    close();
+}
+
+
+qint64 DataGenerator::readData(char *data, qint64 len)
+{
+    qint64 total = 0;
+    if (!dg_buffer.isEmpty()) {
+        while (len - total > 0) {
+            const qint64 chunk = qMin((dg_buffer.size() - dg_pos), len - total);
+            memcpy(data + total, dg_buffer.constData() + dg_pos, chunk);
+            dg_pos = (dg_pos + chunk) % dg_buffer.size();
+            total += chunk;
+            if(dg_pos == ZERO)
+            {
+                RemoveBufferedData();
+                break;
+            }
+        }
+    }
+    return total;
+}
+
+qint64 DataGenerator::writeData(const char *data, qint64 len)
+{
+    //No writing allowed.
+    Q_UNUSED(data);
+    Q_UNUSED(len);
+
+    return 0;
+}
+
+qint64 DataGenerator::bytesAvailable() const
+{
+    return dg_buffer.size() + QIODevice::bytesAvailable();
+}
+
+void DataGenerator::RemoveBufferedData()
+{
+    dg_buffer.resize(0);
+    dg_pos = 0;
+}
+
+/*
+ *  Adds in Data from a file.
+ */
+void DataGenerator::AddMoreDataToBufferFromFile(QFile *file, qint64 len)
+{
+    if(file->isOpen())
+    {
+        dg_max += len;
+        dg_buffer.resize(dg_max);
+        dg_buffer = file->read(len);
+    }
+
+}
+
+void DataGenerator::AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len)
+{
+    dg_max += len;
+    dg_buffer.append(array);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Garbage function, trying to grab header info... no worky
+QAudioFormat MainWindow::OptimizeWavFile(QFile* file)
+{
+    // Read in the whole thing
+    QByteArray wavFileContent = file->readAll();
+
+    qDebug() << "The size of the WAV file is: " << wavFileContent.size();
+
+    // Define the header components
+    char fileType[4];
+    qint32 fileSize;
+    char waveName[4];
+    char fmtName[3];
+    qint32 fmtLength;
+    short fmtType;
+    short numberOfChannels;
+    qint32 sampleRate;
+    qint32 sampleRateXBitsPerSampleXChanngelsDivEight;
+    short bitsPerSampleXChannelsDivEightPointOne;
+    short bitsPerSample;
+    char dataHeader[4];
+    qint32 dataSize;
+
+    // Create a data stream to analyze the data
+    QDataStream analyzeHeaderDS(&wavFileContent,QIODevice::ReadOnly);
+    analyzeHeaderDS.setByteOrder(QDataStream::LittleEndian);
+
+
+    // Now pop off the appropriate data into each header field defined above
+    analyzeHeaderDS.readRawData(fileType,4); // "RIFF"
+    analyzeHeaderDS >> fileSize; // File Size
+    analyzeHeaderDS.readRawData(waveName,4); // "WAVE"
+    analyzeHeaderDS.readRawData(fmtName,3); // "fmt"
+    analyzeHeaderDS >> fmtLength; // Format length
+    analyzeHeaderDS >> fmtType; // Format type
+    analyzeHeaderDS >> numberOfChannels; // Number of channels
+    analyzeHeaderDS >> sampleRate; // Sample rate
+    analyzeHeaderDS >> sampleRateXBitsPerSampleXChanngelsDivEight; // (Sample Rate * BitsPerSample * Channels) / 8
+    analyzeHeaderDS >> bitsPerSampleXChannelsDivEightPointOne; // (BitsPerSample * Channels) / 8.1
+    analyzeHeaderDS >> bitsPerSample; // Bits per sample
+    analyzeHeaderDS.readRawData(dataHeader,4); // "data" header
+    analyzeHeaderDS >> dataSize; // Data Size
+
+    // Print the header
+    qDebug() << "WAV File Header read:";
+    qDebug() << "File Type: " << QString::fromUtf8(fileType);
+    qDebug() << "File Size: " << fileSize;
+    qDebug() << "WAV Marker: " << QString::fromUtf8(waveName);
+    qDebug() << "Format Name: " << QString::fromUtf8(fmtName);
+    qDebug() << "Format Length: " << fmtLength;
+    qDebug() << "Format Type: " << fmtType;
+    qDebug() << "Number of Channels: " << numberOfChannels;
+    qDebug() << "Sample Rate: " << sampleRate;
+    qDebug() << "Sample Rate * Bits/Sample * Channels / 8: " << sampleRateXBitsPerSampleXChanngelsDivEight;
+    qDebug() << "Bits per Sample * Channels / 8.1: " << bitsPerSampleXChannelsDivEightPointOne;
+    qDebug() << "Bits per Sample: " << bitsPerSample;
+    qDebug() << "Data Header: " << QString::fromUtf8(dataHeader);
+    qDebug() << "Data Size: " << dataSize;
+
+    QAudioFormat nope;
+
+    return nope;
 }
