@@ -23,11 +23,7 @@ class ServerUDP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-<<<<<<< HEAD
-            int InitializeSocket();
-=======
             bool InitializeSocket();
->>>>>>> 0febc20486465f324a487855456c8ed0b4679533
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	InitializeSocket
@@ -42,11 +38,7 @@ class ServerUDP : public Server
             --
             -- NOTES: Set time to live, multicast address, and disabled loop back
             --------------------------------------------------------------------------------------------------------------------*/
-<<<<<<< HEAD
-            int MulticastSettings();
-=======
             bool MulticastSettings();
->>>>>>> 0febc20486465f324a487855456c8ed0b4679533
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -65,26 +57,6 @@ class ServerUDP : public Server
             void Broadcast(char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
-<<<<<<< HEAD
-            -- FUNCTION:	Send
-            --
-            -- DATE:		Febuary 28th, 2016		REVISIONS:
-            --
-            -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
-            --
-            -- INTERFACE:	void Broadcast(LPSOCKET_INFORMATION SocketInfo, char * message);
-            --                      ~SocketInfo : Pointer to Socket Information structure
-            --						~message    : message to send
-            --
-            -- RETURNS: void
-            --
-            -- NOTES: Sends a message to a specific connected client
-            --------------------------------------------------------------------------------------------------------------------*/
-            void Send(LPSOCKET_INFORMATION SocketInfo, char * message);
-
-            /*------------------------------------------------------------------------------------------------------------------
-=======
->>>>>>> 0febc20486465f324a487855456c8ed0b4679533
             -- FUNCTION:	RoutineManager
             --
             -- DATE:		Febuary 28th, 2016		REVISIONS:
