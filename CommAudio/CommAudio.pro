@@ -13,6 +13,8 @@ TEMPLATE = app
 
 LIBS += -lws2_32
 
+QMAKE_CXXFLAGS += -std=c++11
+
 SOURCES += main.cpp\
         mainwindow.cpp \
     circularbuffer.cpp \
