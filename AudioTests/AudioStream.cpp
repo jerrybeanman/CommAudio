@@ -64,38 +64,12 @@ void MainWindow::on_volumeSlider_sliderMoved(int position)
 
 void MainWindow::on_startButton_clicked()
 {
-    //Bad practice, need a check for QFileDialog succeeds or not.
-    m_file = 0;
 
-    // Get the file name using a QFileDialog
-    m_file = new QFile(QFileDialog::getOpenFileName(this, tr("Upload a file")));
+    m_file = new WavFile(this);
+    m_file->open(QFileDialog::getOpenFileName(this, tr("Upload a file")));
 
-    m_file->open(QIODevice::ReadOnly);
     delete m_generator;
     m_generator = new DataGenerator(this);
-
-
-
-    /*
-    //OptimizeWavFile(m_file);
-    bool test = (bool)m_file->fileName().isEmpty();
-    // If the selected file is valid, continue with the upload
-    if (!test) {
-        //Skip the wav file header
-        m_file->seek(44);
-
-        // Read the file and transform the output to a QByteArray
-        m_buffer = m_file->readAll();
-
-
-
-        mediaStream = new QBuffer(&m_buffer);
-        qDebug() << mediaStream->size();
-        //begin_pain(NULL);
-    }*/
-    /*player->setMedia(QUrl::fromLocalFile("C:/Users/Tyler/Desktop/CommAudio/Drafts/AudioTests/Test.mp3"));
-    player->play();
-    qDebug() << player->errorString();*/
 }
 
 void MainWindow::on_stopButton_clicked()
@@ -117,20 +91,8 @@ void MainWindow::begin_pain(QString filename)
 {
     m_pullMode = true;
 
-    m_format.setSampleRate(11025);
-    m_format.setChannelCount(1);
-    m_format.setSampleSize(8);
-    m_format.setCodec("audio/pcm");
-    m_format.setByteOrder(QAudioFormat::LittleEndian);
-    m_format.setSampleType(QAudioFormat::UnSignedInt);
-
-
+    m_format = m_file->fileFormat();
     qDebug() << m_device.deviceName();
-
-    /*m_decoder = new QAudioDecoder();
-    m_decoder->setAudioFormat(m_format);
-    m_decoder->setSourceFilename(filename);*/
-
 
     if(!m_device.isFormatSupported(m_format))
     {
@@ -143,22 +105,13 @@ void MainWindow::begin_pain(QString filename)
 
     connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(handleAudioStateChanged(QAudio::State)));
 
-    //mediaStream->open(QIODevice::ReadOnly); //original test.
-
-    //File is already opened btw
-    //m_file->open(QIODevice::ReadOnly);
-
-    //skip the header of the WAV file
-    m_file->seek(44);
-    //m_generator->AddMoreDataToBufferFromFile(m_file, m_file->size() - 44); //works
-
     /* Purpose, split the file in half and read it in portions */
     qint64 size = m_file->size() - 44; //Size of the file minus the header.
     QByteArray array = m_file->read(size/2);
     m_generator->AddMoreDataToBufferFromQByteArray(array, size/2);
 
     array = m_file->read(size/2);
-    //m_generator->AddMoreDataToBufferFromQByteArray(array, size/2);
+    m_generator->AddMoreDataToBufferFromQByteArray(array, size/2);
 
     m_generator->start();
 

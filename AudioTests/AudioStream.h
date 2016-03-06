@@ -10,6 +10,7 @@
 #include <QBuffer>
 #include <QAudioOutput>
 #include <QSlider>
+#include "wavfile.h"
 
 namespace Ui {
 
@@ -37,9 +38,9 @@ public:
     void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);
 
 private:
-    qint64 dg_pos;
-    qint64 dg_max;
-    QByteArray dg_buffer;
+    qint64      dg_pos;
+    qint64      dg_max;
+    QByteArray  dg_buffer;
 };
 
 class MainWindow : public QMainWindow
@@ -74,19 +75,19 @@ private slots:
     QAudioFormat OptimizeWavFile(QFile* file);
 
 private:
-    Ui::MainWindow *ui;
-    QMediaPlayer* player;
-    QByteArray m_buffer;
-    QBuffer* mediaStream;
-    QAudioDecoder* m_decoder;
-    QAudioFormat m_format;
-    QAudioOutput* m_audioOutput;
-    QAudioDeviceInfo m_device;
-    QSlider *m_volumeSlider;
-    QFile* m_file;
-    DataGenerator* m_generator;
-    char* data;
-    bool m_pullMode;
+    Ui::MainWindow*         ui;
+    QMediaPlayer*           player;
+    QByteArray              m_buffer;
+    QBuffer*                mediaStream;
+    QAudioDecoder*          m_decoder;
+    QAudioFormat            m_format;
+    QAudioOutput*           m_audioOutput;
+    QAudioDeviceInfo        m_device;
+    QSlider*                m_volumeSlider;
+    WavFile*                m_file;
+    DataGenerator*          m_generator;
+    char*                   data;
+    bool                    m_pullMode;
 };
 
 #endif // AUDIOSTREAM_H
