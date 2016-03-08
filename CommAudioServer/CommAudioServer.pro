@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2016-02-25T23:09:20
+# Project created by QtCreator 2016-03-07T21:46:33
 #
 #-------------------------------------------------
 
@@ -8,21 +8,23 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = CommAudio
+TARGET = CommAudioServer
 TEMPLATE = app
 
 LIBS += -lws2_32
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    circularbuffer.cpp \
-    Client/Client.cpp \
-    Client/ClientUDP.cpp
+    Server/Server.cpp \
+    Server/ServerTCP.cpp \
+    Server/ServerUDP.cpp \
+    circularbuffer.cpp
 
 HEADERS  += mainwindow.h \
+    Server/server.h \
+    Server/ServerTCP.h \
+    Server/ServerUDP.h \
     circularbuffer.h \
-    globals.h \
-    Client/Client.h \
-    Client/ClientUDP.h
+    globals.h
 
 FORMS    += mainwindow.ui
