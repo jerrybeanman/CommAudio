@@ -3,9 +3,6 @@
 #include "globals.h"
 #include "Server/ServerUDP.h"
 
-
-
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
