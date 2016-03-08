@@ -3,8 +3,9 @@
 #include "Server.h"
 #include <ws2tcpip.h>
 
-class ServerUDP : public Server, public QThread
+class ServerUDP : public Server
 {
+
         public:
 
             ServerUDP(){}
@@ -95,18 +96,6 @@ class ServerUDP : public Server, public QThread
         private:
             struct ip_mreq   MulticastAddress;
             SOCKADDR_IN      DestinationAddress;
-
-            void run()
-            {
-                while(1)
-                {
-                    std::cout << "sending scamaz" << std::endl;
-                    if(!this->Broadcast("scamaz"))
-                    {
-                        std::cout << "ServerUDP::run()->Broadcast() failed" << std::endl;
-                        return;
-                    }
-                }
-            }
+            
     };
 #endif // SERVERUDP_H

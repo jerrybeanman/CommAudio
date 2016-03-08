@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include "Server/ServerUDP.h"
+#include "Server/serverthreadcontroller.h"
+void StartServer();
 
 int main(int argc, char *argv[])
 {
@@ -8,9 +10,10 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    //QObject::connect(&serverUDP, SIGNAL(finished()), &program, SLOT(quit()));
-
+    ServerThreadController test;
 
     return program.exec();
 }
+
+
 

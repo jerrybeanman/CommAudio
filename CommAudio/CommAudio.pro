@@ -28,6 +28,8 @@ HEADERS  += mainwindow.h \
     Server/Server.h \
     Server/ServerUDP.h \
     Client/Client.h \
-    Client/ClientUDP.h
+    Client/ClientUDP.h \
+    Server/ServerThreadController.h \
+    Server/ServerWorker.h
 
 FORMS    += mainwindow.ui
