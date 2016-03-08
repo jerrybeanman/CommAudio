@@ -30,7 +30,8 @@ DWORD WINAPI UDPThread(LPVOID lpParameter)
     ServerUDP * serverUDP = (ServerUDP * )lpParameter;
     while(1)
     {
-        if(!serverUDP->Broadcast("Scamaz"))
+        DWORD BytesSent;
+        if(!serverUDP->Broadcast("Scamaz", &BytesSent))
             return -1;
     }
     return 0;

@@ -41,7 +41,7 @@ class Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual bool Broadcast(char * message) = 0;
+            virtual bool Broadcast(char * message, LPDWORD lpNumberOfBtyesSent) = 0;
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send
@@ -79,14 +79,14 @@ class Server
             virtual void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags) = 0;
 
         protected:
-            u_long          TimeToLive = 1;
-            SOCKET          ServerSocket;
+            u_long                  TimeToLive = 1;
+            SOCKET_INFORMATION    SocketInfo;
 
-            WSADATA         wsaData;            // Session info
+            WSADATA                 wsaData;            // Session info
 
-            CircularBuffer  CircularBuff;   // Circular buffer for server data processing
+            CircularBuffer          CircularBuff;   // Circular buffer for server data processing
 
-            SOCKADDR_IN     InternetAddr;    // Server address structures
+            SOCKADDR_IN             InternetAddr;    // Server address structures
 
     };
 

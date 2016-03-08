@@ -14,12 +14,12 @@
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION
 {
-    WSAOVERLAPPED * Overlapped;
-    SOCKET        * Socket;
-    CHAR            Buffer[DATA_BUFSIZE];
-    WSABUF        * DataBuf;
-    DWORD           BytesSEND;
-    DWORD           BytesRECV;
+    WSAOVERLAPPED  Overlapped;
+    SOCKET         Socket;
+    CHAR           Buffer[DATA_BUFSIZE];
+    WSABUF         DataBuf;
+    DWORD          BytesSEND;
+    DWORD          BytesRECV;
 } SOCKET_INFORMATION, *LPSOCKET_INFORMATION;
 
 #endif

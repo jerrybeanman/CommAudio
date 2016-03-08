@@ -24,7 +24,7 @@ bool ServerTCP::InitializeSocket(short port)
     }
 
     // Create socket for listening
-    if ((ServerSocket = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP) == INVALID_SOCKET))
+    if ((SocketInfo.Socket = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET)
     {
         printf("WSASocket() failed with error %d\n", WSAGetLastError());
         return false;
@@ -36,14 +36,14 @@ bool ServerTCP::InitializeSocket(short port)
     InternetAddr.sin_port = htons(DEFAULT_PORT);
 
     // Bind address to the listening socket
-    if (bind(ServerSocket, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
+    if (bind(SocketInfo.Socket, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
     {
         printf("bind() failed with error %d\n", WSAGetLastError());
         return false;
     }
 
     // listens for only 1 connection
-    if (listen(ServerSocket, MAX_CLIENTS) == SOCKET_ERROR)
+    if (listen(SocketInfo.Socket, MAX_CLIENTS) == SOCKET_ERROR)
     {
         printf("listen() failed with error %d\n", WSAGetLastError());
         return false;
@@ -56,7 +56,7 @@ bool ServerTCP::Accept(void)
 
 }
 
-int ServerTCP::Broadcast(LPSOCKET_INFORMATION SocketInfo, char *message)
+bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
 {
 
 }

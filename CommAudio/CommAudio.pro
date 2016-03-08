@@ -14,9 +14,8 @@ TEMPLATE = app
 LIBS += -lws2_32
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    mainwindow.cpp \
     circularbuffer.cpp \
-    Client/Client.cpp \
     Client/ClientUDP.cpp
 
 HEADERS  += mainwindow.h \

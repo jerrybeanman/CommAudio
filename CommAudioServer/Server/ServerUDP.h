@@ -55,7 +55,7 @@ class ServerUDP : public Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            bool Broadcast(char * message);
+            bool Broadcast(char * message, LPDWORD lpNumberOfBytesSent);
 
 
             /*------------------------------------------------------------------------------------------------------------------

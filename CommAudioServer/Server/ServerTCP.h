@@ -4,15 +4,6 @@
 
 class ServerTCP : public Server
     {
-        /*---------------
-        -- For QThread --
-        -----------------*/
-        public slots:
-            virtual void process() = 0;
-
-        signals:
-            virtual void finished() = 0;
-            virtual void error(QString err) = 0;
 
         public:
             ServerTCP(){}
@@ -64,7 +55,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            int Broadcast(LPSOCKET_INFORMATION SocketInfo, char * message);
+            bool Broadcast(char * message, LPDWORD lpNumberOfBytesSent);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send
