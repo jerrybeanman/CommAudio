@@ -1,5 +1,8 @@
-#pragma once
-#include "globals.h"
+#ifndef CIRCULAR_BUFFER_H
+#define CIRCULAR_BUFFER_H
+
+#include <stdlib.h>
+#include <string.h>
 /* Can be any type */
 struct CircularBuffer
 {
@@ -82,3 +85,5 @@ void CBPushBack(CircularBuffer * CBuff, const void * item);
 -- NOTES: Copy memory space pointed by CBuff's rear into item. Increment rear by size of item afterward.
 --------------------------------------------------------------------------------------------------------------------*/
 void CBPop(CircularBuffer * CBuff, void * item);
+
+#endif

@@ -1,5 +1,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
+#include "circularbuffer.h"
 #include "globals.h"
 
 class Client
@@ -17,11 +18,12 @@ class Client
 
         bool Init_SockAddr(const char* hostname, short hostport);
 
-        char* GetData();
 
     protected:
-        CircularBuffer  CBPackets; // buffer for data coming in from network
-        LPSOCKET_INFORMATION SockInfo;
+        SOCKADDR_IN             InternetAddr;    // Server address structures
+        WSADATA                 wsaData;            // Session info
+        CircularBuffer          CBPackets; // buffer for data coming in from network
+        LPSOCKET_INFORMATION    SockInfo;
 
 };
 

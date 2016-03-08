@@ -1,29 +1,35 @@
 #include "ServerUDP.h"
-bool ServerUDP::InitializeSocket()
+bool ServerUDP::InitializeSocket(short port)
 {
+    int opt = 1;
     // Create a WSA v2.2 session
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
-        printf("WSAStartup failed with error %d\n", WSAGetLastError());
+        std::cout << "WSAStartup failed with error" << WSAGetLastError() << std::endl;
         return false;
     }
 
     // Create socket for listening
-    if ((ServerSocket = WSASocket(AF_INET,SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED) == INVALID_SOCKET))
+    if ((ServerSocket = socket(AF_INET,SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
     {
-        printf("WSASocket() failed with error %d\n", WSAGetLastError());
+        std::cout << "WSASocket() failed with error " << WSAGetLastError() << std::endl;
         return false;
     }
 
+    if (setsockopt(ServerSocket, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt)) < 0)
+    {
+        std::cout << "WSASocket() failed with error " << WSAGetLastError() << std::endl;
+        return false;
+    }
     // Initialize address structure
     InternetAddr.sin_family         = AF_INET;
     InternetAddr.sin_addr.s_addr    = htonl(INADDR_ANY);
-    InternetAddr.sin_port           = htons(DEFAULT_PORT);
+    InternetAddr.sin_port           = htons(port);
 
     // Bind address to the listening socket
-    if (bind(ServerSocket, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
+    if (bind(ServerSocket, (LPSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
     {
-        printf("bind() failed with error %d\n", WSAGetLastError());
+        std::cout << "bind() failed with error " << WSAGetLastError() << std::endl;
         return false;
     }
     return true;
@@ -42,36 +48,35 @@ bool ServerUDP::InitializeSocket()
 --
 -- NOTES: Set time to live, multicast address, and disabled loop back
 --------------------------------------------------------------------------------------------------------------------*/
-bool ServerUDP::MulticastSettings()
+bool ServerUDP::MulticastSettings(const char * name)
 {
     BOOL LoopBackFlag = false;
     //TODO replace with local ip address
-    MulticastAddress.imr_multiaddr.s_addr = inet_addr(DEFAULT_IP);
+    MulticastAddress.imr_multiaddr.s_addr = inet_addr(name);
     MulticastAddress.imr_interface.s_addr = INADDR_ANY;
 
 
     if(setsockopt(ServerSocket, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&TimeToLive, sizeof(TimeToLive)) == SOCKET_ERROR)
     {
-        printf("setsockopt() failed with error on time to live%d\n", WSAGetLastError());
+        std::cout << "setsockopt() failed with error on time to live" << WSAGetLastError() << std::endl;
         return false;
     }
 
     if(setsockopt(ServerSocket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&MulticastAddress, sizeof(MulticastAddress)) == SOCKET_ERROR)
     {
-        printf("setsockopt() failed with error on multicast address%d\n", WSAGetLastError());
+        std::cout << "setsockopt() failed with error on multicast address " <<  WSAGetLastError() << std::endl;
         return false;
     }
 
     if(setsockopt(ServerSocket, IPPROTO_IP, IP_MULTICAST_LOOP, (char *)&LoopBackFlag, sizeof(LoopBackFlag)) == SOCKET_ERROR)
     {
-        printf("Setsocketopt() failed with error on loop back%d\n", WSAGetLastError());
+        std::cout << "Setsocketopt() failed with error on loop back" << WSAGetLastError() << std::endl;
         return false;
     }
 
-    DestinationAddress.sin_family       =      AF_INET;
-    //TODO replace with local ip address
-    DestinationAddress.sin_addr.s_addr  = inet_addr(DEFAULT_IP);
-    DestinationAddress.sin_port         =        htons(DEFAULT_PORT);
+    DestinationAddress.sin_family       = AF_INET;
+    DestinationAddress.sin_addr.s_addr  = inet_addr(name);
+    DestinationAddress.sin_port         = htons(DEFAULT_PORT);
 
     return true;
 }
@@ -90,11 +95,38 @@ bool ServerUDP::MulticastSettings()
 --
 -- NOTES: Sends a message to all the connected clients
 --------------------------------------------------------------------------------------------------------------------*/
-void ServerUDP::Broadcast(char * message)
+bool ServerUDP::Broadcast(char * message)
+{
+
+    /* Send the time to our multicast group! */
+    if(sendto(ServerSocket, message, sizeof(message), 0, (struct sockaddr*)&DestinationAddress,sizeof(DestinationAddress)) < 0)
+    {
+        std::cout << "ServerUDP::sendTo() failed with error" << WSAGetLastError() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	Send
+--
+-- DATE:		Febuary 28th, 2016		REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	virtual void Send(LPSOCKET_INFORMATION sockinfo) = 0;
+--						~sockinfo   : Pointer to the socket information structure
+--                      ~message    : Message to send
+--
+-- RETURNS: void
+--
+-- NOTES: Sends a message to a specific connected client
+--------------------------------------------------------------------------------------------------------------------*/
+void ServerUDP::Send(LPSOCKET_INFORMATION SocketInfo, char * message)
 {
 
 }
-
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	RoutineManager
 --
@@ -115,3 +147,4 @@ void ServerUDP::RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAP
 {
 
 }
+

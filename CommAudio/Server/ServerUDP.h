@@ -3,8 +3,8 @@
 #include "Server.h"
 #include <ws2tcpip.h>
 
-class ServerUDP : public Server
-    {
+class ServerUDP : public Server, public QThread
+{
         public:
 
             ServerUDP(){}
@@ -23,7 +23,7 @@ class ServerUDP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            bool InitializeSocket();
+            bool InitializeSocket(short port);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	InitializeSocket
@@ -38,7 +38,7 @@ class ServerUDP : public Server
             --
             -- NOTES: Set time to live, multicast address, and disabled loop back
             --------------------------------------------------------------------------------------------------------------------*/
-            bool MulticastSettings();
+            bool MulticastSettings(const char * name);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -54,7 +54,25 @@ class ServerUDP : public Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            void Broadcast(char * message);
+            bool Broadcast(char * message);
+
+
+            /*------------------------------------------------------------------------------------------------------------------
+            -- FUNCTION:	Send
+            --
+            -- DATE:		Febuary 28th, 2016		REVISIONS:
+            --
+            -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+            --
+            -- INTERFACE:	virtual void Send(LPSOCKET_INFORMATION sockinfo) = 0;
+            --						~sockinfo   : Pointer to the socket information structure
+            --                      ~message    : Message to send
+            --
+            -- RETURNS: void
+            --
+            -- NOTES: Sends a message to a specific connected client
+            --------------------------------------------------------------------------------------------------------------------*/
+            void Send(LPSOCKET_INFORMATION SocketInfo, char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	RoutineManager
@@ -75,8 +93,20 @@ class ServerUDP : public Server
             void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
 
         private:
-            u_long           TimeToLive = 1;
             struct ip_mreq   MulticastAddress;
             SOCKADDR_IN      DestinationAddress;
+
+            void run()
+            {
+                while(1)
+                {
+                    std::cout << "sending scamaz" << std::endl;
+                    if(!this->Broadcast("scamaz"))
+                    {
+                        std::cout << "ServerUDP::run()->Broadcast() failed" << std::endl;
+                        return;
+                    }
+                }
+            }
     };
 #endif // SERVERUDP_H

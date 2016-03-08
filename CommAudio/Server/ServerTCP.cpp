@@ -14,7 +14,7 @@
 --
 -- NOTES: Initialize socket, server address to lookup to, and connect to the server
 --------------------------------------------------------------------------------------------------------------------*/
-bool ServerTCP::InitializeSocket()
+bool ServerTCP::InitializeSocket(short port)
 {
     // Create a WSA v2.2 session
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -56,7 +56,7 @@ bool ServerTCP::Accept(void)
 
 }
 
-void ServerTCP::Broadcast(LPSOCKET_INFORMATION SocketInfo, char *message)
+int ServerTCP::Broadcast(LPSOCKET_INFORMATION SocketInfo, char *message)
 {
 
 }

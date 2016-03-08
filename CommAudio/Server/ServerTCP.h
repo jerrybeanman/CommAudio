@@ -4,8 +4,17 @@
 
 class ServerTCP : public Server
     {
-        public:
+        /*---------------
+        -- For QThread --
+        -----------------*/
+        public slots:
+            virtual void process() = 0;
 
+        signals:
+            virtual void finished() = 0;
+            virtual void error(QString err) = 0;
+
+        public:
             ServerTCP(){}
             ~ServerTCP(){}
             /*------------------------------------------------------------------------------------------------------------------
@@ -22,7 +31,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            bool InitializeSocket();
+            bool InitializeSocket(short port);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Accept
@@ -55,7 +64,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            void Broadcast(LPSOCKET_INFORMATION SocketInfo, char * message);
+            int Broadcast(LPSOCKET_INFORMATION SocketInfo, char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send

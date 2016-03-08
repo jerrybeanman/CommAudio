@@ -17,9 +17,9 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     circularbuffer.cpp \
     Server/ServerTCP.cpp \
-    Server/Server.cpp \
     Server/ServerUDP.cpp \
-    Client/client.cpp
+    Client/Client.cpp \
+    Client/ClientUDP.cpp
 
 HEADERS  += mainwindow.h \
     circularbuffer.h \
@@ -27,6 +27,7 @@ HEADERS  += mainwindow.h \
     Server/ServerTCP.h \
     Server/Server.h \
     Server/ServerUDP.h \
-    Client/client.h
+    Client/Client.h \
+    Client/ClientUDP.h
 
 FORMS    += mainwindow.ui

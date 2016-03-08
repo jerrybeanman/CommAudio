@@ -1,21 +1,15 @@
-#pragma once
-#include <iostream>
-#include <sstream>
-#include <math.h>
-#include <limits.h>
+#ifndef GLOBALS_H
+#define GLOBALS_H
+
+#define DEAULT_MULTICAST_IP  "234.5.6.7"
+#define DEFAULT_IP           "192.168.0.1"
+#define MAX_CLIENTS          10
+#define DATA_BUFSIZE         2000
+#define DEFAULT_PORT         7000
+
 #include <WinSock2.h>
 #include <windows.h>
-#include <stdio.h>
-#include <iostream>
-#include <commctrl.h>
-#include <time.h>
-
-#define DEFAULT_IP   "192.168.0.1"
-#define MAX_CLIENTS  10
-#define DATA_BUFSIZE 2000
-#define DEFAULT_PORT 7000
-
-#include "circularbuffer.h"
+#include <qtcore>
 
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION
@@ -27,3 +21,5 @@ typedef struct _SOCKET_INFORMATION
     DWORD           BytesSEND;
     DWORD           BytesRECV;
 } SOCKET_INFORMATION, *LPSOCKET_INFORMATION;
+
+#endif

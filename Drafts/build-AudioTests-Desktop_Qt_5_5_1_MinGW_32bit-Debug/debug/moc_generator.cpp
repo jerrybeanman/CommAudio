@@ -18,9 +18,15 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
+<<<<<<< Updated upstream:Drafts/build-AudioTests-Desktop_Qt_5_5_1_MinGW_32bit-Debug/debug/moc_generator.cpp
 struct qt_meta_stringdata_Generator_t {
     QByteArrayData data[1];
     char stringdata0[10];
+=======
+struct qt_meta_stringdata_MainWindow_t {
+    QByteArrayData data[3];
+    char stringdata0[34];
+>>>>>>> Stashed changes:build-CommAudio-Desktop_Qt_5_5_1_MinGW_32bit-Debug/debug/moc_mainwindow.cpp
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -29,10 +35,19 @@ struct qt_meta_stringdata_Generator_t {
     )
 static const qt_meta_stringdata_Generator_t qt_meta_stringdata_Generator = {
     {
+<<<<<<< Updated upstream:Drafts/build-AudioTests-Desktop_Qt_5_5_1_MinGW_32bit-Debug/debug/moc_generator.cpp
 QT_MOC_LITERAL(0, 0, 9) // "Generator"
 
     },
     "Generator"
+=======
+QT_MOC_LITERAL(0, 0, 10), // "MainWindow"
+QT_MOC_LITERAL(1, 11, 21), // "on_pushButton_clicked"
+QT_MOC_LITERAL(2, 33, 0) // ""
+
+    },
+    "MainWindow\0on_pushButton_clicked\0"
+>>>>>>> Stashed changes:build-CommAudio-Desktop_Qt_5_5_1_MinGW_32bit-Debug/debug/moc_mainwindow.cpp
 };
 #undef QT_MOC_LITERAL
 
@@ -42,21 +57,32 @@ static const uint qt_meta_data_Generator[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       1,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        0,       // signalCount
 
+ // slots: name, argc, parameters, tag, flags
+       1,    0,   19,    2, 0x08 /* Private */,
+
+ // slots: parameters
+    QMetaType::Void,
+
        0        // eod
 };
 
 void Generator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    Q_UNUSED(_o);
-    Q_UNUSED(_id);
-    Q_UNUSED(_c);
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        MainWindow *_t = static_cast<MainWindow *>(_o);
+        Q_UNUSED(_t)
+        switch (_id) {
+        case 0: _t->on_pushButton_clicked(); break;
+        default: ;
+        }
+    }
     Q_UNUSED(_a);
 }
 
@@ -84,6 +110,15 @@ int Generator::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QIODevice::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 1)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 1;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 1)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 1;
+    }
     return _id;
 }
 QT_END_MOC_NAMESPACE
