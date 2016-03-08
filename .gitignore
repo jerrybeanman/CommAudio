@@ -1,6 +1,7 @@
 # C++ objects and libs
 
 build-CommAudio-Desktop_*/*
+Drafts/build-CommAudio-Desktop_*/*
 
 *.slo
 *.lo
