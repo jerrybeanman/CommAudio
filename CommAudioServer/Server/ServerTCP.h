@@ -71,7 +71,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Sends a message to a specific connected client
             --------------------------------------------------------------------------------------------------------------------*/
-            void Send(LPSOCKET_INFORMATION sockinfo);
+            void Send(LPSOCKET_INFORMATION sockinfo, char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	RoutineManager
@@ -92,6 +92,7 @@ class ServerTCP : public Server
              void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
 
         private:
+        	SOCKET 	ListeningSocket;
             SOCKET  AcceptedSocket;
     };
 #endif // TCP_SERVER_H

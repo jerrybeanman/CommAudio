@@ -18,13 +18,17 @@ SOURCES += main.cpp\
     Server/Server.cpp \
     Server/ServerTCP.cpp \
     Server/ServerUDP.cpp \
-    circularbuffer.cpp
+    circularbuffer.cpp \
+    soundmanager.cpp \
+    filemanager.cpp
 
 HEADERS  += mainwindow.h \
     Server/server.h \
     Server/ServerTCP.h \
     Server/ServerUDP.h \
     circularbuffer.h \
-    globals.h
+    globals.h \
+    soundmanager.h \
+    filemanager.h
 
 FORMS    += mainwindow.ui

@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include <QApplication>
-#include "Server/ServerUDP.h"
-void StartServer();
+#include "soundmanager.h"
+#include "filemanager.h"
+
 DWORD WINAPI UDPThread(LPVOID lpParameter);
 
 int main(int argc, char *argv[])
@@ -11,31 +12,21 @@ int main(int argc, char *argv[])
     w.show();
 
     ServerUDP serverUDP;
-    HANDLE UDPServerThread;
-    DWORD UDPServerThreadID;
 
-    if(serverUDP.InitializeSocket(DEFAULT_PORT) < 0)
-        return -1;
+    if(!StartSoundManager())
+    {
+    	std::cout << "StartSoundManager() failed to start" << std::endl;
+    	return -1;
+    }
+   /* if(!StartFileManager())
+    {
+    	std::cout << "StartFileManager() failed to start" << std::endl;
+    }*/
 
-    if(serverUDP.MulticastSettings(DEAULT_MULTICAST_IP) < 0)
-        return -1;
-
-    CreateThread(NULL, 0, UDPThread, (LPVOID)&serverUDP, 0, &UDPServerThreadID);
     return program.exec();
 }
 
-DWORD WINAPI UDPThread(LPVOID lpParameter)
-{
-    std::cout << "Thread created " << std::endl;
-    ServerUDP * serverUDP = (ServerUDP * )lpParameter;
-    while(1)
-    {
-        DWORD BytesSent;
-        if(!serverUDP->Broadcast("Scamaz", &BytesSent))
-            return -1;
-    }
-    return 0;
-}
+
 
 
 

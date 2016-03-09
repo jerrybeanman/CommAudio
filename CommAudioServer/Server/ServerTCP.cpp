@@ -56,12 +56,14 @@ bool ServerTCP::Accept(void)
 
 }
 
+
+
 bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
 {
-
+    return true;
 }
 
-void ServerTCP::Send(LPSOCKET_INFORMATION SockInfo)
+void ServerTCP::Send(LPSOCKET_INFORMATION SockInfo, char * message)
 {
 
 }
