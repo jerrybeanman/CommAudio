@@ -31,12 +31,12 @@ bool ServerTCP::InitializeSocket(short port)
     }
 
     // Initialize address structure
-    InternetAddr.sin_family = AF_INET;
-    InternetAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    InternetAddr.sin_port = htons(DEFAULT_PORT);
+    LocalAddr.sin_family = AF_INET;
+    LocalAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    LocalAddr.sin_port = htons(DEFAULT_PORT);
 
     // Bind address to the listening socket
-    if (bind(SocketInfo.Socket, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
+    if (bind(SocketInfo.Socket, (PSOCKADDR)&LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
     {
         printf("bind() failed with error %d\n", WSAGetLastError());
         return false;

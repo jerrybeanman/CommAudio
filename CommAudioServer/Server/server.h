@@ -80,14 +80,14 @@ class Server
 
         protected:
             u_long                  TimeToLive = 1;
-            SOCKET_INFORMATION    SocketInfo;
+            SOCKET_INFORMATION      SocketInfo;
 
             WSADATA                 wsaData;            // Session info
 
             CircularBuffer          CircularBuff;   // Circular buffer for server data processing
 
-            SOCKADDR_IN             InternetAddr;    // Server address structures
-
+            SOCKADDR_IN             LocalAddr;    // Server address structures
+            DWORD                   flags = 0;
     };
 
 #endif // SERVER_H

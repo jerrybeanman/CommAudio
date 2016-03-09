@@ -42,12 +42,13 @@ bool ClientUDP::InitializeSocket(short port)
 
 bool ClientUDP::MulticastSettings(const char * name)
 {
+    DWORD ret;
     MulticastInfo.imr_multiaddr.s_addr = inet_addr(name);
     MulticastInfo.imr_interface.s_addr = INADDR_ANY;
 
     // Join the multicast group
     if(setsockopt(SocketInfo.Socket, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                  (char *)&MulticastInfo, sizeof(MulticastInfo) == SOCKET_ERROR))
+                  (char *)&MulticastInfo, sizeof(struct ip_mreq)) == SOCKET_ERROR)
     {
         std::cout << "MulticastSettings::setsockopt() failed with error " << WSAGetLastError() << std::endl;
         return FALSE;
@@ -57,6 +58,10 @@ bool ClientUDP::MulticastSettings(const char * name)
 
 bool ClientUDP::Recv()
 {
+    SocketInfo.DataBuf.len = DATA_BUFSIZE;
+    SocketInfo.DataBuf.buf = SocketInfo.Buffer;
+    ZeroMemory(&SocketInfo.Overlapped, sizeof(WSAOVERLAPPED));
+    SocketInfo.Overlapped.hEvent =  WSACreateEvent();
     if (WSARecvFrom(
                 SocketInfo.Socket,                  /* Accepted socket					*/
                 &SocketInfo.DataBuf,				/* Message buffer to recieve		*/

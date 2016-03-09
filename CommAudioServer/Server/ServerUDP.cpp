@@ -11,7 +11,7 @@ bool ServerUDP::InitializeSocket(short port)
     }
 
     // Create socket for listening
-    if ((SocketInfo.Socket = socket(AF_INET,SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
+    if ((SocketInfo.Socket = WSASocket(AF_INET,SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET)
     {
         std::cout << "WSASocket() failed with error " << WSAGetLastError() << std::endl;
         return false;
@@ -22,13 +22,14 @@ bool ServerUDP::InitializeSocket(short port)
         std::cout << "WSASocket() failed with error " << WSAGetLastError() << std::endl;
         return false;
     }
+
     // Initialize address structure
-    InternetAddr.sin_family         = AF_INET;
-    InternetAddr.sin_addr.s_addr    = htonl(INADDR_ANY);
-    InternetAddr.sin_port           = htons(port);
+    LocalAddr.sin_family         = AF_INET;
+    LocalAddr.sin_addr.s_addr    = htonl(INADDR_ANY);
+    LocalAddr.sin_port           = htons(port);
 
     // Bind address to the listening socket
-    if (bind(SocketInfo.Socket, (LPSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
+    if (bind(SocketInfo.Socket, (LPSOCKADDR)&LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
     {
         std::cout << "bind() failed with error " << WSAGetLastError() << std::endl;
         return false;
@@ -52,6 +53,7 @@ bool ServerUDP::InitializeSocket(short port)
 bool ServerUDP::MulticastSettings(const char * name)
 {
     BOOL LoopBackFlag = false;
+
     //TODO replace with local ip address
     MulticastAddress.imr_multiaddr.s_addr = inet_addr(name);
     MulticastAddress.imr_interface.s_addr = INADDR_ANY;
@@ -98,7 +100,13 @@ bool ServerUDP::MulticastSettings(const char * name)
 --------------------------------------------------------------------------------------------------------------------*/
 bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
 {
-    DWORD flags = 0;
+
+    SocketInfo.DataBuf.buf = message;
+    SocketInfo.DataBuf.len = strlen(message) + 1;
+
+    ZeroMemory(&SocketInfo.Overlapped, sizeof(WSAOVERLAPPED));
+    SocketInfo.Overlapped.hEvent =  WSACreateEvent();
+
     if (WSASendTo(SocketInfo.Socket,      /* Writing socket                       */
             &(SocketInfo.DataBuf),        /* Message content                      */
             1,
@@ -107,11 +115,19 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
             (SOCKADDR *)&DestinationAddress,             /* Server socket address structure      */
             sizeof(DestinationAddress),
             &(SocketInfo.Overlapped),
-            NULL)               /* size of the socket address structure */
+            NULL)                       /* size of the socket address structure */
             < 0)
     {
-        std::cout << "ServerUDP::sendTo() failed with error" << WSAGetLastError() << std::endl;
-        return false;
+        if (WSAGetLastError() != WSA_IO_PENDING)
+        {
+            std::cout << "ServerUDP::WSASendto() () failed with error " << WSAGetLastError() << std::endl;
+            return FALSE;
+        }
+        if (WSAWaitForMultipleEvents(1, &SocketInfo.Overlapped.hEvent, FALSE, INFINITE, FALSE) == WAIT_TIMEOUT)
+        {
+            std::cout << "ServerUDP::WSASendto() Timeout" << std::endl;
+            return FALSE;
+        }
     }
     return true;
 }
