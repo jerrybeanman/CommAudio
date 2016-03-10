@@ -1,9 +1,13 @@
 #ifndef SERVER_H
 #define SERVER_H
+#include <iostream>
+#include "circularbuffer.h"
 #include "globals.h"
 
+
 class Server
-    {
+{
+
         public:
             Server(){}
             ~Server(){}
@@ -21,7 +25,7 @@ class Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual bool InitializeSocket() = 0;
+            virtual bool InitializeSocket(short port) = 0;
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -37,7 +41,7 @@ class Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual void Broadcast(char * message) = 0;
+            virtual bool Broadcast(char * message, LPDWORD lpNumberOfBtyesSent) = 0;
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send
@@ -75,13 +79,15 @@ class Server
             virtual void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags) = 0;
 
         protected:
-            SOCKET  ServerSocket;
+            u_long                  TimeToLive = 1;
+            SOCKET_INFORMATION      SocketInfo;
 
-            WSADATA		wsaData;            // Session info
+            WSADATA                 wsaData;            // Session info
 
-            CircularBuffer  CircularBuff;   // Circular buffer for server data processing
+            CircularBuffer          CircularBuff;   // Circular buffer for server data processing
 
-            SOCKADDR_IN    InternetAddr;    // Server address structures
+            SOCKADDR_IN             LocalAddr;    // Server address structures
+            DWORD                   flags = 0;
     };
 
 #endif // SERVER_H

@@ -1,20 +1,4 @@
-#ifndef CIRCULAR_BUFFER_H
-#define CIRCULAR_BUFFER_H
-
-#include <stdlib.h>
-#include <string.h>
-/* Can be any type */
-struct CircularBuffer
-{
-    void	*	buffer;			/* data buffer								*/
-    void	*	buffer_end;		/* end of data buffer						*/
-    int        	MaxSize;		/* maximum number of items in the buffer	*/
-    int     	Count;			/* number of items in the buffer			*/
-    int         ElementSize;	/* size of each item in the buffer			*/
-    void	*	Front;			/* pointer to Front							*/
-    void	*	Rear;			/* pointer to Rear							*/
-    int         BytesRECV;      /* Number of bytes recieved					*/
-};
+#include "CircularBuffer.h"
 
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -24,7 +8,7 @@ struct CircularBuffer
 --
 -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
 --
--- INTERFACE:	void CBInitialize(CircularBuffer * CBuff, DWORD MaxElements, DWORD ElementSize);
+-- INTERFACE:	void CBInitialize(CircularBuffer * CBuff, const size_t MaxElements, const size_t ElementSize);
 --						~CBUFF		 : Pointer to circular buffer struct
 --						~MaxSize	 : Maximum elements that can be stored into CBuff
 --						~ElementSize : Size of each element
@@ -33,7 +17,20 @@ struct CircularBuffer
 --
 -- NOTES: Malloc memory space for CBuff, initializes its member by pointing head and rear to the same starting address
 --------------------------------------------------------------------------------------------------------------------*/
-void CBInitialize(CircularBuffer * CBuff, const size_t MaxElements, const size_t ElementSize);
+void CBInitialize(CircularBuffer * CBuff, const size_t MaxElements, const size_t ElementSize)
+{
+    CBuff->buffer = malloc(MaxElements * ElementSize);
+    if (CBuff->buffer == NULL)
+    {
+        return;
+    }
+    CBuff->buffer_end = (char *)CBuff->buffer + MaxElements * ElementSize;
+    CBuff->MaxSize = MaxElements;
+    CBuff->Count = 0;
+    CBuff->ElementSize = ElementSize;
+    CBuff->Front = CBuff->buffer;
+    CBuff->Rear = CBuff->buffer;
+}
 
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	CBFree
@@ -49,7 +46,11 @@ void CBInitialize(CircularBuffer * CBuff, const size_t MaxElements, const size_t
 --
 -- NOTES: Free CB memory from heap
 --------------------------------------------------------------------------------------------------------------------*/
-void CBFree(CircularBuffer * CBuff);
+void CBFree(CircularBuffer * CBuff)
+{
+    free(CBuff->buffer);
+}
+
 
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	CBPushBack
@@ -67,7 +68,18 @@ void CBFree(CircularBuffer * CBuff);
 -- NOTES: Copy item's memory space into the current memory space pointed by front in CBuff. Increment front by size
 --	of item afterward.
 --------------------------------------------------------------------------------------------------------------------*/
-void CBPushBack(CircularBuffer * CBuff, const void * item);
+void CBPushBack(CircularBuffer * CBuff, const void *item)
+{
+    /* Comment this block of code out if we want the head to overwirte the tail */
+    if (CBuff->Count == CBuff->MaxSize)
+        return;
+
+    memcpy(CBuff->Front, item, CBuff->ElementSize);
+    CBuff->Front = (char *)CBuff->Front +  CBuff->ElementSize;
+    if (CBuff->Front == CBuff->buffer_end)
+        CBuff->Front = CBuff->buffer;
+    CBuff->Count++;
+}
 
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	CBPop
@@ -84,6 +96,15 @@ void CBPushBack(CircularBuffer * CBuff, const void * item);
 --
 -- NOTES: Copy memory space pointed by CBuff's rear into item. Increment rear by size of item afterward.
 --------------------------------------------------------------------------------------------------------------------*/
-void CBPop(CircularBuffer * CBuff, void * item);
-
-#endif
+void CBPop(CircularBuffer * CBuff, void * item)
+{
+    if (CBuff->Count == 0)
+    {
+        return;
+    }
+    memcpy(item, CBuff->Rear, CBuff->ElementSize);
+    CBuff->Rear = (char *)CBuff->Rear + CBuff->ElementSize;
+    if (CBuff->Rear == CBuff->buffer_end)
+        CBuff->Rear = CBuff->buffer;
+    CBuff->Count--;
+}

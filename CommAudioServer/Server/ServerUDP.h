@@ -1,13 +1,15 @@
-#ifndef TCP_SERVER_H
-#define TCP_SERVER_H
+#ifndef SERVERUDP_H
+#define SERVERUDP_H
 #include "Server.h"
+#include <ws2tcpip.h>
 
-class ServerTCP : public Server
-    {
+class ServerUDP : public Server
+{
+
         public:
 
-            ServerTCP(){}
-            ~ServerTCP(){}
+            ServerUDP(){}
+            ~ServerUDP(){}
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	InitializeSocket
             --
@@ -22,23 +24,22 @@ class ServerTCP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            bool InitializeSocket();
+            bool InitializeSocket(short port);
 
             /*------------------------------------------------------------------------------------------------------------------
-            -- FUNCTION:	Accept
+            -- FUNCTION:	InitializeSocket
             --
-            -- DATE:		Febuary 28th, 2016		REVISIONS:
+            -- DATE:		Febuary 28th, 2016          REVISIONS:
             --
-            -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+            -- DESIGNER:	Ruoqi Jia, Scott Plummer	PROGRAMMER:	Ruoqi Jia, Scott Plummer
             --
-            -- INTERFACE:	int Accept(void);
+            -- INTERFACE:	virtual int MulticastSettings(short port) = 0;
             --
             -- RETURNS: void
             --
-            -- NOTES:  Calls accept on a player's socket. Sets the returning socket and client address structure to the player.
-                Add connected player to the list of players
+            -- NOTES: Set time to live, multicast address, and disabled loop back
             --------------------------------------------------------------------------------------------------------------------*/
-            bool Accept(void);
+            bool MulticastSettings(const char * name);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -47,15 +48,15 @@ class ServerTCP : public Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	virtual void Broadcast(LPSOCKET_INFORMATION SocketInfor, char * message) = 0;
-            --                      ~SocketInfo : Pointer to Socket Information structure
-            --						~message    : message content
+            -- INTERFACE:	virtual void Broadcast(char * message) = 0;
+            --						~message: message content
             --
             -- RETURNS: void
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            void Broadcast(LPSOCKET_INFORMATION SocketInfo, char * message);
+            bool Broadcast(char * message, LPDWORD lpNumberOfBytesSent);
+
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send
@@ -65,13 +66,14 @@ class ServerTCP : public Server
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
             -- INTERFACE:	virtual void Send(LPSOCKET_INFORMATION sockinfo) = 0;
-            --						~sockinfo: Pointer to the socket information structure
+            --						~sockinfo   : Pointer to the socket information structure
+            --                      ~message    : Message to send
             --
             -- RETURNS: void
             --
             -- NOTES: Sends a message to a specific connected client
             --------------------------------------------------------------------------------------------------------------------*/
-            void Send(LPSOCKET_INFORMATION sockinfo);
+            void Send(LPSOCKET_INFORMATION SocketInfo, char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	RoutineManager
@@ -87,11 +89,13 @@ class ServerTCP : public Server
             --                      ~InFlags            : Modification flags
             -- RETURNS: void
             --
-            -- NOTES: Callback completion routine for recv when a packet has been recieved.
+            -- NOTES: Callback completion routine for recvfrom when a packet has been recieved.
             --------------------------------------------------------------------------------------------------------------------*/
-             void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
+            void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
 
         private:
-            SOCKET  AcceptedSocket;
+            struct ip_mreq   MulticastAddress;
+            SOCKADDR_IN      DestinationAddress;
+            
     };
-#endif // TCP_SERVER_H
+#endif // SERVERUDP_H
