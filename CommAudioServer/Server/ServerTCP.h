@@ -1,13 +1,13 @@
-#ifndef SERVERUDP_H
-#define SERVERUDP_H
+#ifndef TCP_SERVER_H
+#define TCP_SERVER_H
 #include "Server.h"
 
-class ServerUDP : public Server
+class ServerTCP : public Server
     {
-        public:
 
-            ServerUDP(){}
-            ~ServerUDP(){}
+        public:
+            ServerTCP(){}
+            ~ServerTCP(){}
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	InitializeSocket
             --
@@ -22,7 +22,23 @@ class ServerUDP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            int InitializeSocket(short port);
+            bool InitializeSocket(short port);
+
+            /*------------------------------------------------------------------------------------------------------------------
+            -- FUNCTION:	Accept
+            --
+            -- DATE:		Febuary 28th, 2016		REVISIONS:
+            --
+            -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+            --
+            -- INTERFACE:	int Accept(void);
+            --
+            -- RETURNS: void
+            --
+            -- NOTES:  Calls accept on a player's socket. Sets the returning socket and client address structure to the player.
+                Add connected player to the list of players
+            --------------------------------------------------------------------------------------------------------------------*/
+            bool Accept(void);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -31,45 +47,31 @@ class ServerUDP : public Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	virtual void Broadcast(char * message) = 0;
-            --						~message: message content
+            -- INTERFACE:	virtual void Broadcast(LPSOCKET_INFORMATION SocketInfor, char * message) = 0;
+            --                      ~SocketInfo : Pointer to Socket Information structure
+            --						~message    : message content
             --
             -- RETURNS: void
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            void Broadcast(char * message);
+            bool Broadcast(char * message, LPDWORD lpNumberOfBytesSent);
 
             /*------------------------------------------------------------------------------------------------------------------
-            -- FUNCTION:	MulticastSettings
-            --
-            -- DATE:		Febuary 28th, 2016          REVISIONS:
-            --
-            -- DESIGNER:	Ruoqi Jia, Scott Plummer	PROGRAMMER:	Ruoqi Jia, Scott Plummer
-            --
-            -- INTERFACE:	virtual int MulticastSettings(short port) = 0;
-            --
-            -- RETURNS: void
-            --
-            -- NOTES: Set time to live, multicast address, and disabled loop back
-            --------------------------------------------------------------------------------------------------------------------*/
-            bool MulticastSettings();
-
-            /*------------------------------------------------------------------------------------------------------------------
-            -- FUNCTION:	Broadcast
+            -- FUNCTION:	Send
             --
             -- DATE:		Febuary 28th, 2016		REVISIONS:
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	virtual void Broadcast(char * message) = 0;
-            --						~message: message content
+            -- INTERFACE:	virtual void Send(LPSOCKET_INFORMATION sockinfo) = 0;
+            --						~sockinfo: Pointer to the socket information structure
             --
             -- RETURNS: void
             --
-            -- NOTES: Sends a message to all the connected clients
+            -- NOTES: Sends a message to a specific connected client
             --------------------------------------------------------------------------------------------------------------------*/
-            void Broadcast(char * message);
+            void Send(LPSOCKET_INFORMATION sockinfo, char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	RoutineManager
@@ -85,13 +87,12 @@ class ServerUDP : public Server
             --                      ~InFlags            : Modification flags
             -- RETURNS: void
             --
-            -- NOTES: Callback completion routine for recvfrom when a packet has been recieved.
+            -- NOTES: Callback completion routine for recv when a packet has been recieved.
             --------------------------------------------------------------------------------------------------------------------*/
-            void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
+             void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
 
         private:
-            u_long           TimeToLive = 1;
-            struct ip_mreq   MulticastAddress;
-            SOCKADDR_IN      DestinationAddress;
+        	SOCKET 	ListeningSocket;
+            SOCKET  AcceptedSocket;
     };
-#endif // SERVERUDP_H
+#endif // TCP_SERVER_H
