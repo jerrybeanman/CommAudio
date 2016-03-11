@@ -1,5 +1,6 @@
 #include "ServerUDP.h"
-bool ServerUDP::InitializeSocket()
+
+int ServerUDP::InitializeSocket(short port)
 {
     // Create a WSA v2.2 session
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -30,7 +31,7 @@ bool ServerUDP::InitializeSocket()
 }
 
 /*------------------------------------------------------------------------------------------------------------------
--- FUNCTION:	InitializeSocket
+-- FUNCTION:	MulticastSettings
 --
 -- DATE:		Febuary 28th, 2016          REVISIONS:
 --
