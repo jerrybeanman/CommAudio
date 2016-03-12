@@ -11,37 +11,15 @@
 #include <QAudioOutput>
 #include <QSlider>
 #include "wavfile.h"
+#include "datagenerator.h"
+#include "recorder.h"
 
 namespace Ui {
 
-class Generator;
+class DataGenerator;
 
 class MainWindow;
 }
-
-class DataGenerator : public QIODevice
-{
-    Q_OBJECT
-
-public:
-    DataGenerator(QObject *parent);
-    ~DataGenerator();
-
-    void start();
-    void stop();
-
-    qint64 readData(char *data, qint64 maxlen);
-    qint64 writeData(const char *data, qint64 len);
-    qint64 bytesAvailable() const;
-    void RemoveBufferedData();
-    void AddMoreDataToBufferFromFile(QFile* file, qint64 len);
-    void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);
-
-private:
-    qint64      dg_pos;
-    qint64      dg_max;
-    QByteArray  dg_buffer;
-};
 
 class MainWindow : public QMainWindow
 {
@@ -51,6 +29,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private:
+    void play_audio();
 
 private slots:
 
@@ -60,19 +40,25 @@ private slots:
 
     void on_volumeSlider_sliderMoved(int position);
 
-    void on_startButton_clicked();
-
     void on_stopButton_clicked();
 
     void on_positionChanged(qint64 position);
 
     void on_durationChanged(qint64 position);
 
-    void begin_pain(QString filename);
+    void begin_pain();
 
-    void on_pushButton_clicked();
+    void prepare_audio_devices(QAudioFormat format);
 
-    QAudioFormat OptimizeWavFile(QFile* file);
+    void on_pauseButton_clicked();
+
+    void on_openButton_clicked();
+
+    void on_playButton_clicked();
+
+    void on_playRecordingButton_clicked();
+
+    void on_recordButton_clicked();
 
 private:
     Ui::MainWindow*         ui;
@@ -85,9 +71,13 @@ private:
     QAudioDeviceInfo        m_device;
     QSlider*                m_volumeSlider;
     WavFile*                m_file;
+    Recorder*               m_recorder;
+
     DataGenerator*          m_generator;
     char*                   data;
     bool                    m_pullMode;
+    bool                    fileExists;
+    bool                    fileLoaded;
 };
 
 #endif // AUDIOSTREAM_H
