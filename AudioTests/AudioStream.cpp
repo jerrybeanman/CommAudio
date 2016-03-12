@@ -69,8 +69,8 @@ void MainWindow::on_stopButton_clicked()
     if(m_generator->isPlaying())
     {
         qDebug() << "Stop button clicked.";
-        m_audioOutput->stop();
         m_audioOutput->reset();
+        fileLoaded = false;
         m_generator->resetPosition();
     }
 }
@@ -89,6 +89,7 @@ void MainWindow::begin_pain()
 {
     /* Purpose, split the file in half and read it in portions */
     qint64 size = m_file->size() - 44; //Size of the file minus the header.
+    m_file->seek(0);
     QByteArray array = m_file->read(size/2);
     m_generator->AddMoreDataToBufferFromQByteArray(array, size/2);
 
@@ -145,18 +146,23 @@ void MainWindow::on_openButton_clicked()
 
 void MainWindow::on_playButton_clicked()
 {
+    qDebug() << "Play button clicked.";
     if(!fileLoaded)
     {
+        qDebug() << "Loading file contents.";
         begin_pain();
         fileLoaded = true;
     }
 
     if(m_generator->isPlaying())
     {
+        qDebug() << "Audio file is resuming.";
         m_audioOutput->resume();
     }
     else
     {
+        qDebug() << "Starting file from beginning.";
+
         m_generator->start();
 
         m_audioOutput->start(m_generator);

@@ -25,16 +25,19 @@ void DataGenerator::start()
 
 void DataGenerator::stop()
 {
-    close(); // Pauses the
+    qDebug() << "DataGenerator stopped.";
+    close();
 }
 
 void DataGenerator::resume()
 {
+    qDebug() << "DataGenerator resumed.";
     open(QIODevice::ReadOnly);
 }
 
 void DataGenerator::resetPosition()
 {
+    playing = false;
     dg_pos = 0;
 }
 
