@@ -23,13 +23,17 @@ SOURCES +=  main.cpp\
             playerscontrols.cpp \
             playlistmodel.cpp \
             generator.cpp \
-    wavfile.cpp
+    wavfile.cpp \
+    recorder.cpp \
+    datagenerator.cpp
 
 HEADERS  += AudioStream.h \
             player.h \
             playerscontrols.h \
             playlistmodel.h \
             generator.h \
-    wavfile.h
+    wavfile.h \
+    recorder.h \
+    datagenerator.h
 
 FORMS    += mainwindow.ui
