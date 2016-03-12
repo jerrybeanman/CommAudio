@@ -27,6 +27,24 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::play_audio()
+{
+    if(m_generator->isPlaying())
+    {
+        qDebug() << "Audio file is resuming.";
+        m_audioOutput->resume();
+    }
+    else
+    {
+        qDebug() << "Starting file from beginning.";
+
+        m_generator->start();
+
+        m_audioOutput->start(m_generator);
+        m_audioOutput->setVolume(qreal(100.0f/100.0f));
+    }
+}
+
 void MainWindow::handleAudioStateChanged(QAudio::State newState)
 {
     /*qDebug() << "State: " << newState;
@@ -69,8 +87,8 @@ void MainWindow::on_stopButton_clicked()
     if(m_generator->isPlaying())
     {
         qDebug() << "Stop button clicked.";
-        m_audioOutput->stop();
         m_audioOutput->reset();
+        fileLoaded = false;
         m_generator->resetPosition();
     }
 }
@@ -89,6 +107,7 @@ void MainWindow::begin_pain()
 {
     /* Purpose, split the file in half and read it in portions */
     qint64 size = m_file->size() - 44; //Size of the file minus the header.
+    m_file->seek(0);
     QByteArray array = m_file->read(size/2);
     m_generator->AddMoreDataToBufferFromQByteArray(array, size/2);
 
@@ -96,11 +115,9 @@ void MainWindow::begin_pain()
     m_generator->AddMoreDataToBufferFromQByteArray(array, size/2);
 }
 
-void MainWindow::prepare_audio_devices()
+void MainWindow::prepare_audio_devices(QAudioFormat format)
 {
-    m_pullMode = true;
-
-    m_format = m_file->fileFormat();
+    m_format = format;
     qDebug() << m_device.deviceName();
 
     if(!m_device.isFormatSupported(m_format))
@@ -139,28 +156,44 @@ void MainWindow::on_openButton_clicked()
 
     m_file->open(QFileDialog::getOpenFileName(this, tr("Upload a file")));
 
-    prepare_audio_devices();
+    prepare_audio_devices(m_file->fileFormat());
     fileExists = true;
 }
 
 void MainWindow::on_playButton_clicked()
 {
+    qDebug() << "Play button clicked.";
     if(!fileLoaded)
     {
+        qDebug() << "Loading file contents.";
         begin_pain();
         fileLoaded = true;
     }
 
-    if(m_generator->isPlaying())
-    {
-        m_audioOutput->resume();
-    }
-    else
-    {
-        m_generator->start();
+    play_audio();
 
-        m_audioOutput->start(m_generator);
-        m_audioOutput->setVolume(qreal(100.0f/100.0f));
-    }
+}
 
+//Stop recording and play the recording.
+void MainWindow::on_playRecordingButton_clicked()
+{
+    m_recorder->stop();
+
+    QByteArray array = m_recorder->readAll();
+    int size = m_recorder->bytesWritten();
+
+    prepare_audio_devices(m_recorder->fileFormat());
+
+    m_generator = new DataGenerator(this);
+
+    m_generator->AddMoreDataToBufferFromQByteArray(array, size);
+
+    play_audio();
+}
+
+void MainWindow::on_recordButton_clicked()
+{
+    qDebug() << "recording starts.";
+    m_recorder = new Recorder();
+    m_recorder->start();
 }

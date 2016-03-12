@@ -4,8 +4,8 @@
 
 class ServerTCP : public Server
     {
-        public:
 
+        public:
             ServerTCP(){}
             ~ServerTCP(){}
             /*------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            bool InitializeSocket();
+            bool InitializeSocket(short port);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Accept
@@ -55,7 +55,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            void Broadcast(LPSOCKET_INFORMATION SocketInfo, char * message);
+            bool Broadcast(char * message, LPDWORD lpNumberOfBytesSent);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send
@@ -71,7 +71,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Sends a message to a specific connected client
             --------------------------------------------------------------------------------------------------------------------*/
-            void Send(LPSOCKET_INFORMATION sockinfo);
+            void Send(LPSOCKET_INFORMATION sockinfo, char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	RoutineManager
@@ -92,6 +92,7 @@ class ServerTCP : public Server
              void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
 
         private:
+        	SOCKET 	ListeningSocket;
             SOCKET  AcceptedSocket;
     };
 #endif // TCP_SERVER_H

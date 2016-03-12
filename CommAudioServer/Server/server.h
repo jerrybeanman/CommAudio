@@ -1,14 +1,16 @@
-#ifndef SERVERUDP_H
-#define SERVERUDP_H
-#include "Server.h"
-#include <ws2tcpip.h>
+#ifndef SERVER_H
+#define SERVER_H
+#include <iostream>
+#include "circularbuffer.h"
+#include "globals.h"
 
-class ServerUDP : public Server
-    {
+
+class Server
+{
+
         public:
-
-            ServerUDP(){}
-            ~ServerUDP(){}
+            Server(){}
+            ~Server(){}
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	InitializeSocket
             --
@@ -23,22 +25,7 @@ class ServerUDP : public Server
             --
             -- NOTES: Initialize socket, server address to lookup to, and connect to the server
             --------------------------------------------------------------------------------------------------------------------*/
-            bool InitializeSocket();
-
-            /*------------------------------------------------------------------------------------------------------------------
-            -- FUNCTION:	InitializeSocket
-            --
-            -- DATE:		Febuary 28th, 2016          REVISIONS:
-            --
-            -- DESIGNER:	Ruoqi Jia, Scott Plummer	PROGRAMMER:	Ruoqi Jia, Scott Plummer
-            --
-            -- INTERFACE:	virtual int MulticastSettings(short port) = 0;
-            --
-            -- RETURNS: void
-            --
-            -- NOTES: Set time to live, multicast address, and disabled loop back
-            --------------------------------------------------------------------------------------------------------------------*/
-            bool MulticastSettings();
+            virtual bool InitializeSocket(short port) = 0;
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -54,7 +41,24 @@ class ServerUDP : public Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            void Broadcast(char * message);
+            virtual bool Broadcast(char * message, LPDWORD lpNumberOfBtyesSent) = 0;
+
+            /*------------------------------------------------------------------------------------------------------------------
+            -- FUNCTION:	Send
+            --
+            -- DATE:		Febuary 28th, 2016		REVISIONS:
+            --
+            -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+            --
+            -- INTERFACE:	virtual void Send(LPSOCKET_INFORMATION sockinfo) = 0;
+            --						~sockinfo   : Pointer to the socket information structure
+            --                      ~message    : Message to send
+            --
+            -- RETURNS: void
+            --
+            -- NOTES: Sends a message to a specific connected client
+            --------------------------------------------------------------------------------------------------------------------*/
+            virtual void Send(LPSOCKET_INFORMATION SocketInfo, char * message) = 0;
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	RoutineManager
@@ -63,20 +67,27 @@ class ServerUDP : public Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
+            -- INTERFACE:	virtual void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags) = 0;
             --                      ~Error				: Error code
             --                      ~BytesTransffered	: Total bytes recieved from packet
             --                      ~Overlapped			: Overlapped structure
             --                      ~InFlags            : Modification flags
             -- RETURNS: void
             --
-            -- NOTES: Callback completion routine for recvfrom when a packet has been recieved.
+            -- NOTES: Callback completion routine for recv when a packet has been recieved.
             --------------------------------------------------------------------------------------------------------------------*/
-            void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
+            virtual void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags) = 0;
 
-        private:
-            u_long           TimeToLive = 1;
-            struct ip_mreq   MulticastAddress;
-            SOCKADDR_IN      DestinationAddress;
+        protected:
+            u_long                  TimeToLive = 1;
+            SOCKET_INFORMATION      SocketInfo;
+
+            WSADATA                 wsaData;            // Session info
+
+            CircularBuffer          CircularBuff;   // Circular buffer for server data processing
+
+            SOCKADDR_IN             LocalAddr;    // Server address structures
+            DWORD                   flags = 0;
     };
-#endif // SERVERUDP_H
+
+#endif // SERVER_H

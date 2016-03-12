@@ -4,7 +4,9 @@
 #include <QApplication>
 #include <QAudioInput>
 #include <QBuffer>
+#include "inputbuffer.h"
 #include <QDataStream>
+#include <QDebug>
 
 class Recorder : public QObject
 {
@@ -14,28 +16,34 @@ public:
     ~Recorder();
     const QAudioFormat &fileFormat() const;
     void start();
-    QByteArray readAll() const;
+    void stop();
+    const QByteArray readAll();
     int bytesWritten();
+
+public slots:
+    void notified();
+    void handleAudioInputState(QAudio::State state);
 
 private:
     bool SetFormat();
+    void clearData();
 
 private:
-    QAudioFormat    r_format;
-    QAudioInput     *r_input;
-    bool            bufferFull;
-    QIODevice       *dev;
-    QBuffer         *r_buffer;
-    QByteArray      r_byteArray;
-    QByteArray      r_readyArray;
-    bool            inProgress;
-    bool            ready;
-
+    QAudioFormat        r_format;
+    QAudioInput         *r_input;
+    QAudioDeviceInfo    r_inputInfo;
+    QIODevice           *dev;
+    InputBuffer         *r_newBuffer;
+    InputBuffer         *r_saveBuffer;
+    bool                inProgress;
+    bool                ready;
+    int                 audio_state;
+    int                 writeBuffer;
+    int                 size;
+    qint64              pos;
 
 signals:
 
-public slots:
-    void dataReady();
 };
 
 #endif // RECORDER_H

@@ -12,6 +12,7 @@
 #include <QSlider>
 #include "wavfile.h"
 #include "datagenerator.h"
+#include "recorder.h"
 
 namespace Ui {
 
@@ -28,6 +29,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private:
+    void play_audio();
 
 private slots:
 
@@ -45,13 +48,17 @@ private slots:
 
     void begin_pain();
 
-    void prepare_audio_devices();
+    void prepare_audio_devices(QAudioFormat format);
 
     void on_pauseButton_clicked();
 
     void on_openButton_clicked();
 
     void on_playButton_clicked();
+
+    void on_playRecordingButton_clicked();
+
+    void on_recordButton_clicked();
 
 private:
     Ui::MainWindow*         ui;
@@ -64,6 +71,8 @@ private:
     QAudioDeviceInfo        m_device;
     QSlider*                m_volumeSlider;
     WavFile*                m_file;
+    Recorder*               m_recorder;
+
     DataGenerator*          m_generator;
     char*                   data;
     bool                    m_pullMode;
