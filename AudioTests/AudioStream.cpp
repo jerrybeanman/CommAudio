@@ -170,3 +170,49 @@ void MainWindow::on_playButton_clicked()
     }
 
 }
+
+void MainWindow::on_playRecordingButton_clicked()
+{
+    m_recorder->stop();
+
+    QByteArray array = m_recorder->readAll();
+    int size = m_recorder->bytesWritten();
+
+    m_generator = new DataGenerator(this);
+
+    m_generator->AddMoreDataToBufferFromQByteArray(array, size);
+
+    m_format = m_recorder->fileFormat();
+    qDebug() << m_device.deviceName();
+
+    if(!m_device.isFormatSupported(m_format))
+    {
+        qWarning()<<"raw audio format not supported by backend, cannot play audio.";
+        return;
+    }
+
+    m_audioOutput = 0;
+    m_audioOutput = new QAudioOutput(m_device, m_format, this);
+
+    if(m_generator->isPlaying())
+    {
+        qDebug() << "Audio file is resuming.";
+        m_audioOutput->resume();
+    }
+    else
+    {
+        qDebug() << "Starting file from beginning.";
+
+        m_generator->start();
+
+        m_audioOutput->start(m_generator);
+        m_audioOutput->setVolume(qreal(100.0f/100.0f));
+    }
+}
+
+void MainWindow::on_recordButton_clicked()
+{
+    qDebug() << "recording starts.";
+    m_recorder = new Recorder();
+    m_recorder->start();
+}

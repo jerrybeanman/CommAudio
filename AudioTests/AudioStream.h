@@ -12,6 +12,7 @@
 #include <QSlider>
 #include "wavfile.h"
 #include "datagenerator.h"
+#include "recorder.h"
 
 namespace Ui {
 
@@ -53,6 +54,10 @@ private slots:
 
     void on_playButton_clicked();
 
+    void on_playRecordingButton_clicked();
+
+    void on_recordButton_clicked();
+
 private:
     Ui::MainWindow*         ui;
     QMediaPlayer*           player;
@@ -64,6 +69,8 @@ private:
     QAudioDeviceInfo        m_device;
     QSlider*                m_volumeSlider;
     WavFile*                m_file;
+    Recorder*               m_recorder;
+
     DataGenerator*          m_generator;
     char*                   data;
     bool                    m_pullMode;

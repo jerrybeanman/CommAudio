@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>244</width>
-    <height>285</height>
+    <width>438</width>
+    <height>329</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,9 +43,9 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>20</y>
-      <width>86</width>
+      <x>30</x>
+      <y>10</y>
+      <width>111</width>
       <height>90</height>
      </rect>
     </property>
@@ -82,7 +82,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>20</y>
+      <y>10</y>
       <width>61</width>
       <height>91</height>
      </rect>
@@ -130,13 +130,45 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>30</y>
+      <width>160</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="QPushButton" name="recordButton">
+       <property name="text">
+        <string>Record</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="playRecordingButton">
+       <property name="text">
+        <string>Play Recording</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <zorder>layoutWidget</zorder>
+   <zorder>layoutWidget</zorder>
+   <zorder>verticalLayoutWidget</zorder>
+   <zorder>horizontalLayoutWidget</zorder>
+   <zorder>progressLabel</zorder>
+   <zorder>verticalLayoutWidget_2</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>244</width>
+     <width>438</width>
      <height>21</height>
     </rect>
    </property>
