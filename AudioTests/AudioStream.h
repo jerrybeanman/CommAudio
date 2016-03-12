@@ -29,6 +29,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private:
+    void play_audio();
 
 private slots:
 
@@ -46,7 +48,7 @@ private slots:
 
     void begin_pain();
 
-    void prepare_audio_devices();
+    void prepare_audio_devices(QAudioFormat format);
 
     void on_pauseButton_clicked();
 

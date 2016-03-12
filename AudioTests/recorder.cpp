@@ -7,9 +7,8 @@ Recorder::Recorder()
         //CRITICAL ERROR
         inProgress = false;
         ready = false;
-        bufferFull = false;
     }
-    writeBuffer = 1;
+    size = 0;
 }
 
 Recorder::~Recorder()
@@ -25,9 +24,8 @@ const QAudioFormat &Recorder::fileFormat() const
 void Recorder::start()
 {
     bool status = r_newBuffer->open(QIODevice::ReadWrite);
-    bool status1 = r_saveBuffer->open(QIODevice::ReadWrite);
 
-    if(!status || !status1)
+    if(!status)
     {
         qDebug() << "Error opening the buffer";
     }
@@ -46,35 +44,30 @@ void Recorder::start()
     connect(r_input,SIGNAL(stateChanged(QAudio::State)),this, SLOT(handleAudioInputState(QAudio::State)));
 
     qDebug() << "platform buffer size:" << r_input->bufferSize();
+
+    inProgress = true;
     r_input->start(r_newBuffer);
 }
 
 void Recorder::stop()
 {
-    r_input->stop();
-    r_readyArray.resize(r_newBuffer->size());
-
-    r_newBuffer->seek(0);
-    r_readyArray = r_newBuffer->readAll();
-
-    r_newBuffer->close();
-    qDebug() << "Ready array size: " << r_readyArray.size();
-    delete r_input;
+    if(inProgress)
+    {
+        r_input->stop();
+        r_newBuffer->close();
+        delete r_input;
+        inProgress = false;
+    }
 }
 
-QByteArray Recorder::readAll() const
+const QByteArray Recorder::readAll()
 {
-    return r_readyArray;
+    return r_newBuffer->readAll();
 }
 
 int Recorder::bytesWritten()
 {
     return r_newBuffer->size();
-}
-
-void Recorder::swapBuffers()
-{
-
 }
 
 void Recorder::notified()
@@ -83,12 +76,11 @@ void Recorder::notified()
     {
         qDebug() << "Error State:" << r_input->error();
         qDebug() << "Bytes total inputed: " << r_newBuffer->size();
-        qDebug() << "platform buffer size after called QAudioInput start():" << r_input->bufferSize();
+        /*qDebug() << "platform buffer size after called QAudioInput start():" << r_input->bufferSize();
 
         qDebug() << "bytesReady = " << r_input->bytesReady()
         << ", " << "elapsedUSecs = " << r_input->elapsedUSecs()
-        << ", " << "processedUSecs = "<< r_input->processedUSecs();
-
+        << ", " << "processedUSecs = "<< r_input->processedUSecs();*/
     }
 }
 
@@ -118,8 +110,8 @@ bool Recorder::SetFormat()
     r_format.setByteOrder(QAudioFormat::LittleEndian);
     r_format.setSampleType(QAudioFormat::UnSignedInt);
 
-    r_newBuffer = new QBuffer();
-    r_saveBuffer = new QBuffer();
+    r_newBuffer = new InputBuffer();
 
     return true;
 }
+

@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QAudioInput>
 #include <QBuffer>
+#include "inputbuffer.h"
 #include <QDataStream>
 #include <QDebug>
 
@@ -16,9 +17,8 @@ public:
     const QAudioFormat &fileFormat() const;
     void start();
     void stop();
-    QByteArray readAll() const;
+    const QByteArray readAll();
     int bytesWritten();
-    void swapBuffers();
 
 public slots:
     void notified();
@@ -32,17 +32,15 @@ private:
     QAudioFormat        r_format;
     QAudioInput         *r_input;
     QAudioDeviceInfo    r_inputInfo;
-    bool                bufferFull;
     QIODevice           *dev;
-    QBuffer             *r_newBuffer;
-    QBuffer             *r_saveBuffer;
-    QByteArray          r_byteArray;
-    QByteArray          r_readyArray;
+    InputBuffer         *r_newBuffer;
+    InputBuffer         *r_saveBuffer;
     bool                inProgress;
     bool                ready;
     int                 audio_state;
     int                 writeBuffer;
-
+    int                 size;
+    qint64              pos;
 
 signals:
 
