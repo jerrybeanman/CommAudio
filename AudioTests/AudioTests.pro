@@ -25,7 +25,8 @@ SOURCES +=  main.cpp\
             generator.cpp \
     wavfile.cpp \
     recorder.cpp \
-    datagenerator.cpp
+    datagenerator.cpp \
+    inputbuffer.cpp
 
 HEADERS  += AudioStream.h \
             player.h \
@@ -34,6 +35,7 @@ HEADERS  += AudioStream.h \
             generator.h \
     wavfile.h \
     recorder.h \
-    datagenerator.h
+    datagenerator.h \
+    inputbuffer.h
 
 FORMS    += mainwindow.ui

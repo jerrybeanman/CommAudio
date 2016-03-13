@@ -27,6 +27,27 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::play_audio()
+{
+    if(!fileExists)
+        return;
+
+    if(m_generator->isPlaying())
+    {
+        qDebug() << "Audio file is resuming.";
+        m_audioOutput->resume();
+    }
+    else
+    {
+        qDebug() << "Starting file from beginning.";
+
+        m_generator->start();
+
+        m_audioOutput->start(m_generator);
+        m_audioOutput->setVolume(qreal(100.0f/100.0f));
+    }
+}
+
 void MainWindow::handleAudioStateChanged(QAudio::State newState)
 {
     /*qDebug() << "State: " << newState;
@@ -66,6 +87,9 @@ void MainWindow::on_volumeSlider_sliderMoved(int position)
 
 void MainWindow::on_stopButton_clicked()
 {
+    if(!fileExists)
+        return;
+
     if(m_generator->isPlaying())
     {
         qDebug() << "Stop button clicked.";
@@ -97,11 +121,12 @@ void MainWindow::begin_pain()
     m_generator->AddMoreDataToBufferFromQByteArray(array, size/2);
 }
 
-void MainWindow::prepare_audio_devices()
+void MainWindow::prepare_audio_devices(QAudioFormat format)
 {
-    m_pullMode = true;
+    if(!fileExists)
+        return;
 
-    m_format = m_file->fileFormat();
+    m_format = format;
     qDebug() << m_device.deviceName();
 
     if(!m_device.isFormatSupported(m_format))
@@ -118,6 +143,9 @@ void MainWindow::prepare_audio_devices()
 
 void MainWindow::on_pauseButton_clicked()
 {
+    if(!fileExists)
+        return;
+
     if(m_generator->isPlaying())
     {
         qDebug() << "Pause button clicked.";
@@ -138,14 +166,24 @@ void MainWindow::on_openButton_clicked()
     m_file = new WavFile(this);
     m_generator = new DataGenerator(this);
 
-    m_file->open(QFileDialog::getOpenFileName(this, tr("Upload a file")));
+    if(m_file->open(QFileDialog::getOpenFileName(this, tr("Upload a file"))))
+    {
+        prepare_audio_devices(m_file->fileFormat());
+        fileExists = true;
+    }
+    else
+    {
+        fileExists = false;
+    }
 
-    prepare_audio_devices();
-    fileExists = true;
+
 }
 
 void MainWindow::on_playButton_clicked()
 {
+    if(!fileExists)
+        return;
+
     qDebug() << "Play button clicked.";
     if(!fileLoaded)
     {
@@ -154,19 +192,30 @@ void MainWindow::on_playButton_clicked()
         fileLoaded = true;
     }
 
-    if(m_generator->isPlaying())
-    {
-        qDebug() << "Audio file is resuming.";
-        m_audioOutput->resume();
-    }
-    else
-    {
-        qDebug() << "Starting file from beginning.";
+    play_audio();
 
-        m_generator->start();
+}
 
-        m_audioOutput->start(m_generator);
-        m_audioOutput->setVolume(qreal(100.0f/100.0f));
-    }
+//Stop recording and play the recording.
+void MainWindow::on_playRecordingButton_clicked()
+{
+    m_recorder->stop();
 
+    QByteArray array = m_recorder->readAll();
+    int size = m_recorder->bytesWritten();
+
+    prepare_audio_devices(m_recorder->fileFormat());
+
+    m_generator = new DataGenerator(this);
+
+    m_generator->AddMoreDataToBufferFromQByteArray(array, size);
+
+    play_audio();
+}
+
+void MainWindow::on_recordButton_clicked()
+{
+    qDebug() << "recording starts.";
+    m_recorder = new Recorder();
+    m_recorder->start();
 }
