@@ -20,7 +20,7 @@ bool ServerTCP::InitializeSocket(short port)
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
         printf("WSAStartup failed with error %d\n", WSAGetLastError());
-    return false;
+        return false;
     }
 
     // Create socket for listening

@@ -4,12 +4,18 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = CommAudio
 TEMPLATE = app
+
+QT += network \
+      xml \
+      multimedia \
+      multimediawidgets \
+      widgets
 
 LIBS += -lws2_32
 
@@ -18,12 +24,20 @@ QMAKE_CXXFLAGS += -std=c++11
 SOURCES += main.cpp\
     mainwindow.cpp \
     circularbuffer.cpp \
-    Client/ClientUDP.cpp
+    Client/ClientUDP.cpp \
+    wavfile.cpp \
+    datagenerator.cpp \
+    recorder.cpp \
+    inputbuffer.cpp
 
 HEADERS  += mainwindow.h \
     circularbuffer.h \
     globals.h \
     Client/Client.h \
-    Client/ClientUDP.h
+    Client/ClientUDP.h \
+    wavfile.h \
+    datagenerator.h \
+    recorder.h \
+    inputbuffer.h
 
 FORMS    += mainwindow.ui
