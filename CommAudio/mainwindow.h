@@ -3,7 +3,19 @@
 
 #include <QMainWindow>
 #include <QByteArray>
+#include <QMediaPlayer>
+#include <QFileDialog>
+#include <QSound>
+#include <QBuffer>
+#include <QAudioDecoder>
+#include <QAudioFormat>
+#include <QAudioOutput>
+#include <QAudioDeviceInfo>
+#include <QSlider>
 #include <atomic>
+#include "wavfile.h"
+#include "datagenerator.h"
+#include "recorder.h"
 namespace Ui {
 class MainWindow;
 }
@@ -100,6 +112,12 @@ private slots:
 
 private slots:
 
+    void on_pushButton_clicked();
+
+    void on_recordButton_clicked();
+
+    void on_playRecordingButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QByteArray serverIP;
@@ -121,6 +139,47 @@ private:
     -- NOTES:
     ----------------------------------------------------------------------------------------------------------------------*/
     QByteArray getServerAddress();
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: prepare_audio_devices
+    --
+    -- DATE: March 08, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER: Tyler Trepanier-Bracken, Vivek Kalia
+    --
+    -- INTERFACE: void prepare_audio_devices(QAudioFormat format)
+    --
+    -- RETURNS: The IP address entered
+    --
+    -- NOTES:
+    ----------------------------------------------------------------------------------------------------------------------*/
+    void prepare_audio_devices(QAudioFormat format);
+
+    void init_file();
+
+    void play_audio();
+
+private:
+    QMediaPlayer*           player;
+    QByteArray              m_buffer;
+    QBuffer*                mediaStream;
+    QAudioDecoder*          m_decoder;
+    QAudioFormat            m_format;
+    QAudioOutput*           m_audioOutput;
+    QAudioDeviceInfo        m_device;
+    QSlider*                m_volumeSlider;
+    WavFile*                m_file;
+    Recorder*               m_recorder;
+
+    DataGenerator*          m_generator;
+    char*                   data;
+    bool                    m_pullMode;
+    bool                    fileExists;
+    bool                    fileLoaded;
 };
 
 #endif // MAINWINDOW_H
