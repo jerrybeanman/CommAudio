@@ -20,18 +20,13 @@ int main(int argc, char *argv[])
     }
     if(!StartSoundManager())
     {
-    	std::cout << "StartSoundManager() failed to start" << std::endl;
-    	return -1;
+        std::cout << "StartSoundManager() failed to start" << std::endl;
+        return -1;
     }
    /* if(!StartFileManager())
     {
-    	std::cout << "StartFileManager() failed to start" << std::endl;
+        std::cout << "StartFileManager() failed to start" << std::endl;
     }*/
 
     return program.exec();
 }
-
-
-
-
-
