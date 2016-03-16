@@ -1,5 +1,5 @@
 #include "ServerTCP.h"
-
+#include <iostream>
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	InitializeSocket
 --
@@ -19,14 +19,14 @@ bool ServerTCP::InitializeSocket(short port)
     // Create a WSA v2.2 session
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
-        printf("WSAStartup failed with error %d\n", WSAGetLastError());
+        std::cerr << "WSAStartup failed with error" << WSAGetLastError() << std::endl;
         return false;
     }
 
     // Create socket for listening
     if ((SocketInfo.Socket = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET)
     {
-        printf("WSASocket() failed with error %d\n", WSAGetLastError());
+        std::cerr << "WSASocket() failed with error " << WSAGetLastError() << std::endl;
         return false;
     }
 
@@ -38,28 +38,48 @@ bool ServerTCP::InitializeSocket(short port)
     // Bind address to the listening socket
     if (bind(SocketInfo.Socket, (PSOCKADDR)&LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
     {
-        printf("bind() failed with error %d\n", WSAGetLastError());
+        std::cerr << "bind() failed with error " << WSAGetLastError() << std::endl;
         return false;
     }
 
     // listens for only 1 connection
     if (listen(SocketInfo.Socket, MAX_CLIENTS) == SOCKET_ERROR)
     {
-        printf("listen() failed with error %d\n", WSAGetLastError());
+        std::cerr << "listen() failed with error " <<  WSAGetLastError() << std::endl;
         return false;
     }
     return true;
 }
 
-bool ServerTCP::Accept(void)
+std::string ServerTCP::Accept(void)
 {
-
+    Client newClient;
+    int Len = sizeof(newClient.Connection);
+    if((newClient.SocketInfo.Socket = accept(ListeningSocket, (SOCKADDR*)&newClient.Connection, &Len)) == INVALID_SOCKET)
+    {
+        std::cerr << "ServerTCP::Accept() failed with error " << WSAGetLastError() << std::endl;
+        return "";
+    }
+    std::string ip = inet_ntoa(newClient.Connection.sin_addr);
+    ClientList[ip] = newClient;
+    return ip;
 }
 
 
 
 bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
 {
+    Client tmpClient;
+    for(const auto &pair : ClientList)
+    {
+        tmpClient = pair.second;
+        if(send(tmpClient.SocketInfo.Socket, message, DATA_BUFSIZE, 0) == -1)
+        {
+            std::cerr << "Broadcast() failed for player id: " << pair.first << std::endl;
+            std::cerr << "errno: " << WSAGetLastError() << std::endl;
+            return false;
+        }
+    }
     return true;
 }
 
@@ -72,3 +92,4 @@ void ServerTCP::RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAP
 {
 
 }
+
