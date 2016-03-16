@@ -30,6 +30,12 @@ public:
     void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);
     void resetPosition();
 
+signals:
+    void audioProgressChanged(int progress);
+
+public:
+    float progress;
+
 private:
     qint64      dg_pos;
     qint64      dg_max;

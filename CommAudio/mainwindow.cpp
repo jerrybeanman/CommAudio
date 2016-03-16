@@ -64,7 +64,9 @@ void MainWindow::on_filePicker_pressed() {
         fileLoaded = false;
     }
     m_file = new WavFile(this);
-    m_generator = new DataGenerator(this);
+    m_generator = new DataGenerator(this);//audioProgressChanged(progress);
+    connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
+
     m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)")));
     prepare_audio_devices(m_file->fileFormat());
     fileExists = true;
@@ -166,4 +168,9 @@ void MainWindow::on_playRecordingButton_clicked()
     m_generator->AddMoreDataToBufferFromQByteArray(array, size);
 
     play_audio();
+}
+
+void MainWindow::on_progressBar_actionTriggered(int progress)
+{
+    ui->progressBar->setValue(progress);
 }

@@ -44,17 +44,23 @@ void DataGenerator::resetPosition()
 qint64 DataGenerator::readData(char *data, qint64 len)
 {
     qint64 total = 0;
+
     if (!dg_buffer.isEmpty() && playing) {
         while (len - total > 0) {
             const qint64 chunk = qMin((dg_buffer.size() - dg_pos), len - total);
             memcpy(data + total, dg_buffer.constData() + dg_pos, chunk);
             dg_pos = (dg_pos + chunk) % dg_buffer.size();
             total += chunk;
+
+            progress = (int)((dg_pos * 100) / ((qint64)dg_buffer.size()));
+
             if(dg_pos == ZERO)
             {
                 playing = false;
+                progress = 100;
                 break;
             }
+            emit audioProgressChanged(progress);
         }
     }
     return total;

@@ -118,6 +118,8 @@ private slots:
 
     void on_playRecordingButton_clicked();
 
+    void on_progressBar_actionTriggered(int action);
+
 private:
     Ui::MainWindow *ui;
     QByteArray serverIP;
