@@ -2,19 +2,26 @@
 #include <QApplication>
 #include "soundmanager.h"
 #include "filemanager.h"
+#include <direct.h>
+#define GetCurrentDir _getcwd
 
-DWORD WINAPI UDPThread(LPVOID lpParameter);
+std::vector<std::string> FileNames;
 
 int main(int argc, char *argv[])
 {
     QApplication program(argc, argv);
     MainWindow w;
     w.show();
-
+    char current_dir[200];
+    if (!GetCurrentDir(current_dir, sizeof(current_dir)))
+    {
+        return errno;
+    }
     ServerUDP serverUDP;
-    std::cout << "before get file" << std::endl;
-    std::vector<std::string> s = get_all_files_names_within_folder(L"C:\\Users\\Jerry\\Dropbox\\BCIT_CST\\Term_4\\4985\\CommAudio\\CommAudio\\*.*");
-    for(auto const  &x : s)
+
+    FileNames = GetFileNames(current_dir, "Debug");
+
+    for(auto const  &x : FileNames)
     {
         std::cout << x << std::endl;
     }
