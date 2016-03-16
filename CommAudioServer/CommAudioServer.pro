@@ -32,3 +32,5 @@ HEADERS  += mainwindow.h \
     filemanager.h
 
 FORMS    += mainwindow.ui
+CONFIG += c++11
+CONFIG     += debug
