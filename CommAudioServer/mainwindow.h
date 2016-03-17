@@ -190,6 +190,7 @@ private:
     bool                    fileExists;
     bool                    fileLoaded;
     bool                    streaming;
+    struct UDPBroadcast*    udp;
 };
 
 #endif // MAINWINDOW_H

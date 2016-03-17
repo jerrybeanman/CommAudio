@@ -4,13 +4,19 @@ bool StartSoundManager(struct UDPBroadcast* udp)
 {
     DWORD UDPServerThreadID;
 
-    if(serverUDP.InitializeSocket(DEFAULT_PORT) < 0)
+    if(udp->serverUDP.InitializeSocket(DEFAULT_PORT) < 0)
+        return FALSE;
+
+    if(udp->serverUDP.MulticastSettings(DEAULT_MULTICAST_IP) < 0)
+        return FALSE;
+
+    /*if(serverUDP.InitializeSocket(DEFAULT_PORT) < 0)
         return FALSE;
 
     if(serverUDP.MulticastSettings(DEAULT_MULTICAST_IP) < 0)
-        return FALSE;
+        return FALSE;*/
 
-    udp->serverUDP = serverUDP;
+    //udp->serverUDP = serverUDP;
 
     if(CreateThread(NULL, 0, BroadcastMusic, (LPVOID)&udp, 0, &UDPServerThreadID) == NULL)
     {
@@ -37,6 +43,5 @@ DWORD WINAPI BroadcastMusic(LPVOID lpParameter)
             return -1;
         BytesLeft = udp->bytes_to_send - bytes_to_send;
     }
-    free(udp);
     return 0;
 }

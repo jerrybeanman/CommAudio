@@ -221,7 +221,6 @@ void MainWindow::on_streamButton_clicked(bool checked)
             qDebug() << "After init";
             fileLoaded = true;
         }
-        streaming = true;
         play_audio();
 
     }
@@ -233,14 +232,22 @@ void MainWindow::on_streamButton_clicked(bool checked)
 
 void MainWindow::handleDataAvailable(int len)
 {
-    if(streaming)
+    if(!streaming)
     {
-        struct UDPBroadcast* udp = (struct UDPBroadcast*) malloc(sizeof(struct UDPBroadcast));
-        udp->bytes_to_send = len;
+        udp = (struct UDPBroadcast*) malloc(sizeof(struct UDPBroadcast));
+        udp->bytes_to_send = (DWORD)len;
         udp->source = m_buffer.data() + m_pos;
 
         m_pos += len;
 
         StartSoundManager(udp);
+        streaming = true;
+    }
+    else
+    {
+        udp->bytes_to_send = (DWORD)len;
+        udp->source = m_buffer.data() + m_pos;
+
+        m_pos += len;
     }
 }
