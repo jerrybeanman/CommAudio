@@ -12,6 +12,7 @@
 #include "datagenerator.h"
 #include "wavfile.h"
 #include "globals.h"
+#include "soundmanager.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -53,8 +54,6 @@ void MainWindow::generatePlaylist(QByteArray songs) {
 }
 
 void MainWindow::on_filePicker_pressed() {
-//    QString filePicker = QFileDialog::getOpenFileName(this, tr("Select File"),
-//                               0, tr("Music (*.wav)"));
 
     if(fileExists)
     {
@@ -64,7 +63,7 @@ void MainWindow::on_filePicker_pressed() {
         fileLoaded = false;
     }
     m_file = new WavFile(this);
-    m_generator = new DataGenerator(this);//audioProgressChanged(progress);
+    m_generator = new DataGenerator(this, &m_buffer);//audioProgressChanged(progress);
     connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
     m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)")));
@@ -133,8 +132,41 @@ void MainWindow::play_audio()
     }
 }
 
+/*
+void MainWindow::on_stopButton_clicked() // Stop the music
+{
+    if(!fileExists)
+        return;
+
+    if(m_generator->isPlaying())
+    {
+        qDebug() << "Stop button clicked.";
+        m_audioOutput->reset();
+        fileLoaded = false;
+        m_generator->resetPosition();
+    }
+}
+
+void MainWindow::on_pauseButton_clicked()
+{
+    if(!fileExists)
+        return;
+
+    if(m_generator->isPlaying())
+    {
+        qDebug() << "Pause button clicked.";
+        m_audioOutput->suspend();
+    }
+}
+
+
+*/
+
 void MainWindow::on_pushButton_clicked()
 {
+    if(!fileExists)
+        return;
+
     qDebug() << "Play button clicked.";
     if(!fileLoaded)
     {
@@ -163,7 +195,7 @@ void MainWindow::on_playRecordingButton_clicked()
 
     prepare_audio_devices(m_recorder->fileFormat());
 
-    m_generator = new DataGenerator(this);
+    m_generator = new DataGenerator(this, &m_buffer);
 
     m_generator->AddMoreDataToBufferFromQByteArray(array, size);
 
@@ -173,4 +205,42 @@ void MainWindow::on_playRecordingButton_clicked()
 void MainWindow::on_progressBar_actionTriggered(int progress)
 {
     ui->progressBar->setValue(progress);
+}
+
+void MainWindow::on_streamButton_clicked(bool checked)
+{
+    qDebug() << "stream button clicked:" << checked;
+    if(!checked && m_generator != 0) // Start stream
+    {
+        connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
+        qDebug() << "Play button clicked.";
+        if(!fileLoaded)
+        {
+            qDebug() << "Loading file contents.";
+            init_file();
+            qDebug() << "After init";
+            fileLoaded = true;
+        }
+        streaming = true;
+        play_audio();
+
+    }
+    else        //Stop stream
+    {
+        streaming = false;
+    }
+}
+
+void MainWindow::handleDataAvailable(int len)
+{
+    if(streaming)
+    {
+        struct UDPBroadcast* udp = (struct UDPBroadcast*) malloc(sizeof(struct UDPBroadcast));
+        udp->bytes_to_send = len;
+        udp->source = m_buffer.data() + m_pos;
+
+        m_pos += len;
+
+        StartSoundManager(udp);
+    }
 }

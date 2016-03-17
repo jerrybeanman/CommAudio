@@ -10,5 +10,5 @@ bool StartFileManager();
 DWORD WINAPI TCPAccept(LPVOID lpParameter);
 DWORD WINAPI TCPReadThread(LPVOID lpParameter);
 void ParseRequestMessage(char * message);
-std::vector<std::string> get_all_files_names_within_folder(std::wstring folder);
+std::vector<std::string> GetFileNames(std::string folder, std::string extension);
 #endif // FILEMANAGER_H

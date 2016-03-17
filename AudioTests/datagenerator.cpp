@@ -2,7 +2,7 @@
 
 const qint64 ZERO   = 0;
 
-DataGenerator::DataGenerator(QObject *parent)
+DataGenerator::DataGenerator(QObject *parent, QByteArray *buf)
     :   QIODevice(parent), dg_pos(0), dg_max(0)
 {
     playing = false;

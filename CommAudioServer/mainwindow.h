@@ -16,6 +16,8 @@
 #include "wavfile.h"
 #include "datagenerator.h"
 #include "recorder.h"
+#include "soundmanager.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -120,6 +122,10 @@ private slots:
 
     void on_progressBar_actionTriggered(int action);
 
+    void on_streamButton_clicked(bool checked);
+
+    void handleDataAvailable(int len);
+
 private:
     Ui::MainWindow *ui;
     QByteArray serverIP;
@@ -179,9 +185,11 @@ private:
 
     DataGenerator*          m_generator;
     char*                   data;
+    qint64                  m_pos;
     bool                    m_pullMode;
     bool                    fileExists;
     bool                    fileLoaded;
+    bool                    streaming;
 };
 
 #endif // MAINWINDOW_H

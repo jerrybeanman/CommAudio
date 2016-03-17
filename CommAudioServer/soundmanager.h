@@ -1,9 +1,18 @@
 #ifndef SOUNDMANAGER_H
 #define SOUNDMANAGER_H
 #include "globals.h"
+#include "datagenerator.h"
 #include "Server/ServerUDP.h"
 
-bool StartSoundManager();
+struct UDPBroadcast
+{
+    ServerUDP serverUDP;
+    DWORD bytes_to_send;
+    char* source;
+};
+
+bool SetDataSource(DataGenerator* generator);
+bool StartSoundManager(UDPBroadcast* udp);
 
 DWORD WINAPI BroadcastMusic(LPVOID lpParameter);
 

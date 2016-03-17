@@ -63,14 +63,18 @@ void ParseRequestMessage(char * message)
 	}
 }
 
-std::vector<std::string> get_all_files_names_within_folder(std::wstring folder)
+std::vector<std::string> GetFileNames(std::string folder, std::string extension)
 {
+    std::wstring path(folder.begin(), folder.end());
+    std::wstring tmpExtension(extension.begin(), extension.end());
+    path += L"\\*.";
+    path += tmpExtension;
+    path += L"*";
     std::vector<std::string> names;
     WIN32_FIND_DATA fd;
-    HANDLE hFind = FindFirstFile(folder.c_str(), &fd);
+    HANDLE hFind = FindFirstFile(path.c_str(), &fd);
     if(hFind != INVALID_HANDLE_VALUE)
     {
-        std::cout << "aaa" << std::endl;
         do
         {
 	        // read all (real) files in current folder

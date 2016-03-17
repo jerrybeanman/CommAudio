@@ -84,6 +84,11 @@ bool ServerUDP::MulticastSettings(const char * name)
     return true;
 }
 
+bool ServerUDP::Broadcast(char *message)
+{
+
+}
+
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	Broadcast
 --
@@ -101,8 +106,10 @@ bool ServerUDP::MulticastSettings(const char * name)
 bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
 {
 
+    DWORD BytesToSend = *lpNumberOfBytesSent;
+
     SocketInfo.DataBuf.buf = message;
-    SocketInfo.DataBuf.len = strlen(message) + 1;
+    SocketInfo.DataBuf.len = BytesToSend;
 
     ZeroMemory(&SocketInfo.Overlapped, sizeof(WSAOVERLAPPED));
     SocketInfo.Overlapped.hEvent =  WSACreateEvent();
@@ -173,4 +180,3 @@ void ServerUDP::RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAP
 {
 
 }
-

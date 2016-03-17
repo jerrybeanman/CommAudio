@@ -2,14 +2,10 @@
 
 const qint64 ZERO   = 0;
 
-DataGenerator::DataGenerator(QObject *parent)
-    :   QIODevice(parent), dg_pos(0), dg_max(0)
+DataGenerator::DataGenerator(QObject *parent, QByteArray *buf)
+    :   QIODevice(parent), dg_readpos(0), dg_max(0), dg_externBuf(buf)
 {
     playing = false;
-    if(dg_pos == 0)
-    {
-
-    }
 }
 
 DataGenerator::~DataGenerator()
@@ -38,7 +34,17 @@ void DataGenerator::resume()
 void DataGenerator::resetPosition()
 {
     playing = false;
-    dg_pos = 0;
+    dg_readpos = 0;
+}
+
+qint64 DataGenerator::writeToExternalBuffer(qint64 chunk, qint64 total)
+{
+    qint64 size = dg_externBuf->size();
+    dg_externBuf->resize(size + chunk);
+    memcpy(dg_externBuf->data() + size, dg_buffer.constData() + dg_readpos, chunk);
+    externChunk = chunk;
+    emit dataAvailable(externChunk);
+    return chunk + size;
 }
 
 qint64 DataGenerator::readData(char *data, qint64 len)
@@ -47,14 +53,17 @@ qint64 DataGenerator::readData(char *data, qint64 len)
 
     if (!dg_buffer.isEmpty() && playing) {
         while (len - total > 0) {
-            const qint64 chunk = qMin((dg_buffer.size() - dg_pos), len - total);
-            memcpy(data + total, dg_buffer.constData() + dg_pos, chunk);
-            dg_pos = (dg_pos + chunk) % dg_buffer.size();
+            const qint64 chunk = qMin((dg_buffer.size() - dg_readpos), len - total);
+            memcpy(data + total, dg_buffer.constData() + dg_readpos, chunk);
+
+            writeToExternalBuffer(chunk, total);
+
+            dg_readpos = (dg_readpos + chunk) % dg_buffer.size();
             total += chunk;
 
-            progress = (int)((dg_pos * 100) / ((qint64)dg_buffer.size()));
+            progress = (int)((dg_readpos * 100) / ((qint64)dg_buffer.size()));
 
-            if(dg_pos == ZERO)
+            if(dg_readpos == ZERO)
             {
                 playing = false;
                 progress = 100;
@@ -88,7 +97,7 @@ bool DataGenerator::isPlaying()
 void DataGenerator::RemoveBufferedData()
 {
     dg_buffer.resize(0);
-    dg_pos = 0;
+    dg_readpos = 0;
 }
 
 /*

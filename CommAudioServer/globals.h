@@ -12,6 +12,11 @@
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <qtcore>
+#include <QByteArray>
+
+#define ClientJoined 1
+#define FileRequest  2
+#define UpdateTable  3
 
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION
@@ -23,5 +28,7 @@ typedef struct _SOCKET_INFORMATION
     DWORD          BytesSEND;
     DWORD          BytesRECV;
 } SOCKET_INFORMATION, *LPSOCKET_INFORMATION;
+
+extern std::vector<std::string> FileNames;
 
 #endif
