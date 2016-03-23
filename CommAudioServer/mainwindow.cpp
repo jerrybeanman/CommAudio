@@ -14,8 +14,9 @@
 #include "globals.h"
 #include "soundmanager.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(char** stream, QWidget *parent) :
     QMainWindow(parent),
+    m_stream_data(stream),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -23,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_device = QAudioDeviceInfo::defaultOutputDevice();
     fileExists = false;
     fileLoaded = false;
+    fileFinished = false;
+    m_pos = 0;
 }
 
 MainWindow::~MainWindow()
@@ -63,7 +66,7 @@ void MainWindow::on_filePicker_pressed() {
         fileLoaded = false;
     }
     m_file = new WavFile(this);
-    m_generator = new DataGenerator(this, &m_buffer);//audioProgressChanged(progress);
+    m_generator = new DataGenerator(this);
     connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
     m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)")));
@@ -83,6 +86,7 @@ void MainWindow::updateFileProgress(const int progress) {
 //    } else if(ui->tabWidget->currentIndex() == 1) {
 //        ui->fileProgress->setValue(progress);
 //    }
+    Q_UNUSED(progress);
 }
 
 void MainWindow::prepare_audio_devices(QAudioFormat format)
@@ -195,7 +199,7 @@ void MainWindow::on_playRecordingButton_clicked()
 
     prepare_audio_devices(m_recorder->fileFormat());
 
-    m_generator = new DataGenerator(this, &m_buffer);
+    m_generator = new DataGenerator(this);
 
     m_generator->AddMoreDataToBufferFromQByteArray(array, size);
 
@@ -213,6 +217,8 @@ void MainWindow::on_streamButton_clicked(bool checked)
     if(!checked && m_generator != 0) // Start stream
     {
         connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
+        connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
+        m_data = m_generator->getExternalReference();
         qDebug() << "Play button clicked.";
         if(!fileLoaded)
         {
@@ -234,20 +240,31 @@ void MainWindow::handleDataAvailable(int len)
 {
     if(!streaming)
     {
-        udp = (struct UDPBroadcast*) malloc(sizeof(struct UDPBroadcast));
-        udp->bytes_to_send = (DWORD)len;
-        udp->source = m_buffer.data() + m_pos;
-
+        streaming = true;
+        *m_stream_data = m_data->data() + m_pos;
         m_pos += len;
 
-        StartSoundManager(udp);
-        streaming = true;
     }
     else
     {
-        udp->bytes_to_send = (DWORD)len;
-        udp->source = m_buffer.data() + m_pos;
-
+        *m_stream_data = m_data->data() + m_pos;
         m_pos += len;
     }
+
+    m_stream_size = static_cast <DWORD>(len);
+    song_size = &m_stream_size;
+
+    if(fileFinished)
+        m_pos = 0;
+
+}
+
+void MainWindow::handleDataFinished()
+{
+    qDebug() << "Data has finished sending.";
+    fileFinished = true;
+    /*
+     *
+     * Do stuff here
+     */
 }

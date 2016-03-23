@@ -12,7 +12,6 @@
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <qtcore>
-#include <QByteArray>
 
 #define ClientJoined 1
 #define FileRequest  2
@@ -30,5 +29,7 @@ typedef struct _SOCKET_INFORMATION
 } SOCKET_INFORMATION, *LPSOCKET_INFORMATION;
 
 extern std::vector<std::string> FileNames;
+extern char** song_stream_data;
+extern DWORD* song_size;
 
 #endif

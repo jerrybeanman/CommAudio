@@ -2,8 +2,8 @@
 
 const qint64 ZERO   = 0;
 
-DataGenerator::DataGenerator(QObject *parent, QByteArray *buf)
-    :   QIODevice(parent), dg_readpos(0), dg_max(0), dg_externBuf(buf)
+DataGenerator::DataGenerator(QObject *parent)
+    :   QIODevice(parent), dg_readpos(0), dg_max(0), dg_streampos(0)
 {
     playing = false;
 }
@@ -37,14 +37,9 @@ void DataGenerator::resetPosition()
     dg_readpos = 0;
 }
 
-qint64 DataGenerator::writeToExternalBuffer(qint64 chunk, qint64 total)
+QByteArray *DataGenerator::getExternalReference()
 {
-    qint64 size = dg_externBuf->size();
-    dg_externBuf->resize(size + chunk);
-    memcpy(dg_externBuf->data() + size, dg_buffer.constData() + dg_readpos, chunk);
-    externChunk = chunk;
-    emit dataAvailable(externChunk);
-    return chunk + size;
+    return &dg_externBuf;
 }
 
 qint64 DataGenerator::readData(char *data, qint64 len)
@@ -56,24 +51,51 @@ qint64 DataGenerator::readData(char *data, qint64 len)
             const qint64 chunk = qMin((dg_buffer.size() - dg_readpos), len - total);
             memcpy(data + total, dg_buffer.constData() + dg_readpos, chunk);
 
-            writeToExternalBuffer(chunk, total);
-
             dg_readpos = (dg_readpos + chunk) % dg_buffer.size();
             total += chunk;
 
+            externChunk = chunk;
             progress = (int)((dg_readpos * 100) / ((qint64)dg_buffer.size()));
 
             if(dg_readpos == ZERO)
             {
                 playing = false;
                 progress = 100;
+                emit dataFinished();
                 break;
             }
-            emit audioProgressChanged(progress);
+        }
+
+        emit audioProgressChanged(progress);
+        emit dataAvailable(externChunk);
+    }
+    return total;
+}
+
+qint64 DataGenerator::readExternalData(char *data, qint64 maxlen)
+{
+    qint64 total = 0;
+
+    if (dg_streampos < dg_max) {
+        while (maxlen - total > 0) {
+            const qint64 chunk = qMin((dg_externBuf.size() - dg_streampos), maxlen - total);
+            memcpy(data + total, dg_externBuf.constData() + dg_streampos, chunk);
+
+            dg_streampos = (dg_streampos + chunk) % dg_externBuf.size();
+            total += chunk;
+
+            if(dg_streampos == ZERO ||
+                    dg_streampos == (dg_externBuf.size() - 1))
+            {
+                emit dataFinished();
+                break;
+            }
         }
     }
     return total;
 }
+
+
 
 qint64 DataGenerator::writeData(const char *data, qint64 len)
 {
@@ -118,4 +140,6 @@ void DataGenerator::AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 l
 {
     dg_max += len;
     dg_buffer.append(array);
+    dg_externBuf.resize(dg_max);
+    memcpy(dg_externBuf.data(), dg_buffer.constData(), dg_max);
 }

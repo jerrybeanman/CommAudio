@@ -12,7 +12,7 @@ struct UDPBroadcast
 };
 
 bool SetDataSource(DataGenerator* generator);
-bool StartSoundManager(UDPBroadcast* udp);
+bool StartSoundManager();
 
 DWORD WINAPI BroadcastMusic(LPVOID lpParameter);
 

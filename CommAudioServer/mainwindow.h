@@ -27,7 +27,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(char** stream, QWidget *parent = 0);
     ~MainWindow();
 private slots:
 
@@ -126,6 +126,8 @@ private slots:
 
     void handleDataAvailable(int len);
 
+    void handleDataFinished();
+
 private:
     Ui::MainWindow *ui;
     QByteArray serverIP;
@@ -184,12 +186,15 @@ private:
     Recorder*               m_recorder;
 
     DataGenerator*          m_generator;
-    char*                   data;
+    QByteArray*             m_data;
+    char**                  m_stream_data;
+    DWORD                   m_stream_size;
     qint64                  m_pos;
     bool                    m_pullMode;
     bool                    fileExists;
     bool                    fileLoaded;
     bool                    streaming;
+    bool                    fileFinished;
     struct UDPBroadcast*    udp;
 };
 
