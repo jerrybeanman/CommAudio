@@ -29,6 +29,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::play_audio()
 {
+    if(!fileExists)
+        return;
+
     if(m_generator->isPlaying())
     {
         qDebug() << "Audio file is resuming.";
@@ -71,7 +74,7 @@ void MainWindow::handleAudioStateChanged(QAudio::State newState)
     }*/
 }
 
-void MainWindow::on_programSlider_sliderMoved(int position)
+void MainWindow::on_progressSlider_sliderMoved(int position)
 {
     player->setPosition(position);
 }
@@ -84,6 +87,9 @@ void MainWindow::on_volumeSlider_sliderMoved(int position)
 
 void MainWindow::on_stopButton_clicked()
 {
+    if(!fileExists)
+        return;
+
     if(m_generator->isPlaying())
     {
         qDebug() << "Stop button clicked.";
@@ -117,6 +123,9 @@ void MainWindow::begin_pain()
 
 void MainWindow::prepare_audio_devices(QAudioFormat format)
 {
+    if(!fileExists)
+        return;
+
     m_format = format;
     qDebug() << m_device.deviceName();
 
@@ -134,6 +143,9 @@ void MainWindow::prepare_audio_devices(QAudioFormat format)
 
 void MainWindow::on_pauseButton_clicked()
 {
+    if(!fileExists)
+        return;
+
     if(m_generator->isPlaying())
     {
         qDebug() << "Pause button clicked.";
@@ -154,14 +166,24 @@ void MainWindow::on_openButton_clicked()
     m_file = new WavFile(this);
     m_generator = new DataGenerator(this);
 
-    m_file->open(QFileDialog::getOpenFileName(this, tr("Upload a file")));
+    if(m_file->open(QFileDialog::getOpenFileName(this, tr("Upload a file"))))
+    {
+        prepare_audio_devices(m_file->fileFormat());
+        fileExists = true;
+    }
+    else
+    {
+        fileExists = false;
+    }
 
-    prepare_audio_devices(m_file->fileFormat());
-    fileExists = true;
+
 }
 
 void MainWindow::on_playButton_clicked()
 {
+    if(!fileExists)
+        return;
+
     qDebug() << "Play button clicked.";
     if(!fileLoaded)
     {

@@ -57,9 +57,10 @@ bool ServerUDP::MulticastSettings(const char * name)
     //TODO replace with local ip address
     MulticastAddress.imr_multiaddr.s_addr = inet_addr(name);
     MulticastAddress.imr_interface.s_addr = INADDR_ANY;
+    u_long                  aTimeToLive = 1;
 
 
-    if(setsockopt(SocketInfo.Socket, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&TimeToLive, sizeof(TimeToLive)) == SOCKET_ERROR)
+    if(setsockopt(SocketInfo.Socket, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&aTimeToLive, sizeof(aTimeToLive)) == SOCKET_ERROR)
     {
         std::cout << "setsockopt() failed with error on time to live" << WSAGetLastError() << std::endl;
         return false;
@@ -84,6 +85,11 @@ bool ServerUDP::MulticastSettings(const char * name)
     return true;
 }
 
+bool ServerUDP::Broadcast(char *message)
+{
+
+}
+
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	Broadcast
 --
@@ -101,8 +107,10 @@ bool ServerUDP::MulticastSettings(const char * name)
 bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
 {
 
+    DWORD BytesToSend = *lpNumberOfBytesSent;
+
     SocketInfo.DataBuf.buf = message;
-    SocketInfo.DataBuf.len = strlen(message) + 1;
+    SocketInfo.DataBuf.len = BytesToSend;
 
     ZeroMemory(&SocketInfo.Overlapped, sizeof(WSAOVERLAPPED));
     SocketInfo.Overlapped.hEvent =  WSACreateEvent();
@@ -173,4 +181,3 @@ void ServerUDP::RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAP
 {
 
 }
-
