@@ -102,8 +102,6 @@ void MainWindow::prepare_audio_devices(QAudioFormat format)
 
     m_audioOutput = 0;
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
-
-    //connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(handleAudioStateChanged(QAudio::State)));
 }
 
 void MainWindow::init_file()
@@ -241,13 +239,12 @@ void MainWindow::handleDataAvailable(int len)
     if(!streaming)
     {
         streaming = true;
-        *m_stream_data = m_data->data() + m_pos;
+        *m_stream_data = m_data->data();
         m_pos += len;
 
     }
     else
     {
-        *m_stream_data = m_data->data() + m_pos;
         m_pos += len;
     }
 
