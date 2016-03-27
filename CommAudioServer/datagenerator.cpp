@@ -138,8 +138,8 @@ void DataGenerator::AddMoreDataToBufferFromFile(QFile *file, qint64 len)
 
 void DataGenerator::AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len)
 {
-    dg_max += len;
+    dg_externBuf.resize(dg_max + len);
     dg_buffer.append(array);
-    dg_externBuf.resize(dg_max);
-    memcpy(dg_externBuf.data(), dg_buffer.constData(), dg_max);
+    memcpy(dg_externBuf.data() + dg_max, dg_buffer.constData() + dg_max, len);
+    dg_max += len;
 }
