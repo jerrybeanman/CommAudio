@@ -107,10 +107,8 @@ bool ServerUDP::Broadcast(char *message)
 bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
 {
 
-    DWORD BytesToSend = *lpNumberOfBytesSent;
-
     SocketInfo.DataBuf.buf = message;
-    SocketInfo.DataBuf.len = BytesToSend;
+    SocketInfo.DataBuf.len = *lpNumberOfBytesSent;
 
     ZeroMemory(&SocketInfo.Overlapped, sizeof(WSAOVERLAPPED));
     SocketInfo.Overlapped.hEvent =  WSACreateEvent();
@@ -118,7 +116,7 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
     if (WSASendTo(SocketInfo.Socket,      /* Writing socket                       */
             &(SocketInfo.DataBuf),        /* Message content                      */
             1,
-            lpNumberOfBytesSent,     /* Size of the message                  */
+            NULL,     /* Size of the message                  */
             flags,                              /* Bytes that are sent                  */
             (SOCKADDR *)&DestinationAddress,             /* Server socket address structure      */
             sizeof(DestinationAddress),
@@ -136,7 +134,13 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
             std::cout << "ServerUDP::WSASendto() Timeout" << std::endl;
             return FALSE;
         }
+        if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesSEND, FALSE, &flags))
+        {
+            std::cout << "SeverUDP::WSAGetOverlappedResult failed with errno" << WSAGetLastError() << std::endl;
+            return FALSE;
+        }
     }
+    std::cout << "Bytes Sent::" << SocketInfo.BytesSEND << std::endl;
     return true;
 }
 

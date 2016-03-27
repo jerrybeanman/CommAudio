@@ -239,15 +239,14 @@ void MainWindow::handleDataAvailable(int len)
     if(!streaming)
     {
         streaming = true;
-        *m_stream_data = m_data->data();
+        *song_stream_data = m_generator->getExternalReference()->data();
         m_pos += len;
 
     }
     else
     {
-        m_pos += len;
+        (*song_stream_data) += len;
     }
-
     m_stream_size = static_cast <DWORD>(len);
     song_size = &m_stream_size;
 
