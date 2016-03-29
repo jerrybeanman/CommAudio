@@ -11,12 +11,11 @@
 #include <QSlider>
 #include "datagenerator.h"
 #include "wavfile.h"
+//always scamazing
 #include "globals.h"
-#include "soundmanager.h"
 
-MainWindow::MainWindow(char** stream, QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    m_stream_data(stream),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -24,8 +23,12 @@ MainWindow::MainWindow(char** stream, QWidget *parent) :
     m_device = QAudioDeviceInfo::defaultOutputDevice();
     fileExists = false;
     fileLoaded = false;
-    fileFinished = false;
-    m_pos = 0;
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected()));
+    /*data_file = new QFile("output.wav");
+    if(data_file->open(QIODevice::WriteOnly | QIODevice::Append)) {
+        return;
+    }*/
+
 }
 
 MainWindow::~MainWindow()
@@ -46,7 +49,46 @@ void MainWindow::on_connectButton_pressed()
     serverIP = getServerAddress();
     ui->serverIPAddr->clear();
     ui->stackedWidget->setCurrentIndex(1);
+
     generatePlaylist("Song1 Song2 Song3 Song4 Song5 Song6");
+
+    broadcastThread = new QThread();
+    threadManager* worker = new threadManager();
+    //check with tyler
+    m_generator = new DataGenerator(this);
+
+    worker->moveToThread(broadcastThread);
+
+    connect(worker, SIGNAL(dataReceived(const QByteArray, unsigned int)), this,
+            SLOT(write_to_file(const QByteArray, unsigned int)));
+    connect(worker, SIGNAL(threadRequested()), broadcastThread, SLOT(start()));
+    connect(broadcastThread, SIGNAL(started()), worker, SLOT(receiveThread()));
+    connect(worker, SIGNAL(finished()), broadcastThread, SLOT(quit()), Qt::DirectConnection);
+
+    worker->threadRequest();
+
+}
+
+void MainWindow::write_to_file(const QByteArray temp, unsigned int size) {
+    //qDebug() << "Writing to file " << size;
+    QDataStream stream(data_file);
+    stream.writeRawData(temp, size);
+}
+
+void MainWindow::tabSelected() {
+    qDebug() << "Tab changed to: " << ui->tabWidget->currentIndex();
+
+    //kill current tabs thread
+    //create new tabs thread
+    switch(ui->tabWidget->currentIndex()) {
+        case broadcasting:
+            generatePlaylist("Song1 Song2 Song3 Song4 Song5 Song6");
+            break;
+        case fileTransfer:
+            break;
+        case mic:
+            break;
+    }
 }
 
 void MainWindow::generatePlaylist(QByteArray songs) {
@@ -57,6 +99,8 @@ void MainWindow::generatePlaylist(QByteArray songs) {
 }
 
 void MainWindow::on_filePicker_pressed() {
+//    QString filePicker = QFileDialog::getOpenFileName(this, tr("Select File"),
+//                               0, tr("Music (*.wav)"));
 
     if(fileExists)
     {
@@ -66,15 +110,15 @@ void MainWindow::on_filePicker_pressed() {
         fileLoaded = false;
     }
     m_file = new WavFile(this);
-    m_generator = new DataGenerator(this);
+    m_generator = new DataGenerator(this);//audioProgressChanged(progress);
     connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
     m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)")));
     prepare_audio_devices(m_file->fileFormat());
     fileExists = true;
-
     QFileInfo fileInfo(m_file->fileName());
     QString filename(fileInfo.fileName());
+
     ui->listWidget_2->addItem(filename);
 
     updateFileProgress(0);
@@ -86,7 +130,6 @@ void MainWindow::updateFileProgress(const int progress) {
 //    } else if(ui->tabWidget->currentIndex() == 1) {
 //        ui->fileProgress->setValue(progress);
 //    }
-    Q_UNUSED(progress);
 }
 
 void MainWindow::prepare_audio_devices(QAudioFormat format)
@@ -102,9 +145,11 @@ void MainWindow::prepare_audio_devices(QAudioFormat format)
 
     m_audioOutput = 0;
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
+
+    //connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(handleAudioStateChanged(QAudio::State)));
 }
 
-void MainWindow::load_file()
+void MainWindow::init_file()
 {
     /* Purpose, split the file in half and read it in portions */
     qint64 size = m_file->size() - 44; //Size of the file minus the header.
@@ -134,46 +179,13 @@ void MainWindow::play_audio()
     }
 }
 
-/*
-void MainWindow::on_stopButton_clicked() // Stop the music
-{
-    if(!fileExists)
-        return;
-
-    if(m_generator->isPlaying())
-    {
-        qDebug() << "Stop button clicked.";
-        m_audioOutput->reset();
-        fileLoaded = false;
-        m_generator->resetPosition();
-    }
-}
-
-void MainWindow::on_pauseButton_clicked()
-{
-    if(!fileExists)
-        return;
-
-    if(m_generator->isPlaying())
-    {
-        qDebug() << "Pause button clicked.";
-        m_audioOutput->suspend();
-    }
-}
-
-
-*/
-
 void MainWindow::on_pushButton_clicked()
 {
-    if(!fileExists)
-        return;
-
     qDebug() << "Play button clicked.";
     if(!fileLoaded)
     {
         qDebug() << "Loading file contents.";
-        load_file();
+        init_file();
         qDebug() << "After init";
         fileLoaded = true;
     }
@@ -207,49 +219,4 @@ void MainWindow::on_playRecordingButton_clicked()
 void MainWindow::on_progressBar_actionTriggered(int progress)
 {
     ui->progressBar->setValue(progress);
-}
-
-void MainWindow::on_streamButton_clicked(bool checked)
-{
-    qDebug() << "stream button clicked:" << checked;
-    if(!checked && m_generator != 0) // Start stream
-    {
-        connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
-        connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
-
-        m_stream_size = 0;
-        song_size = &m_stream_size;
-        qDebug() << "Play button clicked.";
-        if(!fileLoaded)
-        {
-            qDebug() << "Loading file contents.";
-            load_file();
-            fileLoaded = true;
-        }
-        play_audio();
-        *song_stream_data = m_generator->getExternalReference()->data();
-    }
-    else        //Stop stream
-    {
-        streaming = false;
-        // stop streaming somehow here.
-    }
-}
-
-void MainWindow::handleDataAvailable(int len)
-{
-    *song_size += static_cast <DWORD>(len);
-    if(fileFinished)
-        m_pos = 0;
-
-}
-
-void MainWindow::handleDataFinished()
-{
-    qDebug() << "Data has finished sending.";
-    fileFinished = true;
-    /*
-     *
-     * Do stuff here
-     */
 }

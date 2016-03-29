@@ -39,7 +39,7 @@ class ServerUDP : public Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            void Broadcast(char * message);
+            bool Broadcast(char * message);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	MulticastSettings
@@ -71,7 +71,6 @@ class ServerUDP : public Server
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
             bool Broadcast(char * message, LPDWORD lpNumberOfBytesSent);
-
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send

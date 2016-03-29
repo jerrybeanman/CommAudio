@@ -1,11 +1,19 @@
 #ifndef TCP_SERVER_H
 #define TCP_SERVER_H
+#include <map>
 #include "Server.h"
 
+struct Client
+{
+      SOCKET_INFORMATION SocketInfo;
+      SOCKADDR_IN        Connection;
+};
 class ServerTCP : public Server
-    {
+{
 
         public:
+            std::map<std::string, Client> ClientList;
+
             ServerTCP(){}
             ~ServerTCP(){}
             /*------------------------------------------------------------------------------------------------------------------
@@ -38,7 +46,7 @@ class ServerTCP : public Server
             -- NOTES:  Calls accept on a player's socket. Sets the returning socket and client address structure to the player.
                 Add connected player to the list of players
             --------------------------------------------------------------------------------------------------------------------*/
-            bool Accept(void);
+            std::string Accept(void);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Broadcast
@@ -91,8 +99,9 @@ class ServerTCP : public Server
             --------------------------------------------------------------------------------------------------------------------*/
              void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
 
+             void AssignID(Client client);
         private:
         	SOCKET 	ListeningSocket;
-            SOCKET  AcceptedSocket;
+            SOCKET      AcceptedSocket;
     };
 #endif // TCP_SERVER_H

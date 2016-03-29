@@ -1,14 +1,14 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2016-03-07T21:46:33
+# Project created by QtCreator 2016-03-25T18:17:21
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = CommAudioServer
+TARGET = test
 TEMPLATE = app
 
 QT += network \
@@ -21,32 +21,28 @@ LIBS += -lws2_32
 
 QMAKE_CXXFLAGS += -std=c++11
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    Server/Server.cpp \
-    Server/ServerTCP.cpp \
-    Server/ServerUDP.cpp \
+
+SOURCES += \
+    Client/ClientUDP.cpp \
     circularbuffer.cpp \
-    soundmanager.cpp \
-    filemanager.cpp \
     datagenerator.cpp \
     inputbuffer.cpp \
+    main.cpp \
+    mainwindow.cpp \
     recorder.cpp \
+    threadmanager.cpp \
     wavfile.cpp
 
-HEADERS  += mainwindow.h \
-    Server/server.h \
-    Server/ServerTCP.h \
-    Server/ServerUDP.h \
+HEADERS  += \
+    Client/client.h \
+    Client/clientudp.h \
     circularbuffer.h \
-    globals.h \
-    soundmanager.h \
-    filemanager.h \
     datagenerator.h \
+    globals.h \
     inputbuffer.h \
+    mainwindow.h \
     recorder.h \
+    threadmanager.h \
     wavfile.h
 
 FORMS    += mainwindow.ui
-CONFIG   += c++11
-CONFIG   += debug

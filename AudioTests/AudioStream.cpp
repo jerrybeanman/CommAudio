@@ -74,7 +74,7 @@ void MainWindow::handleAudioStateChanged(QAudio::State newState)
     }*/
 }
 
-void MainWindow::on_programSlider_sliderMoved(int position)
+void MainWindow::on_progressSlider_sliderMoved(int position)
 {
     player->setPosition(position);
 }
