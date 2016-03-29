@@ -13,11 +13,11 @@
 #include <QAudioDeviceInfo>
 #include <QSlider>
 #include <atomic>
+#include <QThread>
 #include "wavfile.h"
 #include "datagenerator.h"
 #include "recorder.h"
-#include "soundmanager.h"
-
+#include "threadmanager.h"
 namespace Ui {
 class MainWindow;
 }
@@ -27,9 +27,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(char** stream, QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 private slots:
+
 
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: on_connectButton_pressed
@@ -50,6 +51,27 @@ private slots:
     -- Switches the stack widget to the next page.
     ----------------------------------------------------------------------------------------------------------------------*/
     void on_connectButton_pressed();
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: tabSelected
+    --
+    -- DATE: March 18, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void tabSelected()
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    -- Determines what tab has been switched to
+    ----------------------------------------------------------------------------------------------------------------------*/
+    void tabSelected();
+
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: generateSongList
     --
@@ -122,11 +144,7 @@ private slots:
 
     void on_progressBar_actionTriggered(int action);
 
-    void on_streamButton_clicked(bool checked);
-
-    void handleDataAvailable(int len);
-
-    void handleDataFinished();
+    void write_to_file(const QByteArray data, unsigned int size);
 
 private:
     Ui::MainWindow *ui;
@@ -169,7 +187,7 @@ private:
     ----------------------------------------------------------------------------------------------------------------------*/
     void prepare_audio_devices(QAudioFormat format);
 
-    void load_file();
+    void init_file();
 
     void play_audio();
 
@@ -184,18 +202,16 @@ private:
     QSlider*                m_volumeSlider;
     WavFile*                m_file;
     Recorder*               m_recorder;
+    QThread*                broadcastThread;
+    QFile*                  data_file;
 
     DataGenerator*          m_generator;
-    QByteArray*             m_data;
-    char**                  m_stream_data;
-    DWORD                   m_stream_size;
-    qint64                  m_pos;
+    char*                   data;
     bool                    m_pullMode;
     bool                    fileExists;
     bool                    fileLoaded;
-    bool                    streaming;
-    bool                    fileFinished;
-    struct UDPBroadcast*    udp;
+
+    enum tabs {broadcasting, fileTransfer, mic};
 };
 
 #endif // MAINWINDOW_H

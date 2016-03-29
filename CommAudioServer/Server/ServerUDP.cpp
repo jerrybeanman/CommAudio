@@ -110,6 +110,9 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
     SocketInfo.DataBuf.buf = message;
     SocketInfo.DataBuf.len = *lpNumberOfBytesSent;
 
+    std::cout << "ServerUDP::Broadcast>>Length: " << *lpNumberOfBytesSent << std::endl;
+    fflush(stdout);
+
     ZeroMemory(&SocketInfo.Overlapped, sizeof(WSAOVERLAPPED));
     SocketInfo.Overlapped.hEvent =  WSACreateEvent();
 
@@ -140,7 +143,7 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
             return FALSE;
         }
     }
-    std::cout << "Bytes Sent::" << SocketInfo.BytesSEND << std::endl;
+    std::cerr << "ServerUDP::Broadcast>>Bytes Sent:[" << SocketInfo.BytesSEND << "]" << std::endl;
     return true;
 }
 
