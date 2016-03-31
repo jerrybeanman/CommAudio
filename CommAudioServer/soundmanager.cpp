@@ -30,20 +30,21 @@ DWORD WINAPI BroadcastMusic(LPVOID lpParameter)
     DWORD packet_size = 16384;
     while(1)
     {
-        if(song_size != 0 && *song_size > 0)
+        if(song_size != 0 && *song_size > 0 && song_stream_data != 0)
         {
             bytes_to_SEND = (DWORD)(*song_size);
 
             //std::cerr << "SoundManager::Broadcast>>Incoming data:[" << bytes_to_SEND << "]" << std::endl;
             std::cerr << "Sending::" << std::endl;
-            for(DWORD i = 0; i < bytes_to_SEND; i++)
+            /*for(DWORD i = 0; i < bytes_to_SEND; i++)
             {
                 fprintf(stderr, "%c", (*song_stream_data)[i]);
             }
             fprintf(stderr, "\n");
-            fflush(stderr);
+            fflush(stderr);*/
 
-            if(!serverUDP->Broadcast(*song_stream_data, &bytes_to_SEND))
+            //Make extra sure that we don't send garbage data
+            if(song_stream_data != 0 && !serverUDP->Broadcast(*song_stream_data, &bytes_to_SEND))
             {
                 qDebug() << "Jerry, your Broadcast sucks";
                 return -1;

@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include <QFileDialog>
 #include <QSound>
-#include <QMediaPlayer>
 #include <QBuffer>
 #include <QAudioDecoder>
 #include <QAudioFormat>
@@ -14,13 +13,11 @@
 #include "globals.h"
 #include "soundmanager.h"
 
-MainWindow::MainWindow(char** stream, QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    m_stream_data(stream),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    player = new QMediaPlayer(this);
     m_device = QAudioDeviceInfo::defaultOutputDevice();
     fileExists = false;
     fileLoaded = false;
@@ -66,12 +63,20 @@ void MainWindow::on_filePicker_pressed() {
         fileLoaded = false;
     }
     m_file = new WavFile(this);
+
+    if(!m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)"))))
+    {
+        m_file = 0;
+        qDebug() << "Cannot open file:";
+        return;
+    }
+
+    fileExists = true;
     m_generator = new DataGenerator(this);
     connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
-    m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)")));
     prepare_audio_devices(m_file->fileFormat());
-    fileExists = true;
+
 
     QFileInfo fileInfo(m_file->fileName());
     QString filename(fileInfo.fileName());
@@ -106,7 +111,7 @@ void MainWindow::prepare_audio_devices(QAudioFormat format)
 
 void MainWindow::load_file()
 {
-    /* Purpose, split the file in half and read it in portions */
+    /* Purpose: split the file in half and read it in portions */
     qint64 size = m_file->size() - 44; //Size of the file minus the header.
     m_file->seek(0);
     QByteArray array = m_file->read(size/2);
@@ -132,6 +137,21 @@ void MainWindow::play_audio()
         m_audioOutput->start(m_generator);
         m_audioOutput->setVolume(qreal(100.0f/100.0f));
     }
+}
+
+void MainWindow::stop_stream()
+{
+    qDebug() << "Stopping stream.";
+    if(m_audioOutput == 0 || m_generator == 0)
+    {
+        qDebug() << "MainWindow::stop_stream>> m_audioOutput or m_generator was NULL";
+        return;
+    }
+
+    m_audioOutput->reset();
+    m_generator->resetPosition();
+    *song_stream_data = 0;
+    song_size = 0;
 }
 
 /*
@@ -211,15 +231,31 @@ void MainWindow::on_progressBar_actionTriggered(int progress)
 
 void MainWindow::on_streamButton_clicked(bool checked)
 {
-    qDebug() << "stream button clicked:" << checked;
-    if(!checked && m_generator != 0) // Start stream
+    Q_UNUSED(checked);
+    bool prevState = streaming; // Temporary keep track of the previous state.
+    streaming = !streaming; //switching the streaming state
+
+    qDebug() << "FileExists:" << fileExists;
+
+    if(!fileExists)
+    {
+        qDebug() << "Load a file before hitting the stream button.";
+        return;
+    }
+    if(m_generator == 0)
+    {
+        qDebug() << "No generator.";
+        return;
+    }
+
+    if(!streaming) // Start stream
     {
         connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
         connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
 
         m_stream_size = 0;
         song_size = &m_stream_size;
-        qDebug() << "Play button clicked.";
+        qDebug() << "Stream button clicked.";
         if(!fileLoaded)
         {
             qDebug() << "Loading file contents.";
@@ -229,10 +265,14 @@ void MainWindow::on_streamButton_clicked(bool checked)
         play_audio();
         *song_stream_data = m_generator->getExternalReference()->data();
     }
-    else        //Stop stream
+    else if(streaming && m_generator->isPlaying())
     {
-        streaming = false;
-        // stop streaming somehow here.
+        qDebug() << "Stopping stream";
+        stop_stream();
+    }
+    else // Streaming button clicked but it was unable to proceed
+    {
+        streaming = prevState;
     }
 }
 
@@ -241,7 +281,6 @@ void MainWindow::handleDataAvailable(int len)
     *song_size += static_cast <DWORD>(len);
     if(fileFinished)
         m_pos = 0;
-
 }
 
 void MainWindow::handleDataFinished()

@@ -27,7 +27,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(char** stream, QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 private slots:
 
@@ -173,6 +173,8 @@ private:
 
     void play_audio();
 
+    void stop_stream();
+
 private:
     QMediaPlayer*           player;
     QByteArray              m_buffer;
@@ -186,16 +188,12 @@ private:
     Recorder*               m_recorder;
 
     DataGenerator*          m_generator;
-    QByteArray*             m_data;
-    char**                  m_stream_data;
     DWORD                   m_stream_size;
     qint64                  m_pos;
-    bool                    m_pullMode;
     bool                    fileExists;
     bool                    fileLoaded;
     bool                    streaming;
     bool                    fileFinished;
-    struct UDPBroadcast*    udp;
 };
 
 #endif // MAINWINDOW_H

@@ -12,7 +12,7 @@ DWORD* song_size = 0;
 int main(int argc, char *argv[])
 {
     QApplication program(argc, argv);
-    MainWindow* w = new MainWindow(song_stream_data);
+    MainWindow* w = new MainWindow();
     w->show();
     char current_dir[200];
     if (!GetCurrentDir(current_dir, sizeof(current_dir)))
