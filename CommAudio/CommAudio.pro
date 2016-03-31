@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -21,23 +21,27 @@ LIBS += -lws2_32
 
 QMAKE_CXXFLAGS += -std=c++11
 
-SOURCES += main.cpp\
-    mainwindow.cpp \
-    circularbuffer.cpp \
+SOURCES += \
     Client/ClientUDP.cpp \
-    wavfile.cpp \
+    circularbuffer.cpp \
     datagenerator.cpp \
+    inputbuffer.cpp \
+    main.cpp \
+    mainwindow.cpp \
     recorder.cpp \
-    inputbuffer.cpp
+    threadmanager.cpp \
+    wavfile.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
+    Client/client.h \
+    Client/clientudp.h \
     circularbuffer.h \
-    globals.h \
-    Client/Client.h \
-    Client/ClientUDP.h \
-    wavfile.h \
     datagenerator.h \
+    globals.h \
+    inputbuffer.h \
+    mainwindow.h \
     recorder.h \
-    inputbuffer.h
+    threadmanager.h \
+    wavfile.h
 
 FORMS    += mainwindow.ui

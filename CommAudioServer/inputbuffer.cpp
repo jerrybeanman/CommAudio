@@ -34,7 +34,7 @@ qint64 InputBuffer::readData(char *data, qint64 maxlen)
         return 0;
 
     qint64 writeLen = qMin(maxlen, i_buffered_length);
-    if( (writeLen + i_read_pos) > MAXSIZE)
+    if((writeLen + i_read_pos) > MAXSIZE)
     {
         qint64 firstData = MAXSIZE - i_read_pos;
         memcpy(data, i_buffer.constData() + i_read_pos, firstData);
@@ -77,6 +77,7 @@ qint64 InputBuffer::size() const
 
 const QByteArray &InputBuffer::readAll()
 {
+    i_data.clear();
     i_data.resize(0);
     i_data.resize(i_buffered_length);
     readData(i_data.data(), i_buffered_length);
