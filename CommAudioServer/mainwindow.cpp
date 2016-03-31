@@ -64,6 +64,7 @@ void MainWindow::on_filePicker_pressed() {
     }
     m_file = new WavFile(this);
 
+
     if(!m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)"))))
     {
         m_file = 0;
@@ -75,7 +76,14 @@ void MainWindow::on_filePicker_pressed() {
     m_generator = new DataGenerator(this);
     connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
-    prepare_audio_devices(m_file->fileFormat());
+    //Tests
+
+
+    m_file->seek(0);
+    QByteArray array = m_file->read(44);
+    QAudioFormat format = m_generator->readHeader(array.data());
+    QAudioFormat temp = m_file->fileFormat();
+    prepare_audio_devices(format);
 
 
     QFileInfo fileInfo(m_file->fileName());

@@ -116,3 +116,88 @@ void DataGenerator::AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 l
     memcpy(dg_externBuf.data() + dg_max, dg_buffer.constData() + dg_max, len);
     dg_max += len;
 }
+
+
+
+struct chunk
+{
+    char        id[4];
+    quint32     size;
+};
+
+struct RIFFHeader
+{
+    chunk       descriptor;     // "RIFF"
+    char        type[4];        // "WAVE"
+};
+
+struct WAVEHeader
+{
+    chunk       descriptor;
+    quint16     audioFormat;
+    quint16     numChannels;
+    quint32     sampleRate;
+    quint32     byteRate;
+    quint16     blockAlign;
+    quint16     bitsPerSample;
+};
+
+struct DATAHeader
+{
+    chunk       descriptor;
+};
+
+struct CombinedHeader
+{
+    RIFFHeader  riff;
+    WAVEHeader  wave;
+};
+
+QAudioFormat DataGenerator::readHeader(char* data)
+{
+    QAudioFormat format;
+    CombinedHeader header;
+    bool result = false;
+
+    memcpy(reinterpret_cast<char *>(&header), data, sizeof(CombinedHeader));
+    data += sizeof(WAVEHeader);
+
+    //bool result = read(reinterpret_cast<char *>(&header), sizeof(CombinedHeader)) == sizeof(CombinedHeader);
+    if ((memcmp(&header.riff.descriptor.id, "RIFF", 4) == 0
+        || memcmp(&header.riff.descriptor.id, "RIFX", 4) == 0)
+        && memcmp(&header.riff.type, "WAVE", 4) == 0
+        && memcmp(&header.wave.descriptor.id, "fmt ", 4) == 0
+        && (header.wave.audioFormat == 1 || header.wave.audioFormat == 0))
+    {
+
+        // Skip extra remaining header information
+        DATAHeader dataHeader;
+
+        if (qFromLittleEndian<quint32>(header.wave.descriptor.size) > sizeof(WAVEHeader)) {
+            size_t bytes_to_SKIP = qFromLittleEndian<quint32>(header.wave.descriptor.size) % sizeof(WAVEHeader);
+            data += bytes_to_SKIP;
+        }
+
+        memcpy((char*)(&dataHeader), data, sizeof(DATAHeader));
+
+
+        // Establish format
+        if (memcmp(&header.riff.descriptor.id, "RIFF", 4) == 0)
+            format.setByteOrder(QAudioFormat::LittleEndian);
+        else
+            format.setByteOrder(QAudioFormat::BigEndian);
+
+        int bps = qFromLittleEndian<quint16>(header.wave.bitsPerSample);
+        format.setChannelCount(qFromLittleEndian<quint16>(header.wave.numChannels));
+        format.setCodec("audio/pcm");
+        format.setSampleRate(qFromLittleEndian<quint32>(header.wave.sampleRate));
+        format.setSampleSize(qFromLittleEndian<quint16>(header.wave.bitsPerSample));
+        format.setSampleType(bps == 8 ? QAudioFormat::UnSignedInt : QAudioFormat::SignedInt);
+
+        qDebug() << "Successfully read the file header";
+
+        return format;
+    }
+    qDebug() << "READING THE HEADER INSIDE OF THE DATAGENERATOR SCREWED UP";
+    return format;
+}
