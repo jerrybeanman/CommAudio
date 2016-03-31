@@ -11,6 +11,7 @@
 #include <WinSock2.h>
 #include <windows.h>
 #include <qtcore>
+#include "circularbuffer.h"
 
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION
@@ -22,5 +23,5 @@ typedef struct _SOCKET_INFORMATION
     DWORD          BytesSEND;
     DWORD          BytesRECV;
 } SOCKET_INFORMATION, *LPSOCKET_INFORMATION;
-
+extern CircularBuffer cb;
 #endif

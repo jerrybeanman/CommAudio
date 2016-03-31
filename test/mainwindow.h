@@ -144,7 +144,7 @@ private slots:
 
     void on_progressBar_actionTriggered(int action);
 
-    void write_to_file(const char* data, unsigned int size);
+    void write_to_file(const unsigned int size);
 
 private:
     Ui::MainWindow *ui;
