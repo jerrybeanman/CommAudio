@@ -58,6 +58,7 @@ bool ClientUDP::MulticastSettings(const char * name)
 
 bool ClientUDP::Recv()
 {
+    memset(SocketInfo.Buffer, '\0', DATA_BUFSIZE);
     SocketInfo.DataBuf.len = DATA_BUFSIZE;
     SocketInfo.DataBuf.buf = SocketInfo.Buffer;
     ZeroMemory(&SocketInfo.Overlapped, sizeof(WSAOVERLAPPED));
@@ -66,25 +67,34 @@ bool ClientUDP::Recv()
                 SocketInfo.Socket,                  /* Accepted socket					*/
                 &SocketInfo.DataBuf,				/* Message buffer to recieve		*/
                 1,									/* Maximum data to recieve			*/
-                (LPDWORD)&SocketInfo.BytesRECV,		/* No modification					*/
-                &Flags,
-                (SOCKADDR *)&SourceAddress,			/* Server socket address structure		*/
+                NULL,
+                &Flags,                             /* No modification					*/
+                (SOCKADDR *)&SourceAddress,			/* Server socket address structure	*/
                 (LPINT)&SourceLen,
                 &SocketInfo.Overlapped,
                 NULL)
                 == SOCKET_ERROR)
     {
-        if (WSAGetLastError() != WSA_IO_PENDING)
+        if (WSAGetLastError() == WSA_IO_PENDING)
+        {
+            if (WSAWaitForMultipleEvents(1, &SocketInfo.Overlapped.hEvent, FALSE, INFINITE, FALSE) == WAIT_TIMEOUT)
+            {
+                std::cout << "RecvFrom() Timeout" << std::endl;
+                return FALSE;
+            }
+            if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesRECV, FALSE, &Flags))
+            {
+                std::cout << "ClientUDP::WSAGetOVerlappedResult failed with errno " << WSAGetLastError() << std::endl;
+                return FALSE;
+            }
+        }else
         {
             std::cout << "RecvFrom() failed with error " << WSAGetLastError() << std::endl;
             return FALSE;
         }
-        if (WSAWaitForMultipleEvents(1, &SocketInfo.Overlapped.hEvent, FALSE, INFINITE, FALSE) == WAIT_TIMEOUT)
-        {
-            std::cout << "RecvFrom() Timeout" << std::endl;
-            return FALSE;
-        }
+
     }
+   // std::cout << "Bytes Recieved: " << SocketInfo.BytesRECV << std::endl;
 
     return TRUE;
 }

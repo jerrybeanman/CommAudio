@@ -1,3 +1,4 @@
+//always scamazing
 #include "recorder.h"
 
 Recorder::Recorder()
