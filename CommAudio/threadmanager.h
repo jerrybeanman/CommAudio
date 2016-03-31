@@ -33,7 +33,7 @@ public:
     void threadRequest();
 signals:
     void finished();
-    void dataReceived(const QByteArray temp, const unsigned int value);
+    void dataReceived(const unsigned int);
     void dataHeader(const QByteArray& header);
     void threadRequested();
     void playlistReceived(const QByteArray& playlist);

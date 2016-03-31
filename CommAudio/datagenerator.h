@@ -27,7 +27,6 @@ public:
     bool isPlaying();
     void RemoveBufferedData();
     void AddMoreDataToBufferFromFile(QFile* file, qint64 len);
-    void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);
     void resetPosition();
 
 signals:
@@ -36,6 +35,8 @@ signals:
 public:
     float progress;
 
+public slots:
+    void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);
 private:
     qint64      dg_pos;
     qint64      dg_max;

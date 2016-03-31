@@ -194,6 +194,7 @@ private:
     bool                    fileLoaded;
     bool                    streaming;
     bool                    fileFinished;
+    struct UDPBroadcast*    udp;
 };
 
 #endif // MAINWINDOW_H

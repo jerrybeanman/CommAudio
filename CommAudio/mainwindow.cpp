@@ -11,8 +11,9 @@
 #include <QSlider>
 #include "datagenerator.h"
 #include "wavfile.h"
+//always scamazing
 #include "globals.h"
-
+CircularBuffer cb;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -22,6 +23,14 @@ MainWindow::MainWindow(QWidget *parent) :
     m_device = QAudioDeviceInfo::defaultOutputDevice();
     fileExists = false;
     fileLoaded = false;
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected()));
+    data_file = new QFile("output.wav");
+    if(!data_file->open(QIODevice::WriteOnly)) {
+        qDebug() << data_file->errorString();
+        return;
+    }
+
+
 }
 
 MainWindow::~MainWindow()
@@ -42,7 +51,52 @@ void MainWindow::on_connectButton_pressed()
     serverIP = getServerAddress();
     ui->serverIPAddr->clear();
     ui->stackedWidget->setCurrentIndex(1);
+
     generatePlaylist("Song1 Song2 Song3 Song4 Song5 Song6");
+
+    broadcastThread = new QThread();
+    threadManager* worker = new threadManager();
+    //check with tyler
+    m_generator = new DataGenerator(this);
+
+    worker->moveToThread(broadcastThread);
+
+    connect(worker, SIGNAL(dataReceived(const unsigned int)), this,
+            SLOT(write_to_file(const unsigned int)));
+    connect(worker, SIGNAL(threadRequested()), broadcastThread, SLOT(start()));
+    connect(broadcastThread, SIGNAL(started()), worker, SLOT(receiveThread()));
+    connect(worker, SIGNAL(finished()), broadcastThread, SLOT(quit()), Qt::DirectConnection);
+
+    worker->threadRequest();
+
+}
+DWORD c;
+void MainWindow::write_to_file(const unsigned int size) {
+    //qDebug() << "Writing to file " << size;
+    QDataStream stream(data_file);
+    while(cb.Count != 0)
+    {
+        char* temp = new char[40000];
+        CBPop(&cb, temp);
+        stream.writeRawData(temp,size);
+        delete temp;
+    }
+}
+
+void MainWindow::tabSelected() {
+    qDebug() << "Tab changed to: " << ui->tabWidget->currentIndex();
+
+    //kill current tabs thread
+    //create new tabs thread
+    switch(ui->tabWidget->currentIndex()) {
+        case broadcasting:
+            generatePlaylist("Song1 Song2 Song3 Song4 Song5 Song6");
+            break;
+        case fileTransfer:
+            break;
+        case mic:
+            break;
+    }
 }
 
 void MainWindow::generatePlaylist(QByteArray songs) {

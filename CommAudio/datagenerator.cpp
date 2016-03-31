@@ -1,3 +1,4 @@
+//always scamazing
 #include "datagenerator.h"
 
 const qint64 ZERO   = 0;
