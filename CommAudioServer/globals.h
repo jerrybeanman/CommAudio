@@ -15,7 +15,7 @@
 
 #define ClientJoined 1
 #define FileRequest  2
-#define UpdateTable  3
+#define UpdateList   3
 
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION

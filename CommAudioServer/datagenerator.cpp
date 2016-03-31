@@ -44,58 +44,30 @@ QByteArray *DataGenerator::getExternalReference()
 
 qint64 DataGenerator::readData(char *data, qint64 len)
 {
-    qint64 total = 0;
-
+    qint64 chunk = 0;
     if (!dg_buffer.isEmpty() && playing) {
-        while (len - total > 0) {
-            const qint64 chunk = qMin((dg_buffer.size() - dg_readpos), len - total);
-            memcpy(data + total, dg_buffer.constData() + dg_readpos, chunk);
+        chunk = qMin((dg_buffer.size() - dg_readpos), len);
+        memcpy(data, dg_buffer.constData() + dg_readpos, chunk);
 
-            dg_readpos = (dg_readpos + chunk) % dg_buffer.size();
-            total += chunk;
+        dg_readpos = (dg_readpos + chunk) % dg_buffer.size();
 
-            externChunk = chunk;
-            progress = (int)((dg_readpos * 100) / ((qint64)dg_buffer.size()));
+        externChunk = chunk;
+        progress = (int)((dg_readpos * 100) / ((qint64)dg_buffer.size()));
 
-            if(dg_readpos == ZERO)
-            {
-                playing = false;
-                progress = 100;
-                emit dataFinished();
-                break;
-            }
+        if(dg_readpos == ZERO)
+        {
+            playing = false;
+            progress = 100;
+            //qDebug() << "DataGenerator::readData>>dataFinished";
+            emit dataFinished();
         }
 
+        //qDebug() << "DataGenerator::readData>>progress[" << progress << "] dataAvailable[" << chunk << "]";
         emit audioProgressChanged(progress);
         emit dataAvailable(externChunk);
     }
-    return total;
+    return chunk;
 }
-
-qint64 DataGenerator::readExternalData(char *data, qint64 maxlen)
-{
-    qint64 total = 0;
-
-    if (dg_streampos < dg_max) {
-        while (maxlen - total > 0) {
-            const qint64 chunk = qMin((dg_externBuf.size() - dg_streampos), maxlen - total);
-            memcpy(data + total, dg_externBuf.constData() + dg_streampos, chunk);
-
-            dg_streampos = (dg_streampos + chunk) % dg_externBuf.size();
-            total += chunk;
-
-            if(dg_streampos == ZERO ||
-                    dg_streampos == (dg_externBuf.size() - 1))
-            {
-                emit dataFinished();
-                break;
-            }
-        }
-    }
-    return total;
-}
-
-
 
 qint64 DataGenerator::writeData(const char *data, qint64 len)
 {
@@ -119,6 +91,7 @@ bool DataGenerator::isPlaying()
 void DataGenerator::RemoveBufferedData()
 {
     dg_buffer.resize(0);
+    dg_externBuf.resize(0);
     dg_readpos = 0;
 }
 

@@ -72,9 +72,9 @@ void MainWindow::on_filePicker_pressed() {
     m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)")));
     prepare_audio_devices(m_file->fileFormat());
     fileExists = true;
+
     QFileInfo fileInfo(m_file->fileName());
     QString filename(fileInfo.fileName());
-
     ui->listWidget_2->addItem(filename);
 
     updateFileProgress(0);
@@ -104,7 +104,7 @@ void MainWindow::prepare_audio_devices(QAudioFormat format)
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
 }
 
-void MainWindow::init_file()
+void MainWindow::load_file()
 {
     /* Purpose, split the file in half and read it in portions */
     qint64 size = m_file->size() - 44; //Size of the file minus the header.
@@ -173,7 +173,7 @@ void MainWindow::on_pushButton_clicked()
     if(!fileLoaded)
     {
         qDebug() << "Loading file contents.";
-        init_file();
+        load_file();
         qDebug() << "After init";
         fileLoaded = true;
     }
@@ -216,40 +216,29 @@ void MainWindow::on_streamButton_clicked(bool checked)
     {
         connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
         connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
-        m_data = m_generator->getExternalReference();
+
+        m_stream_size = 0;
+        song_size = &m_stream_size;
         qDebug() << "Play button clicked.";
         if(!fileLoaded)
         {
             qDebug() << "Loading file contents.";
-            init_file();
-            qDebug() << "After init";
+            load_file();
             fileLoaded = true;
         }
         play_audio();
-
+        *song_stream_data = m_generator->getExternalReference()->data();
     }
     else        //Stop stream
     {
         streaming = false;
+        // stop streaming somehow here.
     }
 }
 
 void MainWindow::handleDataAvailable(int len)
 {
-    if(!streaming)
-    {
-        streaming = true;
-        *song_stream_data = m_generator->getExternalReference()->data();
-        m_pos += len;
-
-    }
-    else
-    {
-        (*song_stream_data) += len;
-    }
-    m_stream_size = static_cast <DWORD>(len);
-    song_size = &m_stream_size;
-
+    *song_size += static_cast <DWORD>(len);
     if(fileFinished)
         m_pos = 0;
 

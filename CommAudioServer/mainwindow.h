@@ -169,7 +169,7 @@ private:
     ----------------------------------------------------------------------------------------------------------------------*/
     void prepare_audio_devices(QAudioFormat format);
 
-    void init_file();
+    void load_file();
 
     void play_audio();
 
