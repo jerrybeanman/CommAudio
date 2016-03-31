@@ -137,11 +137,13 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
             std::cout << "ServerUDP::WSASendto() Timeout" << std::endl;
             return FALSE;
         }
-        if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesSEND, FALSE, &flags))
-        {
-            std::cout << "SeverUDP::WSAGetOverlappedResult failed with errno" << WSAGetLastError() << std::endl;
-            return FALSE;
-        }
+    }
+
+    //Get the actual bytes sent.
+    if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesSEND, FALSE, &flags))
+    {
+        std::cout << "SeverUDP::WSAGetOverlappedResult failed with errno" << WSAGetLastError() << std::endl;
+        return FALSE;
     }
     std::cerr << "ServerUDP::Broadcast>>Bytes Sent:[" << SocketInfo.BytesSEND << "]" << std::endl;
     return true;

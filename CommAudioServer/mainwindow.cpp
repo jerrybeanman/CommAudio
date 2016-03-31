@@ -261,8 +261,6 @@ void MainWindow::on_streamButton_clicked(bool checked)
         connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
         connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
 
-        m_stream_size = 0;
-        song_size = &m_stream_size;
         qDebug() << "Stream button clicked.";
         if(!fileLoaded)
         {
@@ -270,8 +268,11 @@ void MainWindow::on_streamButton_clicked(bool checked)
             load_file();
             fileLoaded = true;
         }
-        play_audio();
+        m_stream_size = 44;
+        song_size = &m_stream_size;
         *song_stream_data = m_generator->getExternalReference()->data();
+        play_audio();
+
     }
     else if(streaming && m_generator->isPlaying())
     {
