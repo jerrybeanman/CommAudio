@@ -167,13 +167,23 @@ private:
     --
     -- NOTES:
     ----------------------------------------------------------------------------------------------------------------------*/
-    void prepare_audio_devices(QAudioFormat format);
+    bool prepare_audio_devices(QAudioFormat format);
 
     void load_file();
 
     void play_audio();
 
     void stop_stream();
+
+    void load_music_files();
+
+    void move_song_index();
+
+    bool ready_next_song();
+
+    bool delete_old_song();
+
+    void populate_songlist();
 
 private:
     QMediaPlayer*           player;
@@ -190,11 +200,15 @@ private:
     DataGenerator*          m_generator;
     DWORD                   m_stream_size;
     qint64                  m_pos;
+    qint64                  m_song_index;
     bool                    fileExists;
     bool                    fileLoaded;
     bool                    streaming;
     bool                    fileFinished;
-    struct UDPBroadcast*    udp;
+
+    QStringList             m_music_files;
+    QDir                    m_dir;
+
 };
 
 #endif // MAINWINDOW_H
