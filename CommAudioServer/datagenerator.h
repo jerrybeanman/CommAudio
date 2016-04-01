@@ -7,6 +7,9 @@
 #include <QFileDialog>
 #include <QBuffer>
 #include <QAudioOutput>
+#include <qendian.h>
+#include <QVector>
+#include <QDebug>
 #include "wavfile.h"
 
 class DataGenerator : public QIODevice
@@ -31,6 +34,7 @@ public:
     void AddMoreDataToBufferFromFile(QFile* file, qint64 len);
     void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);
     void resetPosition();
+    QAudioFormat readHeader(char* data);
 
 signals:
     void audioProgressChanged(int progress);
@@ -40,6 +44,7 @@ signals:
 public:
     float progress;
     int externChunk;
+
 
 private:
     qint64      dg_readpos;
