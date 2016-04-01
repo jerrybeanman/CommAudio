@@ -11,11 +11,11 @@ class Client
         Client(){}
         ~Client(){}
 
-        virtual bool InitializeSocket(short port) = 0;
+        bool InitializeSocket(short port);
 
         virtual bool Recv() = 0;
 
-        virtual bool Send(char * message, int size) = 0;
+        bool Send(char * message, int size);
 
 
     protected:

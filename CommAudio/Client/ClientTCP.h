@@ -1,7 +1,6 @@
 #ifndef CLIENTTCP_H
 #define CLIENTTCP_H
 #include "Client.h"
-
 class ClientTCP : public Client
 {
 public:
@@ -9,12 +8,16 @@ public:
 
     void Close();
 
-    bool RecvFrom();
+    bool Recv();
 
-    bool SendTo(char * message, int size);
+    bool Send(char * message, int size);
 
     char* GetData();
 
+    void  acceptConnection();
+
+    SOCKET              listenSocket;
+    WSAEVENT            WSAEvent;
 private:
     SOCKADDR_IN         SourceAddress;
     DWORD               Flags = 0;
