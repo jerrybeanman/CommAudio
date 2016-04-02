@@ -195,7 +195,7 @@ private:
 
     std::string get_all_songs();
 
-    void split_songs_from_string(std::string);
+    void split_songs_from_string(std::string combinedString);
 
 private:
     QMediaPlayer*           player;
