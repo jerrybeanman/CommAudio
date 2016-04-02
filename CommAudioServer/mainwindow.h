@@ -128,6 +128,12 @@ private slots:
 
     void handleDataFinished();
 
+    void on_pauseBtn_clicked();
+
+    void on_nextsongBtn_clicked();
+
+    void on_prevsongBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
     QByteArray serverIP;
@@ -177,13 +183,19 @@ private:
 
     void load_music_files();
 
-    void move_song_index();
+    void move_song_index(bool previous = false);
 
-    bool ready_next_song();
+    bool ready_next_song(bool previous = false);
+
+    void song_selected_update(bool previous = false);
 
     bool delete_old_song();
 
     void populate_songlist();
+
+    std::string get_all_songs();
+
+    void split_songs_from_string(std::string);
 
 private:
     QMediaPlayer*           player;

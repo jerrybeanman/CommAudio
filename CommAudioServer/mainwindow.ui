@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>408</width>
-    <height>286</height>
+    <width>635</width>
+    <height>411</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -205,6 +205,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <widget class="QListWidget" name="listWidget_2">
+              <property name="minimumSize">
+               <size>
+                <width>200</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
                 <width>100</width>
@@ -248,6 +254,20 @@
                <widget class="QPushButton" name="pushButton">
                 <property name="text">
                  <string>Play</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="nextsongBtn">
+                <property name="text">
+                 <string>Next Song</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="prevsongBtn">
+                <property name="text">
+                 <string>Previous Song</string>
                 </property>
                </widget>
               </item>
@@ -309,6 +329,13 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QPushButton" name="pauseBtn">
+      <property name="text">
+       <string>Pause</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -316,7 +343,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>408</width>
+     <width>635</width>
      <height>21</height>
     </rect>
    </property>
