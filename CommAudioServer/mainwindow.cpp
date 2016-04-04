@@ -119,7 +119,7 @@ bool MainWindow::prepare_audio_devices(QAudioFormat format)
 
     m_audioOutput = 0;
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
-
+    qDebug() << "Properly set the media";
     return true;
 }
 
@@ -208,11 +208,62 @@ void MainWindow::move_song_index(bool previous)
 
 bool MainWindow::ready_next_song(bool previous)
 {
+    /*
+    bool prevState = streaming; // Temporary keep track of the previous state.
+    streaming = !streaming; //switching the streaming state
+
+    qDebug() << "FileExists:" << fileExists;
+
+    if(!fileExists)
+    {
+        qDebug() << "Load a file before hitting the stream button.";
+        return;
+    }
+    if(m_generator == 0)
+    {
+        qDebug() << "No generator.";
+        return;
+    }
+
+    if(!streaming) // Start stream
+    {
+        connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
+        connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
+
+        qDebug() << "Stream button clicked.";
+        if(!fileLoaded)
+        {
+            qDebug() << "Loading file contents.";
+            load_file();
+            fileLoaded = true;
+        }
+        m_stream_size = 44;
+        song_size = &m_stream_size;
+        *song_stream_data = m_generator->getExternalReference()->data();
+        play_audio();
+
+    }
+    else if(streaming && m_generator->isPlaying())
+    {
+        qDebug() << "Stopping stream";
+        stop_stream();
+    }
+    else // Streaming button clicked but it was unable to proceed
+    {
+        streaming = prevState;
+    }
+    */
     if(fileExists)
     {
         delete_old_song();
     }
     m_file = new WavFile(this);
+
+    if(m_generator == 0)
+    {
+        qDebug() << "No generator.";
+        return false;
+    }
 
     // Handle moving to the next song when the song is finished
     QString song_filename = MUSIC_DIRECTORY + m_music_files[m_song_index];
@@ -227,9 +278,7 @@ bool MainWindow::ready_next_song(bool previous)
     m_generator = new DataGenerator(this);
     connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
-    //Tests
-
-
+    //Prepare the audio device to stream
     m_file->seek(0);
     QByteArray array = m_file->read(44);
     QAudioFormat format = m_generator->readHeader(array.data());
@@ -248,6 +297,8 @@ bool MainWindow::ready_next_song(bool previous)
     }
 
     song_selected_update(previous);
+
+    prepare_stream();
 
     play_audio();
 
@@ -318,6 +369,24 @@ void MainWindow::split_songs_from_string(std::string combinedString)
     combo.fromStdString(combinedString);
 
     QStringList server_music_files = combo.split(",", QString::SkipEmptyParts);
+}
+
+bool MainWindow::prepare_stream()
+{
+    if(!streaming) // Start stream
+    {
+        streaming = true;
+
+        connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
+        connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
+
+        qDebug() << "Stream button clicked.";
+
+        m_stream_size = 44;
+        song_size = &m_stream_size;
+        *song_stream_data = m_generator->getExternalReference()->data();
+
+    }
 }
 
 /*
@@ -459,6 +528,7 @@ void MainWindow::handleDataFinished()
 {
     qDebug() << "Data has finished sending.";
     fileFinished = true;
+    streaming = false;
     move_song_index();
 }
 
@@ -476,12 +546,14 @@ void MainWindow::on_pauseBtn_clicked()
 
 void MainWindow::on_nextsongBtn_clicked()
 {
+    streaming = false;
     move_song_index();
     ready_next_song();
 }
 
 void MainWindow::on_prevsongBtn_clicked()
 {
+    streaming = false;
     move_song_index(true);
     ready_next_song(true);
 }
