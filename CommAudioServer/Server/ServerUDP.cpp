@@ -57,9 +57,10 @@ bool ServerUDP::MulticastSettings(const char * name)
     //TODO replace with local ip address
     MulticastAddress.imr_multiaddr.s_addr = inet_addr(name);
     MulticastAddress.imr_interface.s_addr = INADDR_ANY;
+    u_long                  aTimeToLive = 1;
 
 
-    if(setsockopt(SocketInfo.Socket, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&TimeToLive, sizeof(TimeToLive)) == SOCKET_ERROR)
+    if(setsockopt(SocketInfo.Socket, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&aTimeToLive, sizeof(aTimeToLive)) == SOCKET_ERROR)
     {
         std::cout << "setsockopt() failed with error on time to live" << WSAGetLastError() << std::endl;
         return false;
@@ -84,6 +85,11 @@ bool ServerUDP::MulticastSettings(const char * name)
     return true;
 }
 
+bool ServerUDP::Broadcast(char *message)
+{
+
+}
+
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	Broadcast
 --
@@ -102,7 +108,10 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
 {
 
     SocketInfo.DataBuf.buf = message;
-    SocketInfo.DataBuf.len = strlen(message) + 1;
+    SocketInfo.DataBuf.len = *lpNumberOfBytesSent;
+
+    std::cout << "ServerUDP::Broadcast>>Length: " << *lpNumberOfBytesSent << std::endl;
+    fflush(stdout);
 
     ZeroMemory(&SocketInfo.Overlapped, sizeof(WSAOVERLAPPED));
     SocketInfo.Overlapped.hEvent =  WSACreateEvent();
@@ -110,7 +119,7 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
     if (WSASendTo(SocketInfo.Socket,      /* Writing socket                       */
             &(SocketInfo.DataBuf),        /* Message content                      */
             1,
-            lpNumberOfBytesSent,     /* Size of the message                  */
+            NULL,     /* Size of the message                  */
             flags,                              /* Bytes that are sent                  */
             (SOCKADDR *)&DestinationAddress,             /* Server socket address structure      */
             sizeof(DestinationAddress),
@@ -129,6 +138,14 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
             return FALSE;
         }
     }
+
+    //Get the actual bytes sent.
+    if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesSEND, FALSE, &flags))
+    {
+        std::cout << "SeverUDP::WSAGetOverlappedResult failed with errno" << WSAGetLastError() << std::endl;
+        return FALSE;
+    }
+    std::cerr << "ServerUDP::Broadcast>>Bytes Sent:[" << SocketInfo.BytesSEND << "]" << std::endl;
     return true;
 }
 
@@ -173,4 +190,3 @@ void ServerUDP::RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAP
 {
 
 }
-

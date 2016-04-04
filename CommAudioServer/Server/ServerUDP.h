@@ -1,7 +1,6 @@
 #ifndef SERVERUDP_H
 #define SERVERUDP_H
 #include "Server.h"
-#include <ws2tcpip.h>
 
 class ServerUDP : public Server
 {
@@ -27,7 +26,23 @@ class ServerUDP : public Server
             bool InitializeSocket(short port);
 
             /*------------------------------------------------------------------------------------------------------------------
-            -- FUNCTION:	InitializeSocket
+            -- FUNCTION:	Broadcast
+            --
+            -- DATE:		Febuary 28th, 2016		REVISIONS:
+            --
+            -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+            --
+            -- INTERFACE:	virtual void Broadcast(char * message) = 0;
+            --						~message: message content
+            --
+            -- RETURNS: void
+            --
+            -- NOTES: Sends a message to all the connected clients
+            --------------------------------------------------------------------------------------------------------------------*/
+            bool Broadcast(char * message);
+
+            /*------------------------------------------------------------------------------------------------------------------
+            -- FUNCTION:	MulticastSettings
             --
             -- DATE:		Febuary 28th, 2016          REVISIONS:
             --
@@ -56,7 +71,6 @@ class ServerUDP : public Server
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
             bool Broadcast(char * message, LPDWORD lpNumberOfBytesSent);
-
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send

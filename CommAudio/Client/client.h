@@ -1,6 +1,5 @@
 #ifndef CLIENT_H
 #define CLIENT_H
-#include "circularbuffer.h"
 #include "globals.h"
 
 class Client
@@ -16,6 +15,8 @@ class Client
         virtual bool Recv() = 0;
 
         bool Send(char * message, int size);
+
+        virtual bool Close() = 0;
 
 
     protected:

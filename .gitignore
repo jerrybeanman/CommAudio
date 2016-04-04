@@ -1,6 +1,14 @@
 # C++ objects and libs
 
+<<<<<<< HEAD
 build-CommAudio_*/*
+=======
+build-CommAudio-Desktop_*/*
+Drafts/build-CommAudio-Desktop_*/*
+CommAudio/debug/
+CommAudio/release/
+CommAudio/object_script*
+>>>>>>> Develop
 
 *.slo
 *.lo

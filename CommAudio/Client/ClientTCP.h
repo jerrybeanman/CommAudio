@@ -6,7 +6,7 @@ class ClientTCP : public Client
 public:
     bool InitializeSocket(short port, char *ip);
 
-    void Close();
+    bool Close();
 
     bool Recv();
 

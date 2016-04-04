@@ -4,14 +4,22 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = CommAudioServer
 TEMPLATE = app
 
+QT += network \
+      xml \
+      multimedia \
+      multimediawidgets \
+      widgets
+
 LIBS += -lws2_32
+
+QMAKE_CXXFLAGS += -std=c++11
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -20,7 +28,11 @@ SOURCES += main.cpp\
     Server/ServerUDP.cpp \
     circularbuffer.cpp \
     soundmanager.cpp \
-    filemanager.cpp
+    filemanager.cpp \
+    datagenerator.cpp \
+    inputbuffer.cpp \
+    recorder.cpp \
+    wavfile.cpp
 
 HEADERS  += mainwindow.h \
     Server/server.h \
@@ -29,6 +41,12 @@ HEADERS  += mainwindow.h \
     circularbuffer.h \
     globals.h \
     soundmanager.h \
-    filemanager.h
+    filemanager.h \
+    datagenerator.h \
+    inputbuffer.h \
+    recorder.h \
+    wavfile.h
 
 FORMS    += mainwindow.ui
+CONFIG   += c++11
+CONFIG   += debug

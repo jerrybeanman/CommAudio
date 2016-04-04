@@ -1,5 +1,4 @@
 #include "ClientTCP.h"
-#include "completionroutine.h"
 bool ClientTCP::InitializeSocket(short port, char *ip)
 {
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -86,11 +85,18 @@ bool ClientTCP::Recv() {
 }
 
 bool ClientTCP::Send(char * message, int size) {
+    Q_UNUSED(message)
+    Q_UNUSED(size)
 
+    return FALSE;
 }
 
 
-void ClientTCP::Close() {
-    closesocket(SocketInfo.Socket);
+bool ClientTCP::Close() {
+    if(closesocket(SocketInfo.Socket) == SOCKET_ERROR) {
+        return false;
+    }
     WSACleanup();
+
+    return true;
 }
