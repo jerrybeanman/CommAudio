@@ -166,6 +166,7 @@ void MainWindow::stop_stream()
     m_generator->resetPosition();
     *song_stream_data = 0;
     song_size = 0;
+    streaming = false;
 }
 
 void MainWindow::load_music_files()
@@ -214,16 +215,6 @@ bool MainWindow::ready_next_song(bool previous)
 
     qDebug() << "FileExists:" << fileExists;
 
-    if(!fileExists)
-    {
-        qDebug() << "Load a file before hitting the stream button.";
-        return;
-    }
-    if(m_generator == 0)
-    {
-        qDebug() << "No generator.";
-        return;
-    }
 
     if(!streaming) // Start stream
     {
@@ -242,15 +233,6 @@ bool MainWindow::ready_next_song(bool previous)
         *song_stream_data = m_generator->getExternalReference()->data();
         play_audio();
 
-    }
-    else if(streaming && m_generator->isPlaying())
-    {
-        qDebug() << "Stopping stream";
-        stop_stream();
-    }
-    else // Streaming button clicked but it was unable to proceed
-    {
-        streaming = prevState;
     }
     */
     if(fileExists)
@@ -340,11 +322,14 @@ void MainWindow::song_selected_update(bool previous)
 }
 
 bool MainWindow::delete_old_song()
-{
-    qDebug() << "Disposing of old song.";
-    delete m_file;
-    fileLoaded = false;
-    m_generator->RemoveBufferedData();
+{   
+    if(m_file != 0) // File must exist
+    {
+        qDebug() << "Disposing of old song.";
+        delete m_file;
+        fileLoaded = false;
+        m_generator->RemoveBufferedData();
+    }
 }
 
 void MainWindow::populate_songlist()
@@ -520,8 +505,10 @@ void MainWindow::on_streamButton_clicked(bool checked)
 void MainWindow::handleDataAvailable(int len)
 {
     *song_size += static_cast <DWORD>(len);
+    /*
     if(fileFinished)
         m_pos = 0;
+    */
 }
 
 void MainWindow::handleDataFinished()
