@@ -528,7 +528,7 @@ void MainWindow::handleDataFinished()
 {
     qDebug() << "Data has finished sending.";
     fileFinished = true;
-    streaming = true;
+    streaming = false;
     move_song_index();
 }
 
