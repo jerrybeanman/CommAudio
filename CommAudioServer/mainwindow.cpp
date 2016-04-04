@@ -241,12 +241,6 @@ bool MainWindow::ready_next_song(bool previous)
     }
     m_file = new WavFile(this);
 
-    if(m_generator == 0)
-    {
-        qDebug() << "No generator.";
-        return false;
-    }
-
     // Handle moving to the next song when the song is finished
     QString song_filename = MUSIC_DIRECTORY + m_music_files[m_song_index];
     if(!m_file->open(song_filename))
@@ -264,10 +258,9 @@ bool MainWindow::ready_next_song(bool previous)
     m_file->seek(0);
     QByteArray array = m_file->read(44);
     QAudioFormat format = m_generator->readHeader(array.data());
-    QAudioFormat temp = m_file->fileFormat();
     if(!prepare_audio_devices(format))
     {
-        qDebug() << "MainWindow::ready_next_song>>Failed preparing the next song";
+        qWarning() << "MainWindow::ready_next_song>>Failed preparing the next song";
         return false;
     }
 
@@ -280,7 +273,11 @@ bool MainWindow::ready_next_song(bool previous)
 
     song_selected_update(previous);
 
-    prepare_stream();
+    if(!prepare_stream())
+    {
+        qWarning() << "Prepare stream failed.";
+        // Handle stream error here.
+    }
 
     play_audio();
 
@@ -325,11 +322,21 @@ bool MainWindow::delete_old_song()
 {   
     if(m_file != 0) // File must exist
     {
+        while(*song_size != 0) // Allow the remaining piece of the song to send.
+        {
+            ;
+        }
+
         qDebug() << "Disposing of old song.";
         delete m_file;
         fileLoaded = false;
+
         m_generator->RemoveBufferedData();
+
+        return true;
     }
+    qDebug() << "No existing song, no deletion.";
+    return false;
 }
 
 void MainWindow::populate_songlist()
@@ -365,13 +372,17 @@ bool MainWindow::prepare_stream()
         connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
         connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
 
-        qDebug() << "Stream button clicked.";
+        qDebug() << "MainWindow::prepare_stream>>Sending Header.";
 
+        *song_stream_data = m_generator->getExternalReference()->data();
         m_stream_size = 44;
         song_size = &m_stream_size;
-        *song_stream_data = m_generator->getExternalReference()->data();
 
+        return true;
     }
+
+    qDebug() << "MainWindow::prepare_stream>>Header was not sent, streaming set to true when it should be false.";
+    return false;
 }
 
 /*
@@ -515,7 +526,7 @@ void MainWindow::handleDataFinished()
 {
     qDebug() << "Data has finished sending.";
     fileFinished = true;
-    streaming = false;
+    //streaming = false;
     move_song_index();
 }
 
@@ -533,6 +544,12 @@ void MainWindow::on_pauseBtn_clicked()
 
 void MainWindow::on_nextsongBtn_clicked()
 {
+    if(m_generator->isPlaying())
+    {
+        qDebug() << "Pause button clicked.";
+        m_audioOutput->suspend();
+    }
+
     streaming = false;
     move_song_index();
     ready_next_song();
@@ -540,6 +557,12 @@ void MainWindow::on_nextsongBtn_clicked()
 
 void MainWindow::on_prevsongBtn_clicked()
 {
+    if(m_generator->isPlaying())
+    {
+        qDebug() << "Pause button clicked.";
+        m_audioOutput->suspend();
+    }
+
     streaming = false;
     move_song_index(true);
     ready_next_song(true);

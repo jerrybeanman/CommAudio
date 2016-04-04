@@ -284,6 +284,30 @@ private:
     ----------------------------------------------------------------------------------------------------------------------*/
     void move_song_index(bool previous = false);
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Ready Next Song
+    --
+    -- DATE:        March 25, 2016
+    --
+    -- REVISIONS:   April 4, 2016 (Tyler Trepanier
+    --                  Added Stream functionality
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   bool ready_next_song(bool previous = false)
+    --
+    -- PARAMETERS:  bool previous
+    --                  Defaults to false, checks to see if we are changing to the next song or the previous song.
+    --
+    -- RETURNS:     Returns True if there was no issues with switching to the next song.
+    --              Returns False if there was an issue with switching to the next song.
+    --
+    -- NOTES:
+    -- Master function that handles switching between songs for streaming. This function disposes of any old song data,
+    -- loads the next song's data to the data generator and begins to initially stream the song to any listening clients.
+    ----------------------------------------------------------------------------------------------------------------------*/
     bool ready_next_song(bool previous = false);
 
     void song_selected_update(bool previous = false);
