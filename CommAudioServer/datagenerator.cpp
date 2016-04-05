@@ -94,6 +94,7 @@ void DataGenerator::RemoveBufferedData()
     dg_externBuf.resize(0);
     dg_readpos = 0;
     dg_max = 0;
+    playing = false;
 }
 
 /*
