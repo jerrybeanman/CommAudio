@@ -373,9 +373,12 @@ bool MainWindow::prepare_stream()
         connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
 
         qDebug() << "MainWindow::prepare_stream>>Sending Header.";
+        QByteArray* header = m_generator->getExternalReference();
+        header->prepend(HEADER);
+        *song_stream_data = header->data();
 
-        *song_stream_data = m_generator->getExternalReference()->data();
-        m_stream_size = 44;
+        //*song_stream_data = m_generator->getExternalReference()->data();
+        m_stream_size = 51;
         song_size = &m_stream_size;
 
         return true;
@@ -526,7 +529,7 @@ void MainWindow::handleDataFinished()
 {
     qDebug() << "Data has finished sending.";
     fileFinished = true;
-    //streaming = false;
+    streaming = false;
     move_song_index();
 }
 
