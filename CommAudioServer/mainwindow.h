@@ -179,6 +179,8 @@ private:
 
     void play_audio();
 
+    void prepare_stream();
+
     void stop_stream();
 
     void load_music_files();
