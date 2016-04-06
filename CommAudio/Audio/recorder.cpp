@@ -76,11 +76,6 @@ void Recorder::notified()
     {
         qDebug() << "Error State:" << r_input->error();
         qDebug() << "Bytes total inputed: " << r_newBuffer->size();
-        /*qDebug() << "platform buffer size after called QAudioInput start():" << r_input->bufferSize();
-
-        qDebug() << "bytesReady = " << r_input->bytesReady()
-        << ", " << "elapsedUSecs = " << r_input->elapsedUSecs()
-        << ", " << "processedUSecs = "<< r_input->processedUSecs();*/
     }
 }
 

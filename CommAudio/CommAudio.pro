@@ -25,27 +25,27 @@ SOURCES += \
     Client/ClientUDP.cpp \
     Client/ClientTCP.cpp \
     circularbuffer.cpp \
-    datagenerator.cpp \
-    inputbuffer.cpp \
     main.cpp \
     mainwindow.cpp \
-    recorder.cpp \
-    wavfile.cpp \
     tcpthreadmanager.cpp \
-    udpthreadmanager.cpp
+    udpthreadmanager.cpp \
+    Audio/datagenerator.cpp \
+    Audio/inputbuffer.cpp \
+    Audio/recorder.cpp \
+    Audio/wavfile.cpp
 
 HEADERS  += \
     Client/client.h \
     Client/ClientTCP.h \
     circularbuffer.h \
-    datagenerator.h \
     globals.h \
-    inputbuffer.h \
     mainwindow.h \
-    recorder.h \
-    wavfile.h \
     Client/ClientUDP.h \
     tcpthreadmanager.h \
-    udpthreadmanager.h
+    udpthreadmanager.h \
+    Audio/datagenerator.h \
+    Audio/inputbuffer.h \
+    Audio/recorder.h \
+    Audio/wavfile.h
 
 FORMS    += mainwindow.ui

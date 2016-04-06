@@ -58,11 +58,9 @@ qint64 DataGenerator::readData(char *data, qint64 len)
         {
             playing = false;
             progress = 100;
-            //qDebug() << "DataGenerator::readData>>dataFinished";
             emit dataFinished();
         }
 
-        //qDebug() << "DataGenerator::readData>>progress[" << progress << "] dataAvailable[" << chunk << "]";
         emit audioProgressChanged(progress);
         emit dataAvailable(externChunk);
     }
@@ -93,6 +91,7 @@ void DataGenerator::RemoveBufferedData()
     dg_buffer.resize(0);
     dg_externBuf.resize(0);
     dg_readpos = 0;
+    dg_max = 0;
 }
 
 /*
@@ -162,7 +161,6 @@ QAudioFormat DataGenerator::readHeader(char* data)
     memcpy(reinterpret_cast<char *>(&header), data, sizeof(CombinedHeader));
     data += sizeof(WAVEHeader);
 
-    //bool result = read(reinterpret_cast<char *>(&header), sizeof(CombinedHeader)) == sizeof(CombinedHeader);
     if ((memcmp(&header.riff.descriptor.id, "RIFF", 4) == 0
         || memcmp(&header.riff.descriptor.id, "RIFX", 4) == 0)
         && memcmp(&header.riff.type, "WAVE", 4) == 0

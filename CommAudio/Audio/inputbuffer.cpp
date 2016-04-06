@@ -19,16 +19,6 @@ InputBuffer::~InputBuffer()
 
 qint64 InputBuffer::readData(char *data, qint64 maxlen)
 {
-    /*qint64 total = 0;
-    if (!m_buffer.isEmpty()) {
-        while (len - total > 0) {
-            const qint64 chunk = qMin((m_buffer.size() - m_pos), len - total);
-            memcpy(data + total, m_buffer.constData() + m_pos, chunk);
-            m_pos = (m_pos + chunk) % m_buffer.size();
-            total += chunk;
-        }
-    }
-    return total;*/
 
     if(i_buffered_length <= 0)
         return 0;

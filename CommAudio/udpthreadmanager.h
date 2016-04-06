@@ -11,7 +11,6 @@ class UDPThreadManager : public QObject
 {
     Q_OBJECT
 public:
-
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: threadRequest
     --
@@ -31,6 +30,7 @@ public:
     -- Emits the signal to start the receive thread.
     ----------------------------------------------------------------------------------------------------------------------*/
     void UDPThreadRequest();
+    void closeSocket();
 signals:
     void finished();
     void songDataReceived(const unsigned int);
@@ -58,6 +58,9 @@ public slots:
     -- The UDP thread to receive information from the broadcast channel
     ----------------------------------------------------------------------------------------------------------------------*/
     void UDPReceiveThread();
+
+private:
+    ClientUDP clientUDP;
 };
 
 #endif // THREADMANAGER_H

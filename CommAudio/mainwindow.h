@@ -14,9 +14,9 @@
 #include <QSlider>
 #include <atomic>
 #include <QThread>
-#include "recorder.h"
-#include "datagenerator.h"
-#include "wavfile.h"
+#include "Audio/recorder.h"
+#include "Audio/datagenerator.h"
+#include "Audio/wavfile.h"
 #include "udpthreadmanager.h"
 #include "circularbuffer.h"
 #include "tcpthreadmanager.h"
@@ -190,6 +190,8 @@ private:
     ----------------------------------------------------------------------------------------------------------------------*/
     void prepare_audio_devices(QAudioFormat format);
 
+    void initializeUDPThread();
+
     void init_file();
 
     void play_audio();
@@ -201,7 +203,7 @@ private:
     QBuffer*                mediaStream;
     QAudioDecoder*          m_decoder;
     QAudioFormat            m_format;
-    QAudioOutput*           m_audioOutput;
+    QAudioOutput*           m_audioOutput = 0;
     QAudioDeviceInfo        m_device;
     QSlider*                m_volumeSlider;
     WavFile*                m_file;
@@ -209,6 +211,7 @@ private:
     QThread*                broadcastThread;
     QThread*                tcpThread;
     QFile*                  data_file;
+    UDPThreadManager*       UDPWorker;
 
     DataGenerator*          m_generator;
     char*                   data;

@@ -6,8 +6,6 @@
 class ClientUDP : public Client
 {
     public:
-
-
         bool InitializeSocket(short port);
 
         bool MulticastSettings(const char * name);

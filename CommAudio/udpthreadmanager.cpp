@@ -3,7 +3,6 @@
 
 
 void UDPThreadManager::UDPReceiveThread() {
-    ClientUDP clientUDP;
     QByteArray temp;
     if(!clientUDP.InitializeSocket(DEFAULT_PORT))
         return;
@@ -12,30 +11,35 @@ void UDPThreadManager::UDPReceiveThread() {
         return;
 
     CBInitialize(&cb, 10, 40000);
-    bool first = true;
     while(1)
     {
         if(!clientUDP.Recv()) {
-            return;
+            qDebug() << "Exiting thread";
+            break;
         }
 
         //Song name / size
         //file header data
         //if data is header data emit header signal
-        CBPushBack(&cb, clientUDP.SocketInfo.DataBuf.buf);
-        if(first) {
+        QByteArray header = QByteArray::fromRawData(clientUDP.SocketInfo.DataBuf.buf,
+                                                    7);
+        if(header.startsWith("HEADER:")) {
+            CBPushBack(&cb, clientUDP.SocketInfo.DataBuf.buf + 7);
             emit songHeader(clientUDP.SocketInfo.BytesRECV);
-            first = false;
         } else if(clientUDP.SocketInfo.DataBuf.buf[0] == (char)18) {
 
         } else {
+            CBPushBack(&cb, clientUDP.SocketInfo.DataBuf.buf);
             emit songDataReceived(clientUDP.SocketInfo.BytesRECV);
         }
     }
-
-
+    CBFree(&cb);
 }
 
+void UDPThreadManager::closeSocket() {
+    clientUDP.Close();
+    this->thread()->exit();
+}
 
 void UDPThreadManager::UDPThreadRequest() {
     emit UDPThreadRequested();
