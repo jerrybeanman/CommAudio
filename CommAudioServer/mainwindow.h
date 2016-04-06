@@ -128,6 +128,12 @@ private slots:
 
     void handleDataFinished();
 
+    void on_pauseBtn_clicked();
+
+    void on_nextsongBtn_clicked();
+
+    void on_prevsongBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
     QByteArray serverIP;
@@ -167,13 +173,31 @@ private:
     --
     -- NOTES:
     ----------------------------------------------------------------------------------------------------------------------*/
-    void prepare_audio_devices(QAudioFormat format);
+    bool prepare_audio_devices(QAudioFormat format);
 
     void load_file();
 
     void play_audio();
 
+    void prepare_stream();
+
     void stop_stream();
+
+    void load_music_files();
+
+    void move_song_index(bool previous = false);
+
+    bool ready_next_song(bool previous = false);
+
+    void song_selected_update(bool previous = false);
+
+    bool delete_old_song();
+
+    void populate_songlist();
+
+    std::string get_all_songs();
+
+    void split_songs_from_string(std::string combinedString);
 
 private:
     QMediaPlayer*           player;
@@ -190,11 +214,15 @@ private:
     DataGenerator*          m_generator;
     DWORD                   m_stream_size;
     qint64                  m_pos;
+    qint64                  m_song_index;
     bool                    fileExists;
     bool                    fileLoaded;
     bool                    streaming;
     bool                    fileFinished;
-    struct UDPBroadcast*    udp;
+
+    QStringList             m_music_files;
+    QDir                    m_dir;
+
 };
 
 #endif // MAINWINDOW_H

@@ -19,23 +19,18 @@ int main(int argc, char *argv[])
     {
         return errno;
     }
-    /*ServerUDP serverUDP = new serverUDP;
 
-    FileNames = GetFileNames(current_dir, "Debug");
+    FileNames = GetFileNames(current_dir, "wav");
 
-    for(auto const  &x : FileNames)
-    {
-        std::cout << x << std::endl;
-    }*/
     if(!StartSoundManager())
     {
         std::cout << "StartSoundManager() failed to start" << std::endl;
         return -1;
     }
-   /* if(!StartFileManager())
+    if(!StartFileManager())
     {
         std::cout << "StartFileManager() failed to start" << std::endl;
-    }*/
+    }
 
     return program.exec();
 }

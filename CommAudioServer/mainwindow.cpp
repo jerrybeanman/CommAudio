@@ -13,6 +13,7 @@
 #include "globals.h"
 #include "soundmanager.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -23,6 +24,10 @@ MainWindow::MainWindow(QWidget *parent) :
     fileLoaded = false;
     fileFinished = false;
     m_pos = 0;
+    m_song_index = 0;
+
+    load_music_files();
+    ready_next_song();
 }
 
 MainWindow::~MainWindow()
@@ -102,7 +107,7 @@ void MainWindow::updateFileProgress(const int progress) {
     Q_UNUSED(progress);
 }
 
-void MainWindow::prepare_audio_devices(QAudioFormat format)
+bool MainWindow::prepare_audio_devices(QAudioFormat format)
 {
     m_format = format;
     qDebug() << m_device.deviceName();
@@ -110,11 +115,13 @@ void MainWindow::prepare_audio_devices(QAudioFormat format)
     if(!m_device.isFormatSupported(m_format))
     {
         qWarning()<<"raw audio format not supported by backend, cannot play audio.";
-        return;
+        return false;
     }
 
     m_audioOutput = 0;
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
+    qDebug() << "Properly set the media";
+    return true;
 }
 
 void MainWindow::load_file()
@@ -162,6 +169,227 @@ void MainWindow::stop_stream()
     song_size = 0;
 }
 
+void MainWindow::load_music_files()
+{
+    int old_size = m_music_files.size();
+
+    m_dir = QDir(MUSIC_DIRECTORY);
+
+    // No dots, no hidden folders/file, show files only. After those filters, sort it by name.
+    m_music_files = m_dir.entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::Files, QDir::Name);//(QDir::Filter::Files,QDir::SortFlag::NoSort)
+
+    m_music_files.sort();
+
+    if(old_size != m_music_files.size()) // Number of songs changed? Redo the entire list.
+    {
+        populate_songlist();
+    }
+}
+
+void MainWindow::move_song_index(bool previous)
+{
+    if(!previous)
+    {
+        m_song_index++;
+        if(m_song_index > m_music_files.size() - 1)
+        {
+            m_song_index = 0;
+        }
+    }
+    else
+    {
+        m_song_index--;
+        if(m_song_index < 0)
+        {
+            m_song_index = m_music_files.size() - 1;
+        }
+    }
+
+}
+
+bool MainWindow::ready_next_song(bool previous)
+{
+    /*
+    bool prevState = streaming; // Temporary keep track of the previous state.
+    streaming = !streaming; //switching the streaming state
+
+    qDebug() << "FileExists:" << fileExists;
+
+    if(!fileExists)
+    {
+        qDebug() << "Load a file before hitting the stream button.";
+        return;
+    }
+    if(m_generator == 0)
+    {
+        qDebug() << "No generator.";
+        return;
+    }
+
+    if(!streaming) // Start stream
+    {
+        connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
+        connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
+
+        qDebug() << "Stream button clicked.";
+        if(!fileLoaded)
+        {
+            qDebug() << "Loading file contents.";
+            load_file();
+            fileLoaded = true;
+        }
+        m_stream_size = 44;
+        song_size = &m_stream_size;
+        *song_stream_data = m_generator->getExternalReference()->data();
+        play_audio();
+
+    }
+    else if(streaming && m_generator->isPlaying())
+    {
+        qDebug() << "Stopping stream";
+        stop_stream();
+    }
+    else // Streaming button clicked but it was unable to proceed
+    {
+        streaming = prevState;
+    }
+    */
+    if(fileExists)
+    {
+        delete_old_song();
+    }
+    m_file = new WavFile(this);
+
+    if(m_generator == 0)
+    {
+        qDebug() << "No generator.";
+        return false;
+    }
+
+    // Handle moving to the next song when the song is finished
+    QString song_filename = MUSIC_DIRECTORY + m_music_files[m_song_index];
+    if(!m_file->open(song_filename))
+    {
+        m_file = 0;
+        qDebug() << "Cannot open file:";
+        return false;
+    }
+
+    fileExists = true;
+    m_generator = new DataGenerator(this);
+    connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
+
+    //Prepare the audio device to stream
+    m_file->seek(0);
+    QByteArray array = m_file->read(44);
+    QAudioFormat format = m_generator->readHeader(array.data());
+    QAudioFormat temp = m_file->fileFormat();
+    if(!prepare_audio_devices(format))
+    {
+        qDebug() << "MainWindow::ready_next_song>>Failed preparing the next song";
+        return false;
+    }
+
+    if(!fileLoaded)
+    {
+        qDebug() << "Loading file contents.";
+        load_file();
+        fileLoaded = true;
+    }
+
+    song_selected_update(previous);
+
+    prepare_stream();
+
+    play_audio();
+
+    return true;
+}
+
+
+void MainWindow::song_selected_update(bool previous)
+{
+    if (ui->listWidget_2->count() > 0) {
+
+        // Change the previously selected song's colour back to normal.
+        int old_song_index;
+
+        if(previous)
+        {
+            old_song_index = m_song_index + 1;
+            if(old_song_index == ui->listWidget_2->count())
+                old_song_index = 0;
+        }
+        else
+        {
+            old_song_index = m_song_index - 1;
+            if(old_song_index == -1)
+                old_song_index = ui->listWidget_2->count() - 1;
+        }
+
+        QListWidgetItem* olditem = ui->listWidget_2->item(old_song_index);
+        olditem->setForeground(Qt::black);
+        olditem->setBackground(Qt::white);
+
+        // Change the current song's colour to white on blue
+        QListWidgetItem* newitem = ui->listWidget_2->item(m_song_index);
+        newitem->setForeground(Qt::white);
+        newitem->setBackground(Qt::blue);
+
+        ui->listWidget_2->setFocus();
+    }
+}
+
+bool MainWindow::delete_old_song()
+{
+    qDebug() << "Disposing of old song.";
+    delete m_file;
+    fileLoaded = false;
+    m_generator->RemoveBufferedData();
+}
+
+void MainWindow::populate_songlist()
+{
+    while(ui->listWidget_2->count() > 0)
+    {
+        QListWidgetItem* temp = ui->listWidget_2->takeItem(0);
+        if(temp != 0)
+            delete temp;
+    }
+    ui->listWidget_2->addItems(m_music_files);
+}
+
+std::string MainWindow::get_all_songs()
+{
+    return m_music_files.join('~').toStdString();
+}
+
+void MainWindow::split_songs_from_string(std::string combinedString)
+{
+    QString combo;
+    combo.fromStdString(combinedString);
+
+    QStringList server_music_files = combo.split(",", QString::SkipEmptyParts);
+}
+
+void MainWindow::prepare_stream()
+{
+    if(!streaming) // Start stream
+    {
+        streaming = true;
+
+        connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
+        connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
+
+        qDebug() << "Stream button clicked.";
+
+        m_stream_size = 44;
+        song_size = &m_stream_size;
+        *song_stream_data = m_generator->getExternalReference()->data();
+
+    }
+}
+
 /*
 void MainWindow::on_stopButton_clicked() // Stop the music
 {
@@ -177,7 +405,7 @@ void MainWindow::on_stopButton_clicked() // Stop the music
     }
 }
 
-void MainWindow::on_pauseButton_clicked()
+void MainWindow::on_pauseButton_clicked() // Pause the music
 {
     if(!fileExists)
         return;
@@ -235,6 +463,11 @@ void MainWindow::on_playRecordingButton_clicked()
 void MainWindow::on_progressBar_actionTriggered(int progress)
 {
     ui->progressBar->setValue(progress);
+    if(progress == 100)
+    {
+        move_song_index();
+        ready_next_song();
+    }
 }
 
 void MainWindow::on_streamButton_clicked(bool checked)
@@ -296,8 +529,32 @@ void MainWindow::handleDataFinished()
 {
     qDebug() << "Data has finished sending.";
     fileFinished = true;
-    /*
-     *
-     * Do stuff here
-     */
+    streaming = false;
+    move_song_index();
+}
+
+void MainWindow::on_pauseBtn_clicked()
+{
+    if(!fileExists)
+        return;
+
+    if(m_generator->isPlaying())
+    {
+        qDebug() << "Pause button clicked.";
+        m_audioOutput->suspend();
+    }
+}
+
+void MainWindow::on_nextsongBtn_clicked()
+{
+    streaming = false;
+    move_song_index();
+    ready_next_song();
+}
+
+void MainWindow::on_prevsongBtn_clicked()
+{
+    streaming = false;
+    move_song_index(true);
+    ready_next_song(true);
 }

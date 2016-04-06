@@ -55,7 +55,7 @@ std::string ServerTCP::Accept(void)
 {
     Client newClient;
     int Len = sizeof(newClient.Connection);
-    if((newClient.SocketInfo.Socket = accept(ListeningSocket, (SOCKADDR*)&newClient.Connection, &Len)) == INVALID_SOCKET)
+    if((newClient.SocketInfo.Socket = accept(SocketInfo.Socket, (SOCKADDR*)&newClient.Connection, &Len)) == INVALID_SOCKET)
     {
         std::cerr << "ServerTCP::Accept() failed with error " << WSAGetLastError() << std::endl;
         return "";
@@ -85,7 +85,21 @@ bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
 
 void ServerTCP::Send(LPSOCKET_INFORMATION SockInfo, char * message)
 {
-
+    /* Post a message back to the socket for aknowledgement */
+    if (WSASend(SockInfo->Socket,    /* Writing socket                       */
+        &(SockInfo->DataBuf),        /* Pointer to WSABUF                    */
+        1,                           /* Only 1 WSABUF                        */
+        &SockInfo->BytesSEND,        /* Bytes that are sent                  */
+        0,                           /* No behavior to modify                */
+        &(SockInfo->Overlapped),     /* Pointer to overlapped struct         */
+        NULL)                        /* No completion routine                */
+        == SOCKET_ERROR)
+    {
+        if (WSAGetLastError() != ERROR_IO_PENDING)
+        {
+            std::cerr << "Send() failed with errno: " << WSAGetLastError() << std::endl;
+        }
+    }
 }
 
 void ServerTCP::RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags)
