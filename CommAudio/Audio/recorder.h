@@ -4,9 +4,9 @@
 #include <QApplication>
 #include <QAudioInput>
 #include <QBuffer>
-#include "inputbuffer.h"
 #include <QDataStream>
 #include <QDebug>
+#include "inputbuffer.h"
 
 class Recorder : public QObject
 {

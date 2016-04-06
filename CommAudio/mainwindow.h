@@ -14,10 +14,13 @@
 #include <QSlider>
 #include <atomic>
 #include <QThread>
-#include "wavfile.h"
-#include "datagenerator.h"
-#include "recorder.h"
-#include "threadmanager.h"
+#include "Audio/recorder.h"
+#include "Audio/datagenerator.h"
+#include "Audio/wavfile.h"
+#include "udpthreadmanager.h"
+#include "circularbuffer.h"
+#include "tcpthreadmanager.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -144,11 +147,11 @@ private slots:
 
     void on_progressBar_actionTriggered(int action);
 
-    void write_to_file(const unsigned int size);
+    void addToSongBuffer(const unsigned int size);
+
+    void addToSongHeader(const unsigned int size);
 
 private:
-    Ui::MainWindow *ui;
-    QByteArray serverIP;
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: getServerAddress
     --
@@ -187,23 +190,28 @@ private:
     ----------------------------------------------------------------------------------------------------------------------*/
     void prepare_audio_devices(QAudioFormat format);
 
+    void initializeUDPThread();
+
     void init_file();
 
     void play_audio();
 
-private:
+    Ui::MainWindow*         ui;
+    QByteArray              serverIP;
     QMediaPlayer*           player;
     QByteArray              m_buffer;
     QBuffer*                mediaStream;
     QAudioDecoder*          m_decoder;
     QAudioFormat            m_format;
-    QAudioOutput*           m_audioOutput;
+    QAudioOutput*           m_audioOutput = 0;
     QAudioDeviceInfo        m_device;
     QSlider*                m_volumeSlider;
     WavFile*                m_file;
     Recorder*               m_recorder;
     QThread*                broadcastThread;
+    QThread*                tcpThread;
     QFile*                  data_file;
+    UDPThreadManager*       UDPWorker;
 
     DataGenerator*          m_generator;
     char*                   data;

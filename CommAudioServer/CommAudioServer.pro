@@ -29,10 +29,10 @@ SOURCES += main.cpp\
     circularbuffer.cpp \
     soundmanager.cpp \
     filemanager.cpp \
-    datagenerator.cpp \
-    inputbuffer.cpp \
-    recorder.cpp \
-    wavfile.cpp
+    Audio/datagenerator.cpp \
+    Audio/inputbuffer.cpp \
+    Audio/recorder.cpp \
+    Audio/wavfile.cpp
 
 HEADERS  += mainwindow.h \
     Server/server.h \
@@ -42,10 +42,10 @@ HEADERS  += mainwindow.h \
     globals.h \
     soundmanager.h \
     filemanager.h \
-    datagenerator.h \
-    inputbuffer.h \
-    recorder.h \
-    wavfile.h
+    Audio/datagenerator.h \
+    Audio/inputbuffer.h \
+    Audio/recorder.h \
+    Audio/wavfile.h
 
 FORMS    += mainwindow.ui
 CONFIG   += c++11

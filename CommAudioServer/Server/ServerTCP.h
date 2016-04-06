@@ -101,7 +101,6 @@ class ServerTCP : public Server
 
              void AssignID(Client client);
         private:
-        	SOCKET 	ListeningSocket;
             SOCKET      AcceptedSocket;
     };
 #endif // TCP_SERVER_H

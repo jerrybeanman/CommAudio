@@ -3,19 +3,18 @@
 
 #include <QObject>
 #include <QByteArray>
-#include "globals.h"
-#include "Client/clientudp.h"
+#include "circularbuffer.h"
+#include "Client/ClientUDP.h"
+#include "Client/ClientTCP.h"
 
-class threadManager : public QObject
+class UDPThreadManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit threadManager(QObject *parent = 0) {}
-
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: threadRequest
     --
-    -- DATE: March 18, 2015
+    -- DATE: March 18, 2016
     --
     -- REVISIONS: (Date and Description)
     --
@@ -30,19 +29,20 @@ public:
     -- NOTES:
     -- Emits the signal to start the receive thread.
     ----------------------------------------------------------------------------------------------------------------------*/
-    void threadRequest();
+    void UDPThreadRequest();
+    void closeSocket();
 signals:
     void finished();
-    void dataReceived(const unsigned int);
-    void dataHeader(const QByteArray& header);
-    void threadRequested();
+    void songDataReceived(const unsigned int);
+    void songHeader(const unsigned int);
+    void UDPThreadRequested();
     void playlistReceived(const QByteArray& playlist);
 
 public slots:
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: receiveThread
     --
-    -- DATE: March 18, 2015
+    -- DATE: March 18, 2016
     --
     -- REVISIONS: (Date and Description)
     --
@@ -57,7 +57,10 @@ public slots:
     -- NOTES:
     -- The UDP thread to receive information from the broadcast channel
     ----------------------------------------------------------------------------------------------------------------------*/
-    void receiveThread();
+    void UDPReceiveThread();
+
+private:
+    ClientUDP clientUDP;
 };
 
 #endif // THREADMANAGER_H

@@ -13,6 +13,7 @@
 #include "globals.h"
 #include "soundmanager.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -363,7 +364,7 @@ void MainWindow::split_songs_from_string(std::string combinedString)
     QStringList server_music_files = combo.split(",", QString::SkipEmptyParts);
 }
 
-bool MainWindow::prepare_stream()
+void MainWindow::prepare_stream()
 {
     if(!streaming) // Start stream
     {

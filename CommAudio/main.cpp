@@ -1,8 +1,9 @@
 #include "mainwindow.h"
-#include "Client/ClientUDP.h"
+#include "Client/ClientTCP.h"
 #include <QApplication>
 void StartServer();
 DWORD WINAPI UDPThread(LPVOID lpParameter);
+DWORD WINAPI AcceptThread(LPVOID lpParam);
 
 int main(int argc, char *argv[])
 {
@@ -10,5 +11,5 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-  return program.exec();
+    return program.exec();;
 }

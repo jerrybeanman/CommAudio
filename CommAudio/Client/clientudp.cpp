@@ -42,7 +42,6 @@ bool ClientUDP::InitializeSocket(short port)
 
 bool ClientUDP::MulticastSettings(const char * name)
 {
-    DWORD ret;
     MulticastInfo.imr_multiaddr.s_addr = inet_addr(name);
     MulticastInfo.imr_interface.s_addr = INADDR_ANY;
 
@@ -100,6 +99,8 @@ bool ClientUDP::Recv()
 }
 bool ClientUDP::Send(char * message, int size)
 {
+    Q_UNUSED(message)
+    Q_UNUSED(size)
     return FALSE;
 }
 

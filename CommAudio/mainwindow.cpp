@@ -9,10 +9,6 @@
 #include <QAudioOutput>
 #include <QAudioDeviceInfo>
 #include <QSlider>
-#include "datagenerator.h"
-#include "wavfile.h"
-//always scamazing
-#include "globals.h"
 CircularBuffer cb;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -52,45 +48,89 @@ void MainWindow::on_connectButton_pressed()
     ui->serverIPAddr->clear();
     ui->stackedWidget->setCurrentIndex(1);
 
-    generatePlaylist("Song1 Song2 Song3 Song4 Song5 Song6");
 
-    broadcastThread = new QThread();
-    threadManager* worker = new threadManager();
-    //check with tyler
+    tcpThread = new QThread();
+
+    QByteArray testIP("192.168.56.1");
+    TCPThreadManager* TCPWorker = new TCPThreadManager(testIP);
     m_generator = new DataGenerator(this);
 
-    worker->moveToThread(broadcastThread);
+    initializeUDPThread();
 
-    connect(worker, SIGNAL(dataReceived(const unsigned int)), this,
-            SLOT(write_to_file(const unsigned int)));
-    connect(worker, SIGNAL(threadRequested()), broadcastThread, SLOT(start()));
-    connect(broadcastThread, SIGNAL(started()), worker, SLOT(receiveThread()));
-    connect(worker, SIGNAL(finished()), broadcastThread, SLOT(quit()), Qt::DirectConnection);
+    TCPWorker->moveToThread(tcpThread);
 
-    worker->threadRequest();
+    connect(TCPWorker, SIGNAL(TCPThreadRequested()), tcpThread, SLOT(start()));
+    connect(tcpThread, SIGNAL(started()), TCPWorker, SLOT(TCPReceiveThread()));
+    connect(TCPWorker, SIGNAL(finished()), tcpThread, SLOT(quit()), Qt::DirectConnection);
+
+    TCPWorker->TCPThreadRequest();
 
 }
-DWORD c;
-void MainWindow::write_to_file(const unsigned int size) {
-    //qDebug() << "Writing to file " << size;
-    QDataStream stream(data_file);
+static int count;
+void MainWindow::addToSongBuffer(const unsigned int size) {
     while(cb.Count != 0)
     {
-        char* temp = new char[40000];
+        char* temp = new char[size];
         CBPop(&cb, temp);
-        stream.writeRawData(temp,size);
+        QByteArray data = QByteArray::fromRawData(temp, size);
+        m_generator->AddMoreDataToBufferFromQByteArray(data, size);
+        count++;
         delete temp;
     }
+    if((count >= 10 )&& !(m_generator->isPlaying())) {
+        play_audio();
+    }
+}
+
+void MainWindow::addToSongHeader(const unsigned int size) {
+    if(cb.Count != 0) {
+        if(m_audioOutput != nullptr) {
+            m_generator->resetPosition();
+            m_audioOutput->reset();
+            delete(m_audioOutput);
+        }
+        m_generator->RemoveBufferedData();
+        count = 0;
+        char* temp = new char[size];
+        CBPop(&cb, temp);
+        prepare_audio_devices(m_generator->readHeader(temp));
+        delete temp;
+    }
+}
+
+void MainWindow::initializeUDPThread() {
+
+    broadcastThread = new QThread();
+    UDPWorker = new UDPThreadManager();
+
+    UDPWorker->moveToThread(broadcastThread);
+
+    connect(UDPWorker, SIGNAL(songDataReceived(const unsigned int)), this,
+            SLOT(addToSongBuffer(const unsigned int)));
+    connect(UDPWorker, SIGNAL(songHeader(const unsigned int)), this,
+            SLOT(addToSongHeader(const unsigned int)));
+    connect(UDPWorker, SIGNAL(UDPThreadRequested()), broadcastThread, SLOT(start()));
+    connect(broadcastThread, SIGNAL(started()), UDPWorker, SLOT(UDPReceiveThread()));
+    connect(UDPWorker, SIGNAL(finished()), broadcastThread, SLOT(quit()), Qt::DirectConnection);
+
+    UDPWorker->UDPThreadRequest();
 }
 
 void MainWindow::tabSelected() {
     qDebug() << "Tab changed to: " << ui->tabWidget->currentIndex();
 
-    //kill current tabs thread
-    //create new tabs thread
+    if(UDPWorker != nullptr) {
+        UDPWorker->closeSocket();
+        broadcastThread->wait();
+        delete(broadcastThread);
+        delete(UDPWorker);
+        UDPWorker = nullptr;
+        broadcastThread = nullptr;
+    }
     switch(ui->tabWidget->currentIndex()) {
         case broadcasting:
             generatePlaylist("Song1 Song2 Song3 Song4 Song5 Song6");
+            initializeUDPThread();
             break;
         case fileTransfer:
             break;
@@ -107,8 +147,6 @@ void MainWindow::generatePlaylist(QByteArray songs) {
 }
 
 void MainWindow::on_filePicker_pressed() {
-//    QString filePicker = QFileDialog::getOpenFileName(this, tr("Select File"),
-//                               0, tr("Music (*.wav)"));
 
     if(fileExists)
     {
@@ -118,7 +156,7 @@ void MainWindow::on_filePicker_pressed() {
         fileLoaded = false;
     }
     m_file = new WavFile(this);
-    m_generator = new DataGenerator(this);//audioProgressChanged(progress);
+    m_generator = new DataGenerator(this);
     connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
     m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)")));
@@ -138,6 +176,7 @@ void MainWindow::updateFileProgress(const int progress) {
 //    } else if(ui->tabWidget->currentIndex() == 1) {
 //        ui->fileProgress->setValue(progress);
 //    }
+    Q_UNUSED(progress)
 }
 
 void MainWindow::prepare_audio_devices(QAudioFormat format)
@@ -154,7 +193,6 @@ void MainWindow::prepare_audio_devices(QAudioFormat format)
     m_audioOutput = 0;
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
 
-    //connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(handleAudioStateChanged(QAudio::State)));
 }
 
 void MainWindow::init_file()

@@ -1,6 +1,5 @@
 #ifndef CLIENT_H
 #define CLIENT_H
-#include "circularbuffer.h"
 #include "globals.h"
 
 class Client
@@ -11,11 +10,13 @@ class Client
         Client(){}
         ~Client(){}
 
-        virtual bool InitializeSocket(short port) = 0;
+        bool InitializeSocket(short port);
 
         virtual bool Recv() = 0;
 
-        virtual bool Send(char * message, int size) = 0;
+        bool Send(char * message, int size);
+
+        virtual bool Close() = 0;
 
 
     protected:
