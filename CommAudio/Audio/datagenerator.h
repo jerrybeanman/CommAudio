@@ -42,16 +42,14 @@ signals:
     void dataFinished();
 
 public:
-    float progress;
-    int externChunk;
-
+    float progress;             // Percentage of the song that has been sent
+    int externChunk;            // Integer used to externally signal how much data is available to be read.
 
 private:
-    qint64      dg_readpos;
-    qint64      dg_streampos;
-    qint64      dg_max;
-    QByteArray  dg_buffer;
-    QByteArray  dg_externBuf;
-    bool        playing;
+    qint64      dg_readpos;     // Reading position
+    qint64      dg_max;         // Maximum size of the dg_buffer / dg_externBuf
+    QByteArray  dg_buffer;      // Buffer that contains all of the song data.
+    QByteArray  dg_externBuf;   // Copy of the dg_buffer which will be referenced externally.
+    bool        playing;        // Flag to determine if the audio file was already playing or not.
 };
 #endif // DATAGENERATOR_H

@@ -13,9 +13,9 @@
 #include <QAudioDeviceInfo>
 #include <QSlider>
 #include <atomic>
-#include "wavfile.h"
-#include "datagenerator.h"
-#include "recorder.h"
+#include "Audio/wavfile.h"
+#include "Audio/datagenerator.h"
+#include "Audio/recorder.h"
 #include "soundmanager.h"
 
 namespace Ui {
@@ -169,24 +169,145 @@ private:
     --
     -- INTERFACE: void prepare_audio_devices(QAudioFormat format)
     --
-    -- RETURNS: The IP address entered
+    -- RETURNS:     False when the format is not support by the audio device
+    --              True when the format is accepted by the audio device
     --
     -- NOTES:
+    -- Checks the format parameter and tests to it to see if it will allow the file to work with the default Audio Output
+    -- of the listening client. Returns false upon failure
     ----------------------------------------------------------------------------------------------------------------------*/
     bool prepare_audio_devices(QAudioFormat format);
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Load File
+    --
+    -- DATE:        March 13, 2015
+    --
+    -- REVISIONS:   (Date and Description)
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   void load_file()
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES:
+    -- Grabs the file's contents and adds its to the Data Generator's data buffer.
+    ----------------------------------------------------------------------------------------------------------------------*/
     void load_file();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Play Audio
+    --
+    -- DATE:        March 13, 2015
+    --
+    -- REVISIONS:   (Date and Description)
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   void play_audio()
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES:
+    -- Checks to see if Audio is currently playing. If it is playing, it is assumed to be paused and will resume playing
+    -- the song. Otherwise, this must be a NEW song to be played. As such, it begin to play the new song.
+    ----------------------------------------------------------------------------------------------------------------------*/
     void play_audio();
 
-    void prepare_stream();
-
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Stop Stream
+    --
+    -- DATE:        March 17, 2015
+    --
+    -- REVISIONS:   (Date and Description)
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   void stop_stream()
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES:
+    -- Stops a currently running stream and drops all references to the stream itself.
+    ----------------------------------------------------------------------------------------------------------------------*/
     void stop_stream();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Load Music Files
+    --
+    -- DATE:        March 25, 2015
+    --
+    -- REVISIONS:   (Date and Description)
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   void load_music_files()
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES:
+    -- We are assuming that the directory that contains the music is called "Music" which is located at the root folder
+    -- of this program. This grabs all of the contents of the directory of the program and will refresh the song list
+    -- if a file was added or removed.
+    ----------------------------------------------------------------------------------------------------------------------*/
     void load_music_files();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Move Song Index
+    --
+    -- DATE:        March 25, 2015
+    --
+    -- REVISIONS:   (Date and Description)
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   void move_song_index(bool previous = false)
+    --
+    -- PARAMETERS:  bool previous
+    --                  Defaults to false, checks to see if we are changing to the next song or the previous song.
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES:
+    -- Moves the song index to either the next song or the previous song depending on the boolean: previous.
+    ----------------------------------------------------------------------------------------------------------------------*/
     void move_song_index(bool previous = false);
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Ready Next Song
+    --
+    -- DATE:        March 25, 2016
+    --
+    -- REVISIONS:   April 4, 2016 (Tyler Trepanier
+    --                  Added Stream functionality
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   bool ready_next_song(bool previous = false)
+    --
+    -- PARAMETERS:  bool previous
+    --                  Defaults to false, checks to see if we are changing to the next song or the previous song.
+    --
+    -- RETURNS:     Returns True if there was no issues with switching to the next song.
+    --              Returns False if there was an issue with switching to the next song.
+    --
+    -- NOTES:
+    -- Master function that handles switching between songs for streaming. This function disposes of any old song data,
+    -- loads the next song's data to the data generator and begins to initially stream the song to any listening clients.
+    ----------------------------------------------------------------------------------------------------------------------*/
     bool ready_next_song(bool previous = false);
 
     void song_selected_update(bool previous = false);
@@ -199,11 +320,10 @@ private:
 
     void split_songs_from_string(std::string combinedString);
 
+    bool prepare_stream();
+
 private:
-    QMediaPlayer*           player;
     QByteArray              m_buffer;
-    QBuffer*                mediaStream;
-    QAudioDecoder*          m_decoder;
     QAudioFormat            m_format;
     QAudioOutput*           m_audioOutput;
     QAudioDeviceInfo        m_device;
