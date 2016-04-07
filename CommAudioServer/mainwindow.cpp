@@ -8,8 +8,8 @@
 #include <QAudioOutput>
 #include <QAudioDeviceInfo>
 #include <QSlider>
-#include "datagenerator.h"
-#include "wavfile.h"
+#include "Audio/datagenerator.h"
+#include "Audio/wavfile.h"
 #include "globals.h"
 #include "soundmanager.h"
 
@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_song_index = 0;
 
     load_music_files();
-    ready_next_song();
+    //ready_next_song();
 }
 
 MainWindow::~MainWindow()
@@ -364,7 +364,7 @@ void MainWindow::split_songs_from_string(std::string combinedString)
     QStringList server_music_files = combo.split(",", QString::SkipEmptyParts);
 }
 
-void MainWindow::prepare_stream()
+bool MainWindow::prepare_stream()
 {
     if(!streaming) // Start stream
     {
@@ -448,13 +448,12 @@ void MainWindow::on_playRecordingButton_clicked()
     m_recorder->stop();
 
     QByteArray array = m_recorder->readAll();
-    int size = m_recorder->bytesWritten();
 
     prepare_audio_devices(m_recorder->fileFormat());
 
     m_generator = new DataGenerator(this);
 
-    m_generator->AddMoreDataToBufferFromQByteArray(array, size);
+    m_generator->AddMoreDataToBufferFromQByteArray(array, array.size());
 
     play_audio();
 }

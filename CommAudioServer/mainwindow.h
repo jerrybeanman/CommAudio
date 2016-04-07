@@ -13,9 +13,9 @@
 #include <QAudioDeviceInfo>
 #include <QSlider>
 #include <atomic>
-#include "wavfile.h"
-#include "datagenerator.h"
-#include "recorder.h"
+#include "Audio/wavfile.h"
+#include "Audio/datagenerator.h"
+#include "Audio/recorder.h"
 #include "soundmanager.h"
 
 namespace Ui {
@@ -218,8 +218,6 @@ private:
     -- the song. Otherwise, this must be a NEW song to be played. As such, it begin to play the new song.
     ----------------------------------------------------------------------------------------------------------------------*/
     void play_audio();
-
-    void prepare_stream();
 
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION:    Stop Stream

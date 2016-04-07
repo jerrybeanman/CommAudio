@@ -1,7 +1,7 @@
 #ifndef SOUNDMANAGER_H
 #define SOUNDMANAGER_H
 #include "globals.h"
-#include "datagenerator.h"
+#include "Audio/datagenerator.h"
 #include "Server/ServerUDP.h"
 
 struct UDPBroadcast
