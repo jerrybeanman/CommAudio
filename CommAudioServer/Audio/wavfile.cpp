@@ -88,7 +88,7 @@ bool WavFile::open(const QString &fileName)
 {
     close();
     setFileName(fileName);
-    return QFile::open(QIODevice::ReadOnly) && readHeader();
+    return QFile::open(QIODevice::ReadOnly);
 }
 
 const QAudioFormat &WavFile::fileFormat() const

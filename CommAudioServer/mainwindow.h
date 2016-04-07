@@ -122,11 +122,7 @@ private slots:
 
     void on_progressBar_actionTriggered(int action);
 
-    void on_streamButton_clicked(bool checked);
-
     void handleDataAvailable(int len);
-
-    void handleDataFinished();
 
     void on_pauseBtn_clicked();
 

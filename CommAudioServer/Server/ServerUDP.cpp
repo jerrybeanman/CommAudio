@@ -142,7 +142,7 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
         std::cout << "SeverUDP::WSAGetOverlappedResult failed with errno" << WSAGetLastError() << std::endl;
         return FALSE;
     }
-    std::cerr << "ServerUDP::Broadcast>>Bytes Sent:[" << SocketInfo.BytesSEND << "]" << std::endl;
+    //std::cerr << "ServerUDP::Broadcast>>Bytes Sent:[" << SocketInfo.BytesSEND << "]" << std::endl;
     return true;
 }
 

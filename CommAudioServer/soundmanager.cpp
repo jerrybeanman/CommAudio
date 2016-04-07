@@ -32,6 +32,9 @@ DWORD WINAPI BroadcastMusic(LPVOID lpParameter)
     {
         if(song_size != 0 && *song_size > 0 && song_stream_data != 0)
         {
+            /*
+             * BUG: NEED TO HAVE A MAXIMUM SIZED PACKET IF THE SONG SIZE IS TOO BIG
+             */
             bytes_to_SEND = (DWORD)(*song_size);
 
             //std::cerr << "SoundManager::Broadcast>>Incoming data:[" << bytes_to_SEND << "]" << std::endl;
@@ -47,12 +50,13 @@ DWORD WINAPI BroadcastMusic(LPVOID lpParameter)
             if(song_stream_data != 0 && !serverUDP->Broadcast(*song_stream_data, &bytes_to_SEND))
             {
                 qDebug() << "Jerry, your Broadcast sucks";
+                std::cout << "SoundManager::Broadcast>>Song size after:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
                 return -1;
             }
             //std::cout << "SoundManager::Broadcast>>Song size before:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
             *song_size -= bytes_to_SEND;
             *song_stream_data += bytes_to_SEND;
-            //std::cout << "SoundManager::Broadcast>>Song size after:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
+            std::cout << "SoundManager::Broadcast>>Song size after:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
         }
 
     }
