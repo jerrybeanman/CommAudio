@@ -6,7 +6,7 @@ void TCPThreadManager::TCPReceiveThread() {
     DWORD AcceptThreadID;
 
     ClientTCP clientTCP;
-    if(!clientTCP.InitializeSocket(DEFAULT_PORT, ipAddr.data()))
+    if(!clientTCP.InitializeSocket(TCP_PORT, ipAddr.data()))
         return;
 
     WSAEVENT EventArray[1];

@@ -20,16 +20,8 @@ bool ClientTCP::InitializeSocket(short port, char *ip)
     }
 
     LocalAddr.sin_family = AF_INET;
+    LocalAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     LocalAddr.sin_port = htons(port);
-
-    struct hostent	*hp;
-    if ((hp = gethostbyname(ip)) == NULL)
-    {
-
-        return FALSE;
-    }
-
-    memcpy((char *)&LocalAddr.sin_addr, hp->h_addr, hp->h_length);
 
     if(bind(listenSocket, (struct sockaddr*) &LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
     {
@@ -132,5 +124,26 @@ bool ClientTCP::Close() {
     }
     WSACleanup();
 
+    return true;
+}
+
+bool ClientTCP::connectToServer(short port, char *ip) {
+    LocalAddr.sin_family = AF_INET;
+    LocalAddr.sin_port = htons(port);
+
+    struct hostent	*hp;
+    if ((hp = gethostbyname(ip)) == NULL)
+    {
+
+        return FALSE;
+    }
+
+    memcpy((char *)&LocalAddr.sin_addr, hp->h_addr, hp->h_length);
+
+    if (connect (SocketInfo.Socket, (struct sockaddr *)&LocalAddr, sizeof(LocalAddr)) == -1)
+        {
+            qDebug() << "Can't connect to server: " << WSAGetLastError();
+            return false;
+        }
     return true;
 }

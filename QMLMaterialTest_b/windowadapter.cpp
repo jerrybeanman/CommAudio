@@ -64,6 +64,9 @@ void WindowAdapter::on_connectButton_pressed(QString IPAdd)
     connect(TCPWorker, SIGNAL(finished()), tcpThread, SLOT(quit()), Qt::DirectConnection);
 
     TCPWorker->TCPThreadRequest();
+    ClientTCP startConnection;
+    startConnection.connectToServer(TCP_PORT, serverIP.data());
+    startConnection.Send("1", 2);
 
 }
 static int count;
