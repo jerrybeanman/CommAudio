@@ -218,7 +218,6 @@ bool MainWindow::ready_next_song(bool previous)
     }
 
     m_file = new WavFile(this);
-    m_generator = new DataGenerator(this);
 
     // Handle moving to the next song when the song is finished
     QString song_filename = MUSIC_DIRECTORY + m_music_files[m_song_index];
@@ -230,7 +229,7 @@ bool MainWindow::ready_next_song(bool previous)
     }
 
     fileExists = true;
-    //m_generator = new DataGenerator(this);
+    m_generator = new DataGenerator(this);
     connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
     //Prepare the audio device to stream
