@@ -39,6 +39,7 @@ public:
 signals:
     void audioProgressChanged(int progress);
     void dataAvailable(int len);
+    void dataFinished();
 
 public:
     float progress;

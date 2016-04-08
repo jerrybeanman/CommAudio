@@ -6,7 +6,7 @@
 #define MUSIC_DIRECTORY      "../Music/"
 #define HEADER               "HEADER:"
 #define MAX_CLIENTS          10
-#define DATA_BUFSIZE         60000
+#define DATA_BUFSIZE         40000
 #define DEFAULT_PORT         7000
 
 #include <iostream>

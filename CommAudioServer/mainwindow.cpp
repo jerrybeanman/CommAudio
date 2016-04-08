@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     fileExists = false;
     fileLoaded = false;
     fileFinished = false;
+    recording = false;
     m_pos = 0;
     m_song_index = 0;
 
@@ -217,6 +218,7 @@ bool MainWindow::ready_next_song(bool previous)
     }
 
     m_file = new WavFile(this);
+    m_generator = new DataGenerator(this);
 
     // Handle moving to the next song when the song is finished
     QString song_filename = MUSIC_DIRECTORY + m_music_files[m_song_index];
@@ -312,15 +314,17 @@ bool MainWindow::delete_old_song()
     {
         while(*song_size != 0) // Allow the remaining piece of the song to send.
         {
-            fileLoaded = false;
+            std::cerr << "MainWindow::delete_old_song>>Song size: " << *song_size << std::endl;
         }
         *song_size = 0;
 
         qDebug() << "Disposing of old song.";
-        delete m_file;
-        fileLoaded = false;
 
-        m_generator->RemoveBufferedData();
+        // Required, disconnects old signals and stops sending old data.
+        delete m_file;
+        delete m_generator;
+        fileLoaded = false;
+        fileFinished = false;
 
         return true;
     }
@@ -358,8 +362,8 @@ bool MainWindow::prepare_stream()
     {
         streaming = true;
 
-        connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleDataAvailable(int)));
-        connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleDataFinished()));
+        connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleSongDataAvailable(int)));
+        connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleSongDataFinished()));
 
         qDebug() << "MainWindow::prepare_stream>>Sending Header.";
         QByteArray* header = m_generator->getExternalReference();
@@ -396,9 +400,36 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_recordButton_clicked()
 {
-    qDebug() << "recording starts.";
-    m_recorder = new Recorder();
-    m_recorder->start();
+    if(!recording)
+    {
+        qDebug() << "recording starts.";
+        m_recorder = new Recorder();
+
+        //connect(m_recorder, SIGNAL(dataAvailable(int)), this, SLOT(handleSongDataAvailable(int)));
+
+        m_recorder->start();
+    }
+    else
+    {
+        /*
+         * TODO:
+         * When button is clicked, turn recording on and off. This will continously "play"
+         * the recording until it is clicked off. There will probably be an issue where
+         * it will record itself but that's fine.
+         */
+        m_recorder->stop();
+
+        QByteArray array = m_recorder->readAll();
+
+        prepare_audio_devices(m_recorder->fileFormat());
+
+        m_generator = new DataGenerator(this);
+
+        m_generator->AddMoreDataToBufferFromQByteArray(array, array.size());
+
+        play_audio();
+    }
+
 }
 
 void MainWindow::on_playRecordingButton_clicked()
@@ -427,9 +458,16 @@ void MainWindow::on_progressBar_actionTriggered(int progress)
     }
 }
 
-void MainWindow::handleDataAvailable(int len)
+void MainWindow::handleSongDataAvailable(int len)
 {
     *song_size += static_cast <DWORD>(len);
+}
+
+void MainWindow::handleSongDataFinished()
+{
+    qDebug() << "Data has finished sending.";
+    fileFinished = true;
+    streaming = false;
 }
 
 void MainWindow::on_pauseBtn_clicked()

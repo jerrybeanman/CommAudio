@@ -40,8 +40,8 @@ void Recorder::start()
 
     r_input = new QAudioInput(r_inputInfo, r_format, this);
     r_input->setNotifyInterval(1000);
-    connect(r_input, SIGNAL(notify()), this, SLOT(notified()));
-    connect(r_input,SIGNAL(stateChanged(QAudio::State)),this, SLOT(handleAudioInputState(QAudio::State)));
+    //connect(r_input, SIGNAL(notify()), this, SLOT(notified()));
+    //connect(r_input,SIGNAL(stateChanged(QAudio::State)),this, SLOT(handleAudioInputState(QAudio::State)));
 
     qDebug() << "platform buffer size:" << r_input->bufferSize();
 

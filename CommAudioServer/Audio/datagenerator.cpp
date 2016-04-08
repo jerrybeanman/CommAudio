@@ -51,12 +51,10 @@ QAudioFormat DataGenerator::readHeader(char* data)
 {
     QAudioFormat format;
     CombinedHeader header;
-    bool result = false;
 
     memcpy(reinterpret_cast<char *>(&header), data, sizeof(CombinedHeader));
     data += sizeof(WAVEHeader);
 
-    //bool result = read(reinterpret_cast<char *>(&header), sizeof(CombinedHeader)) == sizeof(CombinedHeader);
     if ((memcmp(&header.riff.descriptor.id, "RIFF", 4) == 0
         || memcmp(&header.riff.descriptor.id, "RIFX", 4) == 0)
         && memcmp(&header.riff.type, "WAVE", 4) == 0
@@ -152,6 +150,7 @@ qint64 DataGenerator::readData(char *data, qint64 len)
         {
             playing = false;
             progress = 100;
+            emit dataFinished();
         }
 
         //qDebug() << "DataGenerator::readData>>progress[" << progress << "] dataAvailable[" << chunk << "]";
@@ -190,6 +189,7 @@ void DataGenerator::RemoveBufferedData()
     progress = 0;
     playing = false;
     validFormat = false;
+    close();
 }
 
 /*
