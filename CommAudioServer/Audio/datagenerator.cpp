@@ -196,7 +196,6 @@ void DataGenerator::RemoveBufferedData()
     playing = false;
     validFormat = false;
     close();
-    delete this;
 }
 
 /*
