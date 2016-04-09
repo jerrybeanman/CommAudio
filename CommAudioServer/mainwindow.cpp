@@ -249,8 +249,8 @@ bool MainWindow::ready_next_song(bool previous)
         }
 
         streaming = false;
-        move_song_index(previous);
         song_selected_update(previous);
+        move_song_index(previous);
         ready_next_song(previous);
         return false;
     }
@@ -347,7 +347,7 @@ void MainWindow::populate_songlist()
 
 std::string MainWindow::get_all_songs()
 {
-    return m_music_files.join('~').toStdString();
+    return m_music_files.join(' ').toStdString();
 }
 
 void MainWindow::split_songs_from_string(std::string combinedString)
@@ -473,7 +473,7 @@ void MainWindow::handleSongDataFinished()
 {
     qDebug() << "Data has finished sending.";
     fileFinished = true;
-    //streaming = false;
+    streaming = false;
 }
 
 void MainWindow::on_pauseBtn_clicked()

@@ -28,6 +28,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    std::string get_all_songs();
     ~MainWindow();
 private slots:
 
@@ -316,7 +317,6 @@ private:
 
     void populate_songlist();
 
-    std::string get_all_songs();
 
     void split_songs_from_string(std::string combinedString);
 

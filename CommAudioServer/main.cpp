@@ -3,6 +3,7 @@
 #include "soundmanager.h"
 #include "filemanager.h"
 #include <direct.h>
+#include <sstream>
 #define GetCurrentDir _getcwd
 
 std::vector<std::string> FileNames;
@@ -19,15 +20,19 @@ int main(int argc, char *argv[])
     {
         return errno;
     }
-
-    FileNames = GetFileNames(current_dir, "wav");
+    std::stringstream ss(w->get_all_songs());
+    std::string buf;
+    while(ss >> buf)
+    {
+        FileNames.push_back((buf));
+    }
 
     if(!StartSoundManager())
     {
         std::cout << "StartSoundManager() failed to start" << std::endl;
         return -1;
     }
-    if(!StartFileManager())
+   if(!StartFileManager())
     {
         std::cout << "StartFileManager() failed to start" << std::endl;
     }
