@@ -122,7 +122,7 @@ bool MainWindow::prepare_audio_devices(QAudioFormat format)
         return false;
     }
 
-    m_audioOutput = 0;
+    //delete m_audioOutput;
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
     qDebug() << "Properly set the media";
     return true;
@@ -147,7 +147,7 @@ void MainWindow::play_audio()
     }
     else
     {
-        qDebug() << "Starting file from beginning.";
+        //qDebug() << "Starting file from beginning.";
 
         m_generator->start();
 
@@ -229,6 +229,8 @@ bool MainWindow::ready_next_song(bool previous)
     }
 
     fileExists = true;
+    //m_audioOutput->suspend();
+    m_generator = 0;
     m_generator = new DataGenerator(this);
     connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
@@ -248,6 +250,7 @@ bool MainWindow::ready_next_song(bool previous)
 
         streaming = false;
         move_song_index(previous);
+        song_selected_update(previous);
         ready_next_song(previous);
         return false;
     }
@@ -313,15 +316,15 @@ bool MainWindow::delete_old_song()
     {
         while(*song_size != 0) // Allow the remaining piece of the song to send.
         {
-            std::cerr << "MainWindow::delete_old_song>>Song size: " << *song_size << std::endl;
+            //std::cerr << "MainWindow::delete_old_song>>Song size: " << *song_size << std::endl;
+            ;
         }
-        *song_size = 0;
 
         qDebug() << "Disposing of old song.";
 
         // Required, disconnects old signals and stops sending old data.
         delete m_file;
-        delete m_generator;
+        m_generator->RemoveBufferedData();
         fileLoaded = false;
         fileFinished = false;
 
@@ -361,6 +364,7 @@ bool MainWindow::prepare_stream()
     {
         streaming = true;
 
+        //disconnect()
         connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleSongDataAvailable(int)));
         connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleSongDataFinished()));
 
@@ -422,6 +426,7 @@ void MainWindow::on_recordButton_clicked()
 
         prepare_audio_devices(m_recorder->fileFormat());
 
+
         m_generator = new DataGenerator(this);
 
         m_generator->AddMoreDataToBufferFromQByteArray(array, array.size());
@@ -453,6 +458,8 @@ void MainWindow::on_progressBar_actionTriggered(int progress)
     {
         streaming = false;
         move_song_index();
+        m_audioOutput->suspend();
+        m_audioOutput->reset();
         ready_next_song();
     }
 }
@@ -466,7 +473,7 @@ void MainWindow::handleSongDataFinished()
 {
     qDebug() << "Data has finished sending.";
     fileFinished = true;
-    streaming = false;
+    //streaming = false;
 }
 
 void MainWindow::on_pauseBtn_clicked()

@@ -10,7 +10,10 @@ DataGenerator::DataGenerator(QObject *parent)
 
 DataGenerator::~DataGenerator()
 {
-
+    dg_buffer.clear();
+    dg_buffer.resize(0);
+    dg_externBuf.clear();
+    dg_externBuf.resize(0);
 }
 
 struct chunk
@@ -150,12 +153,13 @@ qint64 DataGenerator::readData(char *data, qint64 len)
         {
             playing = false;
             progress = 100;
-            emit dataFinished();
+            //emit dataFinished();
         }
 
         //qDebug() << "DataGenerator::readData>>progress[" << progress << "] dataAvailable[" << chunk << "]";
-        emit dataAvailable(externChunk);
         emit audioProgressChanged(progress);
+        emit dataAvailable(externChunk);
+
     }
     return chunk;
 }
@@ -181,6 +185,8 @@ bool DataGenerator::isPlaying()
 
 void DataGenerator::RemoveBufferedData()
 {
+    dg_buffer.clear();
+    dg_externBuf.clear();
     dg_buffer.resize(0);
     dg_externBuf.resize(0);
     dg_readpos = 0;
@@ -190,6 +196,7 @@ void DataGenerator::RemoveBufferedData()
     playing = false;
     validFormat = false;
     close();
+    delete this;
 }
 
 /*

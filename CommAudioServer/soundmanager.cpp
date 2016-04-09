@@ -54,7 +54,7 @@ DWORD WINAPI BroadcastMusic(LPVOID lpParameter)
             //std::cout << "SoundManager::Broadcast>>Song size before:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
             *song_size -= bytes_to_SEND;
             *song_stream_data += bytes_to_SEND;
-            std::cout << "SoundManager::Broadcast>>Song size after:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
+            std::cerr << "SoundManager::Broadcast>>Song size after:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
         }
 
     }
