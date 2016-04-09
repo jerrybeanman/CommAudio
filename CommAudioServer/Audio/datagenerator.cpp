@@ -153,7 +153,7 @@ qint64 DataGenerator::readData(char *data, qint64 len)
         {
             playing = false;
             progress = 100;
-            //emit dataFinished();
+            emit dataFinished();
         }
 
         //qDebug() << "DataGenerator::readData>>progress[" << progress << "] dataAvailable[" << chunk << "]";
