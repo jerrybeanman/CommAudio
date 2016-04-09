@@ -123,11 +123,11 @@ private slots:
 
     void on_progressBar_actionTriggered(int action);
 
-    void on_streamButton_clicked(bool checked);
+    void handleSongDataAvailable(int len);
 
-    void handleDataAvailable(int len);
+    void handleSongDataFinished();
 
-    void handleDataFinished();
+    //void handleRecordingDataAvailable(int len);
 
     void on_pauseBtn_clicked();
 
@@ -338,6 +338,7 @@ private:
     bool                    fileExists;
     bool                    fileLoaded;
     bool                    streaming;
+    bool                    recording;
     bool                    fileFinished;
 
     QStringList             m_music_files;

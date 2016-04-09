@@ -323,13 +323,6 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="streamButton">
-      <property name="text">
-       <string>Start Stream</string>
-      </property>
-     </widget>
-    </item>
-    <item>
      <widget class="QPushButton" name="pauseBtn">
       <property name="text">
        <string>Pause</string>
@@ -344,7 +337,7 @@
      <x>0</x>
      <y>0</y>
      <width>635</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
