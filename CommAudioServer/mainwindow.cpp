@@ -353,7 +353,7 @@ void MainWindow::populate_songlist()
 
 std::string MainWindow::get_all_songs()
 {
-    return m_music_files.join('~').toStdString();
+    return m_music_files.join(' ').toStdString();
 }
 
 void MainWindow::split_songs_from_string(std::string combinedString)
@@ -530,7 +530,6 @@ void MainWindow::handleDataFinished()
     qDebug() << "Data has finished sending.";
     fileFinished = true;
     streaming = false;
-    move_song_index();
 }
 
 void MainWindow::on_pauseBtn_clicked()

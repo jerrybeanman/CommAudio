@@ -8,6 +8,7 @@
 #define MAX_CLIENTS          10
 #define DATA_BUFSIZE         60000
 #define DEFAULT_PORT         7000
+#define DEFAULT_PORT_TCP     8000
 
 #include <iostream>
 #include <WinSock2.h>
@@ -18,6 +19,8 @@
 #define ClientJoined 1
 #define FileRequest  2
 #define UpdateList   3
+#define FileBegin    "FileS:"
+#define FileEnd      "FileE:"
 
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION
