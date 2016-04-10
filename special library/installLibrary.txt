@@ -1,7 +1,11 @@
 -travel to the QT folder
+
 1)
 -look for Qt/5.5/qml/QtQuick/Controls/Styles/
--Copy the "QtQuick/Controls/Styles/Material" folder into this similar  directory
+-Copy the "QtQuick/Controls/Styles/Material" 
+folder into this similar  directory
+
+
 2)
 -look for the "Qt/5.5/qml/" folder
 -Copy the "Material" folder into that folder

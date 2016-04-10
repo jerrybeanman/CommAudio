@@ -12,14 +12,17 @@ class TCPThreadManager : public QObject
 public:
     TCPThreadManager(QByteArray& ip) : ipAddr(ip){}
     void TCPThreadRequest();
+    void sendSongRequest(QByteArray& songName);
     ClientTCP clientTCP;
 signals:
     void TCPThreadRequested();
+    void songList(const QByteArray& songList);
 
 public slots:
     void TCPReceiveThread();
 
 private:
+    QByteArray songName;
     QByteArray ipAddr;
 };
 
