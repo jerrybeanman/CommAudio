@@ -1,9 +1,9 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 #include <vector>
+#include <string>
 #include "Server/ServerTCP.h"
 #include "globals.h"
-#include <string>
 
 bool StartFileManager();
 

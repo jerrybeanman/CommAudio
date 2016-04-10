@@ -15,6 +15,7 @@
 #include <atomic>
 #include "Audio/wavfile.h"
 #include "Audio/datagenerator.h"
+#include "Audio/recordgenerator.h"
 #include "Audio/recorder.h"
 #include "soundmanager.h"
 
@@ -125,6 +126,8 @@ private slots:
 
     void handleSongDataAvailable(int len);
 
+    void handleVoiceDataAvailable(int len);
+
     void handleSongDataFinished();
 
     //void handleRecordingDataAvailable(int len);
@@ -219,6 +222,27 @@ private:
     -- the song. Otherwise, this must be a NEW song to be played. As such, it begin to play the new song.
     ----------------------------------------------------------------------------------------------------------------------*/
     void play_audio();
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Play Voice
+    --
+    -- DATE:        March 13, 2015
+    --
+    -- REVISIONS:   (Date and Description)
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   void play_voice()
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES:
+    -- Checks to see if Voice is currently playing. If it is playing, it is assumed to be paused and will resume playing
+    -- the song. Otherwise, this must be a NEW song to be played. As such, it begin to play the new song.
+    ----------------------------------------------------------------------------------------------------------------------*/
+    void play_voice();
 
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION:    Stop Stream
@@ -331,7 +355,8 @@ private:
     WavFile*                m_file;
     Recorder*               m_recorder;
 
-    DataGenerator*          m_generator;
+    DataGenerator*          m_song_generator;
+    RecordGenerator*        m_voice_generator;
     DWORD                   m_stream_size;
     qint64                  m_pos;
     qint64                  m_song_index;

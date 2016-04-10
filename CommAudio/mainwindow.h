@@ -149,8 +149,6 @@ private slots:
 
     void addToSongBuffer(const unsigned int size);
 
-    void addToSongHeader(const unsigned int size);
-
 private:
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: getServerAddress

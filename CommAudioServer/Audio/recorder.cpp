@@ -1,5 +1,7 @@
 #include "recorder.h"
 
+CircularBuffer cb_voice_data;
+
 Recorder::Recorder()
 {
     if( !SetFormat() )
@@ -9,6 +11,8 @@ Recorder::Recorder()
         ready = false;
     }
     size = 0;
+    r_data = new char[DATA_BUFSIZE];
+    CBInitialize(&cb_voice_data, 10, DATA_BUFSIZE);
 }
 
 Recorder::~Recorder()
@@ -40,8 +44,8 @@ void Recorder::start()
 
     r_input = new QAudioInput(r_inputInfo, r_format, this);
     r_input->setNotifyInterval(1000);
-    //connect(r_input, SIGNAL(notify()), this, SLOT(notified()));
-    //connect(r_input,SIGNAL(stateChanged(QAudio::State)),this, SLOT(handleAudioInputState(QAudio::State)));
+    connect(r_input, SIGNAL(notify()), this, SLOT(notified()));
+    connect(r_input,SIGNAL(stateChanged(QAudio::State)),this, SLOT(handleAudioInputState(QAudio::State)));
 
     qDebug() << "platform buffer size:" << r_input->bufferSize();
 
@@ -72,15 +76,19 @@ int Recorder::bytesWritten()
 
 void Recorder::notified()
 {
+    r_bytes_AVAILABLE = 0;
     if(audio_state == QAudio::ActiveState)
     {
-        qDebug() << "Error State:" << r_input->error();
-        qDebug() << "Bytes total inputed: " << r_newBuffer->size();
-        /*qDebug() << "platform buffer size after called QAudioInput start():" << r_input->bufferSize();
+        r_bytes_AVAILABLE = (int)r_newBuffer->size();
 
-        qDebug() << "bytesReady = " << r_input->bytesReady()
-        << ", " << "elapsedUSecs = " << r_input->elapsedUSecs()
-        << ", " << "processedUSecs = "<< r_input->processedUSecs();*/
+        if(r_bytes_AVAILABLE > DATA_BUFSIZE) // Don't exceed max packet size.
+            r_bytes_AVAILABLE = DATA_BUFSIZE;
+
+        qDebug() << "Mic data to send:" << r_bytes_AVAILABLE;
+        r_newBuffer->readData(r_data, r_bytes_AVAILABLE);
+
+        CBPushBack(&cb_voice_data, (void*)r_data);
+        emit dataAvailable(r_bytes_AVAILABLE);
     }
 }
 

@@ -33,6 +33,7 @@ public:
     void RemoveBufferedData();
     void AddMoreDataToBufferFromFile(QFile* file, qint64 len);
     void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);
+    void setValid();
     void resetPosition();
     QAudioFormat readHeader(char* data);
 

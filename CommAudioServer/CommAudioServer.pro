@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     Audio/datagenerator.cpp \
     Audio/inputbuffer.cpp \
     Audio/recorder.cpp \
-    Audio/wavfile.cpp
+    Audio/wavfile.cpp \
+    Audio/recordgenerator.cpp
 
 HEADERS  += mainwindow.h \
     Server/server.h \
@@ -45,7 +46,8 @@ HEADERS  += mainwindow.h \
     Audio/datagenerator.h \
     Audio/inputbuffer.h \
     Audio/recorder.h \
-    Audio/wavfile.h
+    Audio/wavfile.h \
+    Audio/recordgenerator.h
 
 FORMS    += mainwindow.ui
 CONFIG   += c++11

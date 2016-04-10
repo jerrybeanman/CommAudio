@@ -10,6 +10,7 @@ std::vector<std::string> FileNames;
 char** song_stream_data = (char**) malloc(sizeof(char*));
 DWORD* song_size = 0;
 
+
 int main(int argc, char *argv[])
 {
     QApplication program(argc, argv);

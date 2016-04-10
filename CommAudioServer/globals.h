@@ -15,12 +15,14 @@
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <qtcore>
+#include "circularbuffer.h"
 
 #define ClientJoined 1
 #define FileRequest  2
 #define UpdateList   3
 #define FileBegin    "FileS:"
 #define FileEnd      "FileE:"
+#define Recording    "Recor:"
 
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION
@@ -36,5 +38,6 @@ typedef struct _SOCKET_INFORMATION
 extern std::vector<std::string> FileNames;
 extern char** song_stream_data;
 extern DWORD* song_size;
+extern CircularBuffer cb_voice_data;
 
 #endif

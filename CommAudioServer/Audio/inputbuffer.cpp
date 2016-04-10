@@ -54,7 +54,12 @@ qint64 InputBuffer::writeData(const char *data, qint64 len)
     }
 
     i_write_pos = (i_write_pos + len) % MAXSIZE;
-    i_buffered_length += len;
+
+    //Never allow the buffered length to go over the maximum size.
+    if((i_buffered_length + len) > MAXSIZE)
+        i_buffered_length = MAXSIZE;
+    else
+        i_buffered_length += len;
 
     return len;
 }
