@@ -12,7 +12,7 @@ Recorder::Recorder()
     }
     size = 0;
     r_data = new char[DATA_BUFSIZE];
-    CBInitialize(&cb_voice_data, 10, DATA_BUFSIZE);
+    CBInitialize(&cb_voice_data, 20, DATA_BUFSIZE);
 }
 
 Recorder::~Recorder()
@@ -27,7 +27,7 @@ const QAudioFormat &Recorder::fileFormat() const
 
 void Recorder::start()
 {
-    bool status = r_newBuffer->open(QIODevice::ReadWrite);
+    bool status = r_buffer->open(QIODevice::ReadWrite);
 
     if(!status)
     {
@@ -50,7 +50,7 @@ void Recorder::start()
     qDebug() << "platform buffer size:" << r_input->bufferSize();
 
     inProgress = true;
-    r_input->start(r_newBuffer);
+    r_input->start(r_buffer);
 }
 
 void Recorder::stop()
@@ -58,20 +58,25 @@ void Recorder::stop()
     if(inProgress)
     {
         r_input->stop();
-        r_newBuffer->close();
+        r_buffer->close();
         delete r_input;
         inProgress = false;
     }
 }
 
+qint64 Recorder::readData(char *data, qint64 maxlen)
+{
+    return r_buffer->readData(data, maxlen);
+}
+
 const QByteArray Recorder::readAll()
 {
-    return r_newBuffer->readAll();
+    return r_buffer->readAll();
 }
 
 int Recorder::bytesWritten()
 {
-    return r_newBuffer->size();
+    return r_buffer->size();
 }
 
 void Recorder::notified()
@@ -79,13 +84,13 @@ void Recorder::notified()
     r_bytes_AVAILABLE = 0;
     if(audio_state == QAudio::ActiveState)
     {
-        r_bytes_AVAILABLE = (int)r_newBuffer->size();
+        r_bytes_AVAILABLE = (int)r_buffer->size();
 
         if(r_bytes_AVAILABLE > DATA_BUFSIZE) // Don't exceed max packet size.
             r_bytes_AVAILABLE = DATA_BUFSIZE;
 
         qDebug() << "Mic data to send:" << r_bytes_AVAILABLE;
-        r_newBuffer->readData(r_data, r_bytes_AVAILABLE);
+        r_buffer->readData(r_data, r_bytes_AVAILABLE);
 
         CBPushBack(&cb_voice_data, (void*)r_data);
         emit dataAvailable(r_bytes_AVAILABLE);
@@ -111,14 +116,14 @@ void Recorder::handleAudioInputState(QAudio::State state)
 
 bool Recorder::SetFormat()
 {
-    r_format.setSampleRate(8000);
+    r_format.setSampleRate(16000);
     r_format.setChannelCount(1);
     r_format.setSampleSize(8);
     r_format.setCodec("audio/pcm");
     r_format.setByteOrder(QAudioFormat::LittleEndian);
     r_format.setSampleType(QAudioFormat::UnSignedInt);
 
-    r_newBuffer = new InputBuffer();
+    r_buffer = new InputBuffer();
 
     return true;
 }

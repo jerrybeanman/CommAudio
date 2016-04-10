@@ -4,12 +4,9 @@
 
 InputBuffer::InputBuffer()
 {
-    i_buffer.resize(MAXSIZE);
-    setBuffer(&i_buffer);
+    i_size = 0;
+    i_busy = false;
 
-    i_read_pos = 0;
-    i_write_pos = 0;
-    i_buffered_length = 0;
 }
 
 InputBuffer::~InputBuffer()
@@ -19,64 +16,56 @@ InputBuffer::~InputBuffer()
 
 qint64 InputBuffer::readData(char *data, qint64 maxlen)
 {
-    if(i_buffered_length <= 0)
-        return 0;
-
-    qint64 writeLen = qMin(maxlen, i_buffered_length);
-    if((writeLen + i_read_pos) > MAXSIZE)
+    qint64 chunk = 0;
+    while(i_busy)
     {
-        qint64 firstData = MAXSIZE - i_read_pos;
-        memcpy(data, i_buffer.constData() + i_read_pos, firstData);
-        memcpy(data+firstData, i_buffer.constData(), writeLen - firstData);
+        ;
+    }
+    i_busy = true;
+
+    if(maxlen <= i_size)
+    {
+        chunk = maxlen;
     }
     else
     {
-        memcpy(data, i_buffer.constData() + i_read_pos, writeLen);
+        chunk = i_size;
     }
+    memcpy(data, i_buffer.data(), maxlen);
+    i_buffer.remove(0, chunk);
 
-    i_read_pos = (i_read_pos + writeLen) % MAXSIZE;
-    i_buffered_length -= writeLen;
+    i_size -= chunk;
 
-    return writeLen;
+    i_busy = false;
+
+    return chunk;
 }
 
 qint64 InputBuffer::writeData(const char *data, qint64 len)
 {
-    if((i_write_pos + len) > MAXSIZE)
-    {
-        qint64 firstData = MAXSIZE - i_write_pos;
-        memcpy(i_buffer.data() + i_write_pos, data, firstData);
-        memcpy(i_buffer.data(), data+firstData, len - firstData);
+    while(i_busy){
+        ;
     }
-    else
-    {
-        memcpy(i_buffer.data() + i_write_pos, data, len);
-    }
+    i_busy = true;
 
-    i_write_pos = (i_write_pos + len) % MAXSIZE;
+    i_buffer.resize(i_size + len);
+    memcpy(i_buffer.data() + i_size, data, len);
 
-    //Never allow the buffered length to go over the maximum size.
-    if((i_buffered_length + len) > MAXSIZE)
-        i_buffered_length = MAXSIZE;
-    else
-        i_buffered_length += len;
+    i_size += len;
+
+    i_busy = false;
 
     return len;
 }
 
 qint64 InputBuffer::size() const
 {
-    return i_buffered_length;
+    return i_size;
 }
 
 const QByteArray &InputBuffer::readAll()
 {
-    i_data.clear();
-    i_data.resize(0);
-    i_data.resize(i_buffered_length);
-    readData(i_data.data(), i_buffered_length);
-
-    return i_data;
+    return i_buffer;
 }
 
 

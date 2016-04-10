@@ -18,6 +18,7 @@ public:
     const QAudioFormat &fileFormat() const;
     void start();
     void stop();
+    qint64 readData(char * data, qint64 maxlen);
     const QByteArray readAll();
     int bytesWritten();
 
@@ -34,8 +35,7 @@ private:
     QAudioInput         *r_input;
     QAudioDeviceInfo    r_inputInfo;
     QIODevice           *dev;
-    InputBuffer         *r_newBuffer;
-    InputBuffer         *r_saveBuffer;
+    InputBuffer         *r_buffer;
     bool                inProgress;
     bool                ready;
     int                 audio_state;
