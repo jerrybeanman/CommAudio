@@ -2,14 +2,18 @@
 const qint64 ZERO   = 0;
 
 DataGenerator::DataGenerator(QObject *parent)
-    :   QIODevice(parent), dg_readpos(0), dg_max(0), dg_streampos(0)
+    :   QIODevice(parent), dg_readpos(0), dg_max(0)
 {
     playing = false;
+    validFormat = false;
 }
 
 DataGenerator::~DataGenerator()
 {
-
+    dg_buffer.clear();
+    dg_buffer.resize(0);
+    dg_externBuf.clear();
+    dg_externBuf.resize(0);
 }
 
 struct chunk
@@ -45,16 +49,15 @@ struct CombinedHeader
     RIFFHeader  riff;   // Description of the format type
     WAVEHeader  wave;   // Wave file header
 };
+
 QAudioFormat DataGenerator::readHeader(char* data)
 {
     QAudioFormat format;
     CombinedHeader header;
-    bool result = false;
 
     memcpy(reinterpret_cast<char *>(&header), data, sizeof(CombinedHeader));
     data += sizeof(WAVEHeader);
 
-    //bool result = read(reinterpret_cast<char *>(&header), sizeof(CombinedHeader)) == sizeof(CombinedHeader);
     if ((memcmp(&header.riff.descriptor.id, "RIFF", 4) == 0
         || memcmp(&header.riff.descriptor.id, "RIFX", 4) == 0)
         && memcmp(&header.riff.type, "WAVE", 4) == 0
@@ -86,9 +89,11 @@ QAudioFormat DataGenerator::readHeader(char* data)
 
         qDebug() << "Successfully read the file header";
 
+        validFormat = true;
         return format;
     }
     qDebug() << "READING THE HEADER INSIDE OF THE DATAGENERATOR SCREWED UP";
+    validFormat = false;
     return format;
 }
 
@@ -124,6 +129,12 @@ QByteArray *DataGenerator::getExternalReference()
 qint64 DataGenerator::readData(char *data, qint64 len)
 {
     qint64 chunk = 0;
+    if(!validFormat)
+    {
+        qDebug() << "DataGenerator::readData>>Invalid Format";
+        return chunk;
+    }
+
     if (!dg_buffer.isEmpty() && playing) {
 
         // Grab the either the length of data requested or the remaining data available.
@@ -142,13 +153,13 @@ qint64 DataGenerator::readData(char *data, qint64 len)
         {
             playing = false;
             progress = 100;
-            //qDebug() << "DataGenerator::readData>>dataFinished";
             emit dataFinished();
         }
 
         //qDebug() << "DataGenerator::readData>>progress[" << progress << "] dataAvailable[" << chunk << "]";
         emit audioProgressChanged(progress);
         emit dataAvailable(externChunk);
+
     }
     return chunk;
 }
@@ -174,11 +185,17 @@ bool DataGenerator::isPlaying()
 
 void DataGenerator::RemoveBufferedData()
 {
+    dg_buffer.clear();
+    dg_externBuf.clear();
     dg_buffer.resize(0);
     dg_externBuf.resize(0);
     dg_readpos = 0;
     dg_max = 0;
+    externChunk = 0;
+    progress = 0;
     playing = false;
+    validFormat = false;
+    close();
 }
 
 /*

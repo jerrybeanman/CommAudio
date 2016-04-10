@@ -25,16 +25,17 @@ DWORD WINAPI BroadcastMusic(LPVOID lpParameter)
     std::cout << "Thread created " << std::endl;
 
     ServerUDP* serverUDP = (ServerUDP*)lpParameter;
-    quint64 bytes_sent = 0;
     DWORD bytes_to_SEND = 0;
-    DWORD packet_size = 16384;
     while(1)
     {
         if(song_size != 0 && *song_size > 0 && song_stream_data != 0)
         {
             bytes_to_SEND = (DWORD)(*song_size);
+            if(bytes_to_SEND > DATA_BUFSIZE)
+            {
+                bytes_to_SEND = DATA_BUFSIZE;
+            }
 
-            //std::cerr << "SoundManager::Broadcast>>Incoming data:[" << bytes_to_SEND << "]" << std::endl;
             //std::cerr << "Sending::" << std::endl;
             /*for(DWORD i = 0; i < bytes_to_SEND; i++)
             {
@@ -47,12 +48,13 @@ DWORD WINAPI BroadcastMusic(LPVOID lpParameter)
             if(song_stream_data != 0 && !serverUDP->Broadcast(*song_stream_data, &bytes_to_SEND))
             {
                 qDebug() << "Jerry, your Broadcast sucks";
+                std::cout << "SoundManager::Broadcast>>Song size after:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
                 return -1;
             }
             //std::cout << "SoundManager::Broadcast>>Song size before:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
             *song_size -= bytes_to_SEND;
             *song_stream_data += bytes_to_SEND;
-            //std::cout << "SoundManager::Broadcast>>Song size after:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
+            std::cerr << "SoundManager::Broadcast>>Song size after:" << *song_size << " bytes_to_SEND:" << bytes_to_SEND << std::endl;
         }
 
     }

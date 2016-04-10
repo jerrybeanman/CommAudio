@@ -33,7 +33,7 @@ bool ServerTCP::InitializeSocket(short port)
     // Initialize address structure
     LocalAddr.sin_family = AF_INET;
     LocalAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    LocalAddr.sin_port = htons(DEFAULT_PORT);
+    LocalAddr.sin_port = htons(DEFAULT_PORT_TCP);
 
     // Bind address to the listening socket
     if (bind(SocketInfo.Socket, (PSOCKADDR)&LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
@@ -55,7 +55,7 @@ std::string ServerTCP::Accept(void)
 {
     Client newClient;
     int Len = sizeof(newClient.Connection);
-    if((newClient.SocketInfo.Socket = accept(SocketInfo.Socket, (SOCKADDR*)&newClient.Connection, &Len)) == INVALID_SOCKET)
+    if((newClient.SocketInfo.Socket = accept(SocketInfo.Socket, NULL, NULL)) == INVALID_SOCKET)
     {
         std::cerr << "ServerTCP::Accept() failed with error " << WSAGetLastError() << std::endl;
         return "";
@@ -85,6 +85,9 @@ bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
 
 void ServerTCP::Send(LPSOCKET_INFORMATION SockInfo, char * message)
 {
+    ZeroMemory(&SockInfo->Overlapped, sizeof(WSAOVERLAPPED));
+    SockInfo->Overlapped.hEvent = WSACreateEvent();
+
     /* Post a message back to the socket for aknowledgement */
     if (WSASend(SockInfo->Socket,    /* Writing socket                       */
         &(SockInfo->DataBuf),        /* Pointer to WSABUF                    */
@@ -98,7 +101,17 @@ void ServerTCP::Send(LPSOCKET_INFORMATION SockInfo, char * message)
         if (WSAGetLastError() != ERROR_IO_PENDING)
         {
             std::cerr << "Send() failed with errno: " << WSAGetLastError() << std::endl;
+            return;
         }
+        if(WSAWaitForMultipleEvents(1, &SockInfo->Overlapped.hEvent, FALSE, INFINITE, FALSE) == WAIT_TIMEOUT)
+        {
+            std::cerr << "ServerUDP::WSASendto() Tmeout " << std::endl;
+            return;
+        }
+    }
+    if(!WSAGetOverlappedResult(SockInfo->Socket, &(SockInfo->Overlapped), &SockInfo->BytesSEND, FALSE, &flags))
+    {
+        std::cerr << "ServerUDP::WSAGetOverlappedResult() failed: " << WSAGetLastError() << std::endl;
     }
 }
 

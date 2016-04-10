@@ -48,10 +48,10 @@ public:
 
 private:
     qint64      dg_readpos;
-    qint64      dg_streampos;
     qint64      dg_max;
     QByteArray  dg_buffer;
     QByteArray  dg_externBuf;
     bool        playing;
+    bool        validFormat;
 };
 #endif // DATAGENERATOR_H

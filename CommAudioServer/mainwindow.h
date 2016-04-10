@@ -28,6 +28,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    std::string get_all_songs();
     ~MainWindow();
 private slots:
 
@@ -122,11 +123,11 @@ private slots:
 
     void on_progressBar_actionTriggered(int action);
 
-    void on_streamButton_clicked(bool checked);
+    void handleSongDataAvailable(int len);
 
-    void handleDataAvailable(int len);
+    void handleSongDataFinished();
 
-    void handleDataFinished();
+    //void handleRecordingDataAvailable(int len);
 
     void on_pauseBtn_clicked();
 
@@ -316,7 +317,6 @@ private:
 
     void populate_songlist();
 
-    std::string get_all_songs();
 
     void split_songs_from_string(std::string combinedString);
 
@@ -338,6 +338,7 @@ private:
     bool                    fileExists;
     bool                    fileLoaded;
     bool                    streaming;
+    bool                    recording;
     bool                    fileFinished;
 
     QStringList             m_music_files;

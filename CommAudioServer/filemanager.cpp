@@ -8,7 +8,7 @@ bool StartFileManager()
 {
     DWORD TCPServerThreadID;
 
-    if(serverTCP.InitializeSocket(DEFAULT_PORT) < 0)
+    if(serverTCP.InitializeSocket(DEFAULT_PORT_TCP) < 0)
         return FALSE;
 
 	if(CreateThread(NULL, 0, TCPAccept, (LPVOID)&serverTCP, 0, &TCPServerThreadID) == NULL)
@@ -40,7 +40,7 @@ DWORD WINAPI TCPAccept(LPVOID lpParameter)
 DWORD WINAPI TCPReadThread(LPVOID lpParamater)
 {
     Client * client = (Client *)lpParamater;
-	while((client->SocketInfo.DataBuf.len = recv(client->SocketInfo.Socket, client->SocketInfo.DataBuf.buf, DATA_BUFSIZE, 0)) != SOCKET_ERROR)
+    while((client->SocketInfo.BytesRECV = recv(client->SocketInfo.Socket, client->SocketInfo.DataBuf.buf, DATA_BUFSIZE, 0)) != SOCKET_ERROR)
 	{
         ParseRequestMessage(&client->SocketInfo);
 	}
@@ -59,7 +59,7 @@ void ParseRequestMessage(LPSOCKET_INFORMATION SocketInfo)
 		{
 			std::string packet = BuildFilePacket();
             SocketInfo->DataBuf.buf = (char*)packet.c_str();
-            SocketInfo->DataBuf.len = DATA_BUFSIZE;
+            SocketInfo->DataBuf.len = packet.length() + 1;
 			serverTCP.Send(SocketInfo, (char*)packet.c_str());
 		}
 		break;
@@ -69,7 +69,9 @@ void ParseRequestMessage(LPSOCKET_INFORMATION SocketInfo)
 			iss >> filename;
             if(OpenFile(filename))
 			{
+                SendStartMessage(SocketInfo);
                 SendFile(SocketInfo, fp);
+                SendEndMessage(SocketInfo);
 			}
 		}
 		break;
@@ -123,27 +125,44 @@ std::vector<std::string> GetFileNames(std::string folder, std::string extension)
 --------------------------------------------------------------------------------------------------------------------*/
 bool OpenFile(std::string name)
 {
-	char str[32];
-	if ((fp = fopen(name.c_str(), "r")) == NULL)
+    std::string dir = MUSIC_DIRECTORY + name;
+    if ((fp = fopen(dir.c_str(), "rb")) == NULL)
 	{
+        std::cerr << "Errno: " << errno << std::endl;
 		return false;
 	}
 	return true;
 }
 
+void SendStartMessage(LPSOCKET_INFORMATION SocketInfo)
+{
+    std::string fileStart = FileBegin;
+    SocketInfo->DataBuf.buf = (char *)fileStart.c_str();
+    SocketInfo->DataBuf.len = fileStart.length() + 1;
+    serverTCP.Send(SocketInfo, (char *)fileStart.c_str());
+}
+
 void SendFile(LPSOCKET_INFORMATION SocketInfo, FILE * fp)
 {
-	char * pbuf = (char *)malloc(DATA_BUFSIZE);
 	DWORD		FBytesRead;		/* Bytes read from fread						*/
-	while(!feof(fp))
-	{
-		FBytesRead = fread(pbuf, 1, DATA_BUFSIZE, fp);
+    do
+    {
+        char * pbuf = (char *)malloc(DATA_BUFSIZE);
+        FBytesRead = fread(pbuf, 1, DATA_BUFSIZE, fp);
         SocketInfo->DataBuf.buf = pbuf;
         SocketInfo->DataBuf.len = FBytesRead;
         serverTCP.Send(SocketInfo, pbuf);
-				/* zero out memory for next round */
-        memset(pbuf, 0, DATA_BUFSIZE);
-	}
+        /* zero out memory for next round */
+        free(pbuf);
+    }while(FBytesRead == DATA_BUFSIZE);
+}
+
+void SendEndMessage(LPSOCKET_INFORMATION SocketInfo)
+{
+    std::string fileEnd = FileEnd;
+    SocketInfo->DataBuf.buf = (char *)fileEnd.c_str();
+    SocketInfo->DataBuf.len = fileEnd.length() + 1;
+    serverTCP.Send(SocketInfo, (char *)fileEnd.c_str());
 }
 
 std::string BuildFilePacket()
