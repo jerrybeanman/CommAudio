@@ -12,7 +12,7 @@ class TCPThreadManager : public QObject
 public:
     TCPThreadManager(QByteArray& ip) : ipAddr(ip){}
     void TCPThreadRequest();
-
+    ClientTCP clientTCP;
 signals:
     void TCPThreadRequested();
 

@@ -14,8 +14,6 @@ public:
 
     char* GetData();
 
-    void  acceptConnection();
-
     SOCKET              listenSocket;
     WSAEVENT            WSAEvent;
 private:

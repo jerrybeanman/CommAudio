@@ -7,18 +7,11 @@ bool ClientTCP::InitializeSocket(short port, char *ip)
         return FALSE;
     }
 
-    if ((listenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET)
+    if ((SocketInfo.Socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET)
     {
         std::cout << "WSASocket() failed with error " <<  WSAGetLastError() << std::endl;
         return FALSE;
     }
-    bool fFlag = true;
-    if(setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, (char *)&fFlag, sizeof(fFlag)) == SOCKET_ERROR)
-    {
-        std::cout << "InitializeSocket()::setsockopt() failed with error " << WSAGetLastError() << std::endl;
-        return FALSE;
-    }
-
     LocalAddr.sin_family = AF_INET;
     LocalAddr.sin_port = htons(port);
 
@@ -31,21 +24,13 @@ bool ClientTCP::InitializeSocket(short port, char *ip)
 
     memcpy((char *)&LocalAddr.sin_addr, hp->h_addr, hp->h_length);
 
-    if(bind(listenSocket, (struct sockaddr*) &LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
-    {
-        std::cout << "bind() failed with error " << WSAGetLastError() << std::endl;
-        return FALSE;
-    }
+    if (connect (SocketInfo.Socket, (struct sockaddr *)&LocalAddr, sizeof(LocalAddr)) == -1)
+        {
+            qDebug() << "Can't connect to server: " << WSAGetLastError();
+            return false;
+        }
+    return true;
 
-    if (listen(listenSocket, 1)) {
-        return FALSE;
-    }
-
-    return TRUE;
-
-}
-void ClientTCP::acceptConnection(){
-    SocketInfo.Socket = accept(listenSocket, NULL, NULL);
 }
 
 bool ClientTCP::Recv() {
@@ -134,3 +119,4 @@ bool ClientTCP::Close() {
 
     return true;
 }
+
