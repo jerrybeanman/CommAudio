@@ -38,8 +38,45 @@ TabbedPage {
     Tab {
         title: "Streaming"
         iconName: "av/surround_sound"
-        View {
+        Item {
+            width: Units.dp(50)
+            View {
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                    bottom: parent.bottom
+                    margins: Units.dp(2)
 
+                }
+
+                elevation: 1
+                width: 150
+                height: 300
+
+                ListView {
+                    id: streamingPlaylistView
+                    anchors.fill: parent
+
+                }
+            }
+            ActionButton {
+                anchors {
+                    right: parent.right
+                    bottom: parent.bottom
+                    margins: Units.dp(30)
+                }
+
+                action: Action {
+                    id: playlistAddContent
+                    text: "Add Song"
+                    shortcut: "Ctrl+A"
+                    onTriggered: snackbar.open("We do actions too!")
+                }
+                iconName: "content/add"
+            }
+            Snackbar {
+                id: playlistSnackbar
+            }
         }
     }
 
