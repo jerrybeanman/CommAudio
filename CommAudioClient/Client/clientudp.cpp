@@ -39,6 +39,37 @@ bool ClientUDP::InitializeSocket(short port)
     return TRUE;
 }
 
+bool ClientUDP::InitializeSendingSocket(char * ip, short port)
+{
+    bool fFlag;
+      // Create socket for writing based on currently selected protocol
+    if ((SendingSocketInfo.Socket = WSASocket(AF_INET,SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET)
+    {
+        std::cout << "WSASocket() failed with error " <<  WSAGetLastError() << std::endl;
+        return FALSE;
+    }
+    fFlag = TRUE;
+
+    // Avoid WSAADDRINUSE erro on bind
+    if(setsockopt(SocketInfo.Socket, SOL_SOCKET, SO_REUSEADDR, (char *)&fFlag, sizeof(fFlag)) == SOCKET_ERROR)
+    {
+        std::cout << "InitializeSocket()::setsockopt() failed with error " << WSAGetLastError() << std::endl;
+        return FALSE;
+    }
+    // Assign the local port number to recieve on
+    SourceAddress.sin_family        = AF_INET;
+    SourceAddress.sin_addr.s_addr   = inet_addr(ip);
+    SourceAddress.sin_port          = htons(port);
+
+    // Bind server address to socket
+    if(bind(SendingSocketInfo.Socket, (struct sockaddr*) &SourceAddress, sizeof(SourceAddress)) == SOCKET_ERROR)
+    {
+        std::cout << "bind() failed with error " << WSAGetLastError() << std::endl;
+        return FALSE;
+    }
+
+    return TRUE;
+}
 
 bool ClientUDP::MulticastSettings(const char * name)
 {
@@ -93,15 +124,46 @@ bool ClientUDP::Recv()
         }
 
     }
-   // std::cout << "Bytes Recieved: " << SocketInfo.BytesRECV << std::endl;
 
     return TRUE;
 }
+
 bool ClientUDP::Send(char * message, int size)
 {
     Q_UNUSED(message)
     Q_UNUSED(size)
-    return FALSE;
+    DWORD flags = 0;
+    SendingSocketInfo.DataBuf.buf = message;
+    SendingSocketInfo.DataBuf.len = size;
+    memset(&SendingSocketInfo.Overlapped, '\0', sizeof(WSAOVERLAPPED));
+    SendingSocketInfo.Overlapped.hEvent = WSACreateEvent();
+    if (WSASendTo(SendingSocketInfo.Socket,
+        &(SendingSocketInfo.DataBuf),
+        1,
+        &SendingSocketInfo.BytesSEND,
+        flags,
+        (SOCKADDR *)&SourceAddress,
+        sizeof(SourceAddress),
+        &SendingSocketInfo.Overlapped,
+        NULL)
+        < 0)
+    {
+        if (WSAGetLastError() == WSA_IO_PENDING)
+        {
+            if(WSAWaitForMultipleEvents(1, &SendingSocketInfo.Overlapped.hEvent, FALSE, 100, FALSE) == WAIT_TIMEOUT)
+            {
+                std::cout << "RecvFrom() Timeout" << std::endl;
+                return FALSE;
+            }
+           if(!WSAGetOverlappedResult(SendingSocketInfo.Socket, &(SendingSocketInfo.Overlapped), &SendingSocketInfo.BytesSEND, FALSE, &Flags))
+            {
+                std::cout << "ClientUDP::WSAGetOVerlappedResult failed with errno " << WSAGetLastError() << std::endl;
+                return FALSE;
+            }
+        }
+    }
+
+    return true;
 }
 
 bool ClientUDP::Close()
