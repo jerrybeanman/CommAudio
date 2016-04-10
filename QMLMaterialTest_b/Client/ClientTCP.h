@@ -16,6 +16,8 @@ public:
 
     void  acceptConnection();
 
+    bool connectToServer(short port, char *ip);
+
     SOCKET              listenSocket;
     WSAEVENT            WSAEvent;
 private:
