@@ -15,7 +15,8 @@ void MicrophoneThreadManager::MicrohponeSendThread()
 
         // TODO::Implement read from microhpone and assign it into voicedata
 
-        clientUDP.Send(voicedata, strlen(voicedata) + 1);
+        clientUDP.Send(voicedata, 2000);
+        free(voicedata);
     }
 }
 

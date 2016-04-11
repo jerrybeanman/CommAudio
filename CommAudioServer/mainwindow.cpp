@@ -457,7 +457,7 @@ void MainWindow::on_recordButton_clicked()
 
 void MainWindow::on_playRecordingButton_clicked()
 {
-    m_recorder->stop();
+    /*m_recorder->stop();
 
     QByteArray array = m_recorder->readAll();
 
@@ -467,7 +467,7 @@ void MainWindow::on_playRecordingButton_clicked()
     if(prepare_audio_devices(m_recorder->fileFormat()))
         m_song_generator->setValid();
 
-    play_audio();
+    play_audio();*/
 }
 
 void MainWindow::on_progressBar_actionTriggered(int progress)
