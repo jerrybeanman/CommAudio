@@ -11,12 +11,14 @@ void MicrophoneThreadManager::MicrohponeSendThread()
         return;*/
     while(1)
     {
-        char * voicedata = (char *)malloc(2000);
-
+        if(cb_voice_data.Count > 0)
+        {
+            char * voicedata = (char *)malloc(DATA_BUFSIZE);
+            CBPop(&cb_voice_data, voicedata);
+            clientUDP.Send(voicedata, DATA_BUFSIZE);
+            free(voicedata);
+        }
         // TODO::Implement read from microhpone and assign it into voicedata
-
-        clientUDP.Send(voicedata, 2000);
-        free(voicedata);
     }
 }
 

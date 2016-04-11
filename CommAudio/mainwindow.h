@@ -151,8 +151,6 @@ private slots:
 
     void addToSongHeader();
 
-    void addVoiceData(const unsigned int size);
-
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: on_play_clicked
     --
@@ -192,6 +190,26 @@ private slots:
     -- Sends the file which was hilighted in the list of songs
     ----------------------------------------------------------------------------------------------------------------------*/
     void on_requestFile_clicked();
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: Handle Voice Data Available
+    --
+    -- DATE: April 11, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Tyler Trepanier
+    --
+    -- PROGRAMMER: Tyler Trepanier
+    --
+    -- INTERFACE: void handleVoiceDataAvailable(const unsigned int)
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    -- Handles any incoming microphone data and populates the m_voice_generator with this data
+    ----------------------------------------------------------------------------------------------------------------------*/
+    void handleVoiceDataAvailable(const unsigned int);
 
 private:
     /*------------------------------------------------------------------------------------------------------------------
@@ -258,6 +276,26 @@ private:
     void init_file();
 
     void play_audio();
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: Play Voice
+    --
+    -- DATE: April 11, 2016
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Tyler Trepanier
+    --
+    -- PROGRAMMER: Tyler Trepanier
+    --
+    -- INTERFACE: void play_voice()
+    --
+    -- RETURNS: void
+    --
+    -- NOTES:
+    -- Reads from the m_voice_generator and plays the microphone data received from the peer.
+    ----------------------------------------------------------------------------------------------------------------------*/
+    void play_voice();
 
     Ui::MainWindow*         ui;
     QByteArray              serverIP;

@@ -113,17 +113,13 @@ void MainWindow::initializeMicrophoneConnection()
     connect(microphoneWorker, SIGNAL(finished()), microphoneThread, SLOT(quit()), Qt::DirectConnection);
 
     connect(microphoneRecvWorker, SIGNAL(RecievedData(const unsigned int)), this,
-            SLOT(addToSongBuffer(const unsigned int)));
+            SLOT(handleVoiceDataAvailable(const unsigned int)));
     connect(microphoneRecvWorker, SIGNAL(MicrophoneRecvThreadRequested()), microphoneRecvThread, SLOT(start()));
     connect(microphoneRecvThread, SIGNAL(started()), microphoneRecvWorker, SLOT(MicrohponeRecvThread()));
     connect(microphoneRecvWorker, SIGNAL(finished()), microphoneRecvThread, SLOT(quit()), Qt::DirectConnection);
 
     microphoneWorker->MicrophoneThreadRequest();
 
-}
-
-void MainWindow::addVoiceData(const unsigned int size) {
-    //TODO add voice data
 }
 
 void MainWindow::initializeUDPThread() {
@@ -237,11 +233,60 @@ void MainWindow::play_audio()
     }
 }
 
+void MainWindow::play_voice()
+{
+    if(m_recorder == 0)
+        m_recorder = new Recorder();
+
+    if(!ReceivingVoice)
+    {
+        ReceivingVoice = true;
+        if(!prepare_audio_devices(m_recorder->fileFormat()))
+            return;
+
+        m_voice_generator->start();
+
+        m_audioOutput->start(m_voice_generator);
+        m_audioOutput->setVolume(qreal(100.0f/100.0f));
+    }
+    else
+    {
+        //Data is being received here, handle lag here.
+    }
+}
+
 void MainWindow::on_recordButton_clicked()
 {
-    qDebug() << "recording starts.";
-    m_recorder = new Recorder();
-    m_recorder->start();
+    if(!recording)
+    {
+        qDebug() << "recording starts.";
+        m_recorder = new Recorder();
+        m_voice_generator = new RecordGenerator();
+
+        if(prepare_audio_devices(m_recorder->fileFormat()))
+            m_song_generator->setValid();
+        else
+        {
+            qDebug() << "MainWindow::on_recordingButton_clicked>>Can't prepare audio device.";
+            return; //Can't set the format properly, too bad.
+        }
+
+        //connect(m_recorder, SIGNAL(dataAvailable(int)), this, SLOT(handleVoiceDataAvailable(int)));
+
+        m_recorder->start();
+        recording = true;
+    }
+    else
+    {
+        /*
+         * TODO:
+         * When button is clicked, turn recording on and off. This will continously "play"
+         * the recording until it is clicked off. There will probably be an issue where
+         * it will record itself but that's fine.
+         */
+        m_recorder->stop();
+        recording = false;
+    }
 }
 
 void MainWindow::on_playRecordingButton_clicked()
@@ -305,4 +350,22 @@ void MainWindow::on_requestFile_clicked()
     qDebug() << song;
     TCPWorker->sendSongRequest(song.toLocal8Bit());
 
+}
+
+void MainWindow::handleVoiceDataAvailable(const unsigned int len)
+{
+    char* buf = (char*)malloc(DATA_BUFSIZE);
+    //std::cerr << "MainWindow::handleVoiceData>>count:" << cb_voice_data.Count << std::endl;
+    if(cb_voice_data.Count != 0)
+    {
+        CBPop(&cb_voice_data, buf);
+        //emit to TCP that this is available
+
+        QByteArray data = QByteArray::fromRawData(buf, len);
+
+        //qDebug() << "Voice size: " << data.size();
+        m_voice_generator->AddMoreDataToBufferFromQByteArray(data, data.size());
+        play_voice();
+    }
+    free(buf);
 }

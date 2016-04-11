@@ -7,8 +7,9 @@
 #include <QDataStream>
 #include <QDebug>
 #include "inputbuffer.h"
+#include "globals.h"
 
-class Recorder : public QObject
+class Recorder : public QIODevice
 {
     Q_OBJECT
 public:
@@ -17,7 +18,8 @@ public:
     const QAudioFormat &fileFormat() const;
     void start();
     void stop();
-    const QByteArray readAll();
+    qint64 writeData(const char *data, qint64 len);
+    qint64 readData(char * data, qint64 maxlen);
     int bytesWritten();
 
 public slots:
@@ -32,17 +34,15 @@ private:
     QAudioFormat        r_format;
     QAudioInput         *r_input;
     QAudioDeviceInfo    r_inputInfo;
-    QIODevice           *dev;
-    InputBuffer         *r_newBuffer;
-    InputBuffer         *r_saveBuffer;
+    QByteArray          r_buffer;
     bool                inProgress;
     bool                ready;
     int                 audio_state;
-    int                 writeBuffer;
+    int                 r_bytes_AVAILABLE;
     int                 size;
-    qint64              pos;
-
+    char*               r_data;
 signals:
+    void dataAvailable(int len);
 
 };
 
