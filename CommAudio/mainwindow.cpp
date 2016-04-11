@@ -51,26 +51,28 @@ void MainWindow::on_connectButton_pressed()
 
     tcpThread = new QThread();
 
-    QByteArray testIP("192.168.56.1");
-    TCPThreadManager* TCPWorker = new TCPThreadManager(testIP);
-    m_generator = new DataGenerator(this);
+    TCPWorker = new TCPThreadManager(serverIP);
+    m_generator = new DataGenerator();
 
     initializeUDPThread();
 
     TCPWorker->moveToThread(tcpThread);
 
+    connect(TCPWorker, SIGNAL(songList(const QByteArray&)), this,
+            SLOT(generatePlaylist(const QByteArray&)));
     connect(TCPWorker, SIGNAL(TCPThreadRequested()), tcpThread, SLOT(start()));
     connect(tcpThread, SIGNAL(started()), TCPWorker, SLOT(TCPReceiveThread()));
     connect(TCPWorker, SIGNAL(finished()), tcpThread, SLOT(quit()), Qt::DirectConnection);
 
     TCPWorker->TCPThreadRequest();
+    TCPWorker->sendSongRequest(QByteArray("1"));
 
 }
 static int count;
 void MainWindow::addToSongBuffer(const unsigned int size) {
     while(cb.Count != 0)
     {
-        char* temp = new char[size];
+        char* temp = new char[DATA_BUFSIZE];
         CBPop(&cb, temp);
         QByteArray data = QByteArray::fromRawData(temp, size);
         m_generator->AddMoreDataToBufferFromQByteArray(data, size);
@@ -91,7 +93,7 @@ void MainWindow::addToSongHeader(const unsigned int size) {
         }
         m_generator->RemoveBufferedData();
         count = 0;
-        char* temp = new char[size];
+        char* temp = new char[DATA_BUFSIZE];
         CBPop(&cb, temp);
         prepare_audio_devices(m_generator->readHeader(temp));
         delete temp;
@@ -129,45 +131,29 @@ void MainWindow::tabSelected() {
     }
     switch(ui->tabWidget->currentIndex()) {
         case broadcasting:
-            generatePlaylist("Song1 Song2 Song3 Song4 Song5 Song6");
             initializeUDPThread();
             break;
         case fileTransfer:
+            TCPWorker->sendSongRequest(QByteArray("1"));
             break;
         case mic:
             break;
     }
 }
 
-void MainWindow::generatePlaylist(QByteArray songs) {
+void MainWindow::generatePlaylist(const QByteArray& songs) {
+    QListWidget *playList;
+    if(ui->tabWidget->currentIndex() == broadcasting) {
+        playList = ui->serverPlayList;
+    } else if(ui->tabWidget->currentIndex() == fileTransfer){
+        playList = ui->serverSongList;
+    } else {
+        return;
+    }
     QList<QByteArray> songList = songs.split(' ');
     foreach (const QString& song, songList) {
-        ui->serverSongList->addItem(song);
+        playList->addItem(song);
     }
-}
-
-void MainWindow::on_filePicker_pressed() {
-
-    if(fileExists)
-    {
-        qDebug() << "New file.";
-        delete m_file;
-        delete m_generator;
-        fileLoaded = false;
-    }
-    m_file = new WavFile(this);
-    m_generator = new DataGenerator(this);
-    connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
-
-    m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)")));
-    prepare_audio_devices(m_file->fileFormat());
-    fileExists = true;
-    QFileInfo fileInfo(m_file->fileName());
-    QString filename(fileInfo.fileName());
-
-    ui->listWidget_2->addItem(filename);
-
-    updateFileProgress(0);
 }
 
 void MainWindow::updateFileProgress(const int progress) {
@@ -225,20 +211,6 @@ void MainWindow::play_audio()
     }
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    qDebug() << "Play button clicked.";
-    if(!fileLoaded)
-    {
-        qDebug() << "Loading file contents.";
-        init_file();
-        qDebug() << "After init";
-        fileLoaded = true;
-    }
-
-    play_audio();
-}
-
 void MainWindow::on_recordButton_clicked()
 {
     qDebug() << "recording starts.";
@@ -255,7 +227,7 @@ void MainWindow::on_playRecordingButton_clicked()
 
     prepare_audio_devices(m_recorder->fileFormat());
 
-    m_generator = new DataGenerator(this);
+    m_generator = new DataGenerator();
 
     m_generator->AddMoreDataToBufferFromQByteArray(array, size);
 
@@ -265,4 +237,46 @@ void MainWindow::on_playRecordingButton_clicked()
 void MainWindow::on_progressBar_actionTriggered(int progress)
 {
     ui->progressBar->setValue(progress);
+}
+
+void MainWindow::on_play_clicked()
+{
+    if(fileExists)
+    {
+        qDebug() << "New file.";
+        delete m_file;
+        delete m_generator;
+        fileLoaded = false;
+    }
+    m_file = new WavFile(this);
+    m_generator = new DataGenerator();
+    connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
+
+    m_file->open(QFileDialog::getOpenFileName(this, tr("Select a File"), 0, tr("Music (*.wav)")));
+    prepare_audio_devices(m_file->fileFormat());
+    fileExists = true;
+    QFileInfo fileInfo(m_file->fileName());
+    QString filename(fileInfo.fileName());
+
+    updateFileProgress(0);
+
+    qDebug() << "Play button clicked.";
+    if(!fileLoaded)
+    {
+        qDebug() << "Loading file contents.";
+        init_file();
+        qDebug() << "After init";
+        fileLoaded = true;
+    }
+
+    play_audio();
+}
+
+void MainWindow::on_requestFile_clicked()
+{
+    QString song = ui->serverSongList->currentItem()->text();
+    song.prepend("2 ");
+    qDebug() << song;
+    TCPWorker->sendSongRequest(song.toLocal8Bit());
+
 }

@@ -10,13 +10,9 @@ void UDPThreadManager::UDPReceiveThread() {
     if(!clientUDP.MulticastSettings(DEAULT_MULTICAST_IP))
         return;
 
-    CBInitialize(&cb, 10, 40000);
-    while(1)
+    CBInitialize(&cb, 10, DATA_BUFSIZE);
+    while(clientUDP.Recv())
     {
-        if(!clientUDP.Recv()) {
-            qDebug() << "Exiting thread";
-            break;
-        }
 
         //Song name / size
         //file header data
@@ -33,6 +29,7 @@ void UDPThreadManager::UDPReceiveThread() {
             emit songDataReceived(clientUDP.SocketInfo.BytesRECV);
         }
     }
+    qDebug() << "UDP Thread exiting";
     CBFree(&cb);
 }
 

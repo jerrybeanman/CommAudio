@@ -14,14 +14,13 @@ public:
 
     char* GetData();
 
-    void  acceptConnection();
-
     SOCKET              listenSocket;
     WSAEVENT            WSAEvent;
 private:
     SOCKADDR_IN         SourceAddress;
     DWORD               Flags = 0;
     DWORD               SourceLen = sizeof(SourceAddress);
+
 };
 
 #endif // CLIENTTCP_H

@@ -17,7 +17,7 @@ class DataGenerator : public QIODevice
     Q_OBJECT
 
 public:
-    DataGenerator(QObject *parent);
+    DataGenerator();
     ~DataGenerator();
 
     void start();
@@ -39,6 +39,7 @@ public:
 signals:
     void audioProgressChanged(int progress);
     void dataAvailable(int len);
+    void dataFinished();
 
 public:
     float progress;
@@ -47,10 +48,10 @@ public:
 
 private:
     qint64      dg_readpos;
+    qint64      dg_streampos;
     qint64      dg_max;
     QByteArray  dg_buffer;
     QByteArray  dg_externBuf;
     bool        playing;
-    bool        validFormat;
 };
 #endif // DATAGENERATOR_H

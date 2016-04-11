@@ -94,27 +94,8 @@ private slots:
     -- NOTES:
     -- Displays the list of songs to the UI
     ----------------------------------------------------------------------------------------------------------------------*/
-    void generatePlaylist(QByteArray songs);
+    void generatePlaylist(const QByteArray& songs);
 
-    /*------------------------------------------------------------------------------------------------------------------
-    -- FUNCTION: on_filePicker_pressed
-    --
-    -- DATE: March 05, 2015
-    --
-    -- REVISIONS: (Date and Description)
-    --
-    -- DESIGNER: Scott Plummer
-    --
-    -- PROGRAMMER: Scott Plummer
-    --
-    -- INTERFACE: void on_filePicker_pressed()
-    --
-    -- RETURNS: void.
-    --
-    -- NOTES:
-    -- Displays a dialog for the user to select a file
-    ----------------------------------------------------------------------------------------------------------------------*/
-    void on_filePicker_pressed();
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: updateFileProgress
     --
@@ -139,8 +120,6 @@ private slots:
 
 private slots:
 
-    void on_pushButton_clicked();
-
     void on_recordButton_clicked();
 
     void on_playRecordingButton_clicked();
@@ -150,6 +129,29 @@ private slots:
     void addToSongBuffer(const unsigned int size);
 
     void addToSongHeader(const unsigned int size);
+
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: on_play_clicked
+    --
+    -- DATE: March 05, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void on_play_clicked()
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    -- Displays a dialog for the user to select a file and play a file
+    ----------------------------------------------------------------------------------------------------------------------*/
+    void on_play_clicked();
+
+    void on_requestFile_clicked();
 
 private:
     /*------------------------------------------------------------------------------------------------------------------
@@ -212,6 +214,7 @@ private:
     QThread*                tcpThread;
     QFile*                  data_file;
     UDPThreadManager*       UDPWorker;
+    TCPThreadManager*       TCPWorker;
 
     DataGenerator*          m_generator;
     char*                   data;
