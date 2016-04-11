@@ -51,6 +51,19 @@ bool ServerTCP::InitializeSocket(short port)
     return true;
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	Accept
+--
+-- DATE:		Febuary 28th, 2016		REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	std::string ServerTCP::Accept(void)
+--
+-- RETURNS: void
+--
+-- NOTES: Accepts a client, store its ip and socket and to ClientList
+--------------------------------------------------------------------------------------------------------------------*/
 std::string ServerTCP::Accept(void)
 {
     Client newClient;
@@ -65,8 +78,19 @@ std::string ServerTCP::Accept(void)
     return ip;
 }
 
-
-
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	Broadcast
+--
+-- DATE:		Febuary 28th, 2016		REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
+--
+-- RETURNS: void
+--
+-- NOTES: Broadcast a message to all connected clients in ClientList
+--------------------------------------------------------------------------------------------------------------------*/
 bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
 {
     Client tmpClient;
@@ -83,6 +107,21 @@ bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
     return true;
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	Send
+--
+-- DATE:		Febuary 28th, 2016		REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	void ServerTCP::Send(LPSOCKET_INFORMATION SockInfo, char * message)
+--                  SocketInfo  :   Specific socket to send message to
+--                  message     :   Data to send
+--
+-- RETURNS: void
+--
+-- NOTES: Send data to a specific client in ClientList
+--------------------------------------------------------------------------------------------------------------------*/
 void ServerTCP::Send(LPSOCKET_INFORMATION SockInfo, char * message)
 {
     ZeroMemory(&SockInfo->Overlapped, sizeof(WSAOVERLAPPED));

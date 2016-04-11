@@ -39,12 +39,11 @@ class ServerTCP : public Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	int Accept(void);
+            -- INTERFACE:	std::string ServerTCP::Accept(void)
             --
             -- RETURNS: void
             --
-            -- NOTES:  Calls accept on a player's socket. Sets the returning socket and client address structure to the player.
-                Add connected player to the list of players
+            -- NOTES: Accepts a client, store its ip and socket and to ClientList
             --------------------------------------------------------------------------------------------------------------------*/
             std::string Accept(void);
 
@@ -55,13 +54,11 @@ class ServerTCP : public Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	virtual void Broadcast(LPSOCKET_INFORMATION SocketInfor, char * message) = 0;
-            --                      ~SocketInfo : Pointer to Socket Information structure
-            --						~message    : message content
+            -- INTERFACE:	bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
             --
             -- RETURNS: void
             --
-            -- NOTES: Sends a message to all the connected clients
+            -- NOTES: Broadcast a message to all connected clients in ClientList
             --------------------------------------------------------------------------------------------------------------------*/
             bool Broadcast(char * message, LPDWORD lpNumberOfBytesSent);
 
@@ -72,12 +69,13 @@ class ServerTCP : public Server
             --
             -- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
             --
-            -- INTERFACE:	virtual void Send(LPSOCKET_INFORMATION sockinfo) = 0;
-            --						~sockinfo: Pointer to the socket information structure
+            -- INTERFACE:	void ServerTCP::Send(LPSOCKET_INFORMATION SockInfo, char * message)
+            --                  SocketInfo  :   Specific socket to send message to
+            --                  message     :   Data to send
             --
             -- RETURNS: void
             --
-            -- NOTES: Sends a message to a specific connected client
+            -- NOTES: Send data to a specific client in ClientList
             --------------------------------------------------------------------------------------------------------------------*/
             void Send(LPSOCKET_INFORMATION sockinfo, char * message);
 
