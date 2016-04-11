@@ -219,3 +219,8 @@ void DataGenerator::AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 l
     memcpy(dg_externBuf.data() + dg_max, dg_buffer.constData() + dg_max, len);
     dg_max += len;
 }
+
+void DataGenerator::setValid()
+{
+    validFormat = true;
+}

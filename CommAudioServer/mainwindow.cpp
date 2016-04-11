@@ -13,14 +13,13 @@
 #include "globals.h"
 #include "soundmanager.h"
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     m_device = QAudioDeviceInfo::defaultOutputDevice();
-    m_generator = new DataGenerator(this);
+    m_song_generator = new DataGenerator(this);
     fileExists = false;
     fileLoaded = false;
     fileFinished = false;
@@ -31,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     load_music_files();
-   // ready_next_song();
+    //ready_next_song();
 }
 
 MainWindow::~MainWindow()
@@ -68,7 +67,7 @@ void MainWindow::on_filePicker_pressed() {
     {
         qDebug() << "New file.";
         delete m_file;
-        delete m_generator;
+        delete m_song_generator;
         fileLoaded = false;
     }
     m_file = new WavFile(this);
@@ -82,15 +81,15 @@ void MainWindow::on_filePicker_pressed() {
     }
 
     fileExists = true;
-    m_generator = new DataGenerator(this);
-    connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
+    m_song_generator = new DataGenerator(this);
+    connect(m_song_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
     //Tests
 
 
     m_file->seek(0);
     QByteArray array = m_file->read(44);
-    QAudioFormat format = m_generator->readHeader(array.data());
+    QAudioFormat format = m_song_generator->readHeader(array.data());
     QAudioFormat temp = m_file->fileFormat();
     prepare_audio_devices(format);
 
@@ -134,13 +133,13 @@ void MainWindow::load_file()
     {
         m_file->seek(0);
         QByteArray array = m_file->readAll();
-        m_generator->AddMoreDataToBufferFromQByteArray(array, array.size());
+        m_song_generator->AddMoreDataToBufferFromQByteArray(array, array.size());
     }
 }
 
 void MainWindow::play_audio()
 {
-    if(m_generator->isPlaying())
+    if(m_song_generator->isPlaying())
     {
         qDebug() << "Audio file is resuming.";
         m_audioOutput->resume();
@@ -149,9 +148,29 @@ void MainWindow::play_audio()
     {
         //qDebug() << "Starting file from beginning.";
 
-        m_generator->start();
+        m_song_generator->start();
 
-        m_audioOutput->start(m_generator);
+        m_audioOutput->start(m_song_generator);
+        m_audioOutput->setVolume(qreal(100.0f/100.0f));
+    }
+}
+
+void MainWindow::play_voice()
+{
+    if(m_voice_generator->isPlaying())
+    {
+        //We are assuming that the voice will always be playing.
+        /*//qDebug() << "Audio file is resuming.";
+        m_audioOutput->reset();
+        m_audioOutput->start(m_voice_generator);
+        m_audioOutput->setVolume(qreal(100.0f/100.0f));*/
+    }
+    else
+    {
+        //qDebug() << "Starting file from beginning.";
+        m_voice_generator->start();
+
+        m_audioOutput->start(m_voice_generator);
         m_audioOutput->setVolume(qreal(100.0f/100.0f));
     }
 }
@@ -159,14 +178,14 @@ void MainWindow::play_audio()
 void MainWindow::stop_stream()
 {
     qDebug() << "Stopping stream.";
-    if(m_audioOutput == 0 || m_generator == 0)
+    if(m_audioOutput == 0 || m_song_generator == 0)
     {
-        qDebug() << "MainWindow::stop_stream>> m_audioOutput or m_generator was NULL";
+        qDebug() << "MainWindow::stop_stream>> m_audioOutput or m_song_generator was NULL";
         return;
     }
 
     m_audioOutput->reset();
-    m_generator->resetPosition();
+    m_song_generator->resetPosition();
     *song_stream_data = 0;
     song_size = 0;
     streaming = false;
@@ -230,19 +249,19 @@ bool MainWindow::ready_next_song(bool previous)
 
     fileExists = true;
     //m_audioOutput->suspend();
-    m_generator = 0;
-    m_generator = new DataGenerator(this);
-    connect(m_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
+    m_song_generator = 0;
+    m_song_generator = new DataGenerator(this);
+    connect(m_song_generator, SIGNAL(audioProgressChanged(int)), this, SLOT(on_progressBar_actionTriggered(int)));
 
     //Prepare the audio device to stream
     m_file->seek(0);
     QByteArray array = m_file->read(44);
-    QAudioFormat format = m_generator->readHeader(array.data());
+    QAudioFormat format = m_song_generator->readHeader(array.data());
 
     if(!prepare_audio_devices(format))
     {
         qWarning() << "MainWindow::ready_next_song>>Failed preparing the next song";
-        if(m_generator->isPlaying())
+        if(m_song_generator->isPlaying())
         {
             qDebug() << "Pause button clicked.";
             m_audioOutput->suspend();
@@ -324,7 +343,7 @@ bool MainWindow::delete_old_song()
 
         // Required, disconnects old signals and stops sending old data.
         delete m_file;
-        m_generator->RemoveBufferedData();
+        m_song_generator->RemoveBufferedData();
         fileLoaded = false;
         fileFinished = false;
 
@@ -365,15 +384,15 @@ bool MainWindow::prepare_stream()
         streaming = true;
 
         //disconnect()
-        connect(m_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleSongDataAvailable(int)));
-        connect(m_generator, SIGNAL(dataFinished()), this, SLOT(handleSongDataFinished()));
+        connect(m_song_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleSongDataAvailable(int)));
+        connect(m_song_generator, SIGNAL(dataFinished()), this, SLOT(handleSongDataFinished()));
 
         qDebug() << "MainWindow::prepare_stream>>Sending Header.";
-        QByteArray* header = m_generator->getExternalReference();
+        QByteArray* header = m_song_generator->getExternalReference();
         header->prepend(HEADER);
         *song_stream_data = header->data();
 
-        //*song_stream_data = m_generator->getExternalReference()->data();
+        //*song_stream_data = m_song_generator->getExternalReference()->data();
         m_stream_size = 51;
         song_size = &m_stream_size;
 
@@ -407,10 +426,20 @@ void MainWindow::on_recordButton_clicked()
     {
         qDebug() << "recording starts.";
         m_recorder = new Recorder();
+        m_voice_generator = new RecordGenerator();
 
-        //connect(m_recorder, SIGNAL(dataAvailable(int)), this, SLOT(handleSongDataAvailable(int)));
+        if(prepare_audio_devices(m_recorder->fileFormat()))
+            m_song_generator->setValid();
+        else
+        {
+            qDebug() << "MainWindow::on_recordingButton_clicked>>Can't prepare audio device.";
+            return; //Can't set the format properly, too bad.
+        }
+
+        connect(m_recorder, SIGNAL(dataAvailable(int)), this, SLOT(handleVoiceDataAvailable(int)));
 
         m_recorder->start();
+        recording = true;
     }
     else
     {
@@ -421,34 +450,24 @@ void MainWindow::on_recordButton_clicked()
          * it will record itself but that's fine.
          */
         m_recorder->stop();
-
-        QByteArray array = m_recorder->readAll();
-
-        prepare_audio_devices(m_recorder->fileFormat());
-
-
-        m_generator = new DataGenerator(this);
-
-        m_generator->AddMoreDataToBufferFromQByteArray(array, array.size());
-
-        play_audio();
+        recording = false;
     }
 
 }
 
 void MainWindow::on_playRecordingButton_clicked()
 {
-    m_recorder->stop();
+    /*m_recorder->stop();
 
     QByteArray array = m_recorder->readAll();
 
-    prepare_audio_devices(m_recorder->fileFormat());
+    m_song_generator = new DataGenerator(this);
+    m_song_generator->AddMoreDataToBufferFromQByteArray(array, array.size());
 
-    m_generator = new DataGenerator(this);
+    if(prepare_audio_devices(m_recorder->fileFormat()))
+        m_song_generator->setValid();
 
-    m_generator->AddMoreDataToBufferFromQByteArray(array, array.size());
-
-    play_audio();
+    play_audio();*/
 }
 
 void MainWindow::on_progressBar_actionTriggered(int progress)
@@ -469,6 +488,24 @@ void MainWindow::handleSongDataAvailable(int len)
     *song_size += static_cast <DWORD>(len);
 }
 
+void MainWindow::handleVoiceDataAvailable(int len)
+{
+    char* buf = (char*)malloc(DATA_BUFSIZE);
+    //std::cerr << "MainWindow::handleVoiceData>>count:" << cb_voice_data.Count << std::endl;
+    if(cb_voice_data.Count != 0)
+    {
+        CBPop(&cb_voice_data, buf);
+        //emit to TCP that this is available
+
+        QByteArray data = QByteArray::fromRawData(buf, len);
+
+        //qDebug() << "Voice size: " << data.size();
+        m_voice_generator->AddMoreDataToBufferFromQByteArray(data, data.size());
+    }
+    play_voice();
+    free(buf);
+}
+
 void MainWindow::handleSongDataFinished()
 {
     qDebug() << "Data has finished sending.";
@@ -481,7 +518,7 @@ void MainWindow::on_pauseBtn_clicked()
     if(!fileExists)
         return;
 
-    if(m_generator->isPlaying())
+    if(m_song_generator->isPlaying())
     {
         if(streaming)
         {
@@ -499,7 +536,7 @@ void MainWindow::on_pauseBtn_clicked()
 
 void MainWindow::on_nextsongBtn_clicked()
 {
-    if(m_generator->isPlaying())
+    if(m_song_generator->isPlaying())
     {
         qDebug() << "Pause button clicked.";
         m_audioOutput->suspend();
@@ -512,7 +549,7 @@ void MainWindow::on_nextsongBtn_clicked()
 
 void MainWindow::on_prevsongBtn_clicked()
 {
-    if(m_generator->isPlaying())
+    if(m_song_generator->isPlaying())
     {
         qDebug() << "Pause button clicked.";
         m_audioOutput->suspend();

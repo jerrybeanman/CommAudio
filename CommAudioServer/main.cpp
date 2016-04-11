@@ -10,6 +10,7 @@ std::vector<std::string> FileNames;
 char** song_stream_data = (char**) malloc(sizeof(char*));
 DWORD* song_size = 0;
 
+
 int main(int argc, char *argv[])
 {
     QApplication program(argc, argv);
@@ -27,11 +28,11 @@ int main(int argc, char *argv[])
         FileNames.push_back((buf));
     }
 
-    /*if(!StartSoundManager())
+    if(!StartSoundManager())
     {
         std::cout << "StartSoundManager() failed to start" << std::endl;
         return -1;
-    }*/
+    }
    if(!StartFileManager())
     {
         std::cout << "StartFileManager() failed to start" << std::endl;
