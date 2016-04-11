@@ -15,6 +15,7 @@ public:
 signals:
     void finished();
     void MicrophoneRecvThreadRequested();
+    void RecievedData(const unsigned int);
 
 public slots:
     void MicrohponeRecvThread();

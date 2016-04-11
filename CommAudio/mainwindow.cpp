@@ -1,5 +1,6 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "microphonethreadmanager.h"
+#include "microphonethreadrecievingmanager.h"
 #include <QFileDialog>
 #include <QSound>
 #include <QMediaPlayer>
@@ -62,6 +63,8 @@ void MainWindow::on_connectButton_pressed()
     TCPWorker->TCPThreadRequest();
     TCPWorker->sendSongRequest(QByteArray("1"));
 
+    //initializeMicrophoneConnection();
+
 }
 static int count;
 void MainWindow::addToSongBuffer(const unsigned int size) {
@@ -79,7 +82,7 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
     }
 }
 
-void MainWindow::addToSongHeader(const unsigned int size) {
+void MainWindow::addToSongHeader() {
     if(cb.Count != 0) {
         if(m_audioOutput != nullptr) {
             m_generator->resetPosition();
@@ -95,18 +98,32 @@ void MainWindow::addToSongHeader(const unsigned int size) {
     }
 }
 
-void MainWindow::initializeMicrophoneConnection() {
-    microphoneThread = new QThread();
+void MainWindow::initializeMicrophoneConnection()
+{
+    microphoneThread      = new QThread();
+    microphoneRecvThread  = new QThread();
     MicrophoneThreadManager* microphoneWorker = new MicrophoneThreadManager();
+    MicrophoneThreadRecvManager* microphoneRecvWorker = new MicrophoneThreadRecvManager();
 
     microphoneWorker->moveToThread(microphoneThread);
+    microphoneRecvWorker->moveToThread(microphoneRecvThread);
 
     connect(microphoneWorker, SIGNAL(MicrophoneThreadRequested()), microphoneThread, SLOT(start()));
     connect(microphoneThread, SIGNAL(started()), microphoneWorker, SLOT(MicrohponeSendThread()));
     connect(microphoneWorker, SIGNAL(finished()), microphoneThread, SLOT(quit()), Qt::DirectConnection);
 
+    connect(microphoneRecvWorker, SIGNAL(RecievedData(const unsigned int)), this,
+            SLOT(addToSongBuffer(const unsigned int)));
+    connect(microphoneRecvWorker, SIGNAL(MicrophoneRecvThreadRequested()), microphoneRecvThread, SLOT(start()));
+    connect(microphoneRecvThread, SIGNAL(started()), microphoneRecvWorker, SLOT(MicrohponeRecvThread()));
+    connect(microphoneRecvWorker, SIGNAL(finished()), microphoneRecvThread, SLOT(quit()), Qt::DirectConnection);
+
     microphoneWorker->MicrophoneThreadRequest();
 
+}
+
+void MainWindow::addVoiceData(const unsigned int size) {
+    //TODO add voice data
 }
 
 void MainWindow::initializeUDPThread() {
@@ -118,8 +135,8 @@ void MainWindow::initializeUDPThread() {
 
     connect(UDPWorker, SIGNAL(songDataReceived(const unsigned int)), this,
             SLOT(addToSongBuffer(const unsigned int)));
-    connect(UDPWorker, SIGNAL(songHeader(const unsigned int)), this,
-            SLOT(addToSongHeader(const unsigned int)));
+    connect(UDPWorker, SIGNAL(songHeader()), this,
+            SLOT(addToSongHeader()));
     connect(UDPWorker, SIGNAL(UDPThreadRequested()), broadcastThread, SLOT(start()));
     connect(broadcastThread, SIGNAL(started()), UDPWorker, SLOT(UDPReceiveThread()));
     connect(UDPWorker, SIGNAL(finished()), broadcastThread, SLOT(quit()), Qt::DirectConnection);

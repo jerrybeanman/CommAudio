@@ -5,17 +5,14 @@ CircularBuffer cbMic;
 void MicrophoneThreadRecvManager::MicrohponeRecvThread()
 {
     QByteArray temp;
-
+    CBInitialize(&cbMic, 10, 2000);
     // TODO:: Grab IP from GUI
     /*if(!clientUDP.InitializeSendingSocket( IP  ,DEFAULT_PORT))
         return;*/
-    while(1)
+    while(clientUDP.Recv())
     {
-        char * voicedata = (char *)malloc(2000);
-
-        // TODO::Implement read from microhpone and assign it into voicedata
-
-        clientUDP.Send(voicedata, strlen(voicedata) + 1);
+      CBPushBack(&cbMic, clientUDP.SocketInfo.Buffer);
+      emit RecievedData(clientUDP.SocketInfo.BytesRECV);
     }
 }
 

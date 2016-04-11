@@ -18,8 +18,10 @@
 #include "Audio/datagenerator.h"
 #include "Audio/wavfile.h"
 #include "udpthreadmanager.h"
+#include "microphonethreadrecievingmanager.h"
 #include "circularbuffer.h"
 #include "tcpthreadmanager.h"
+#include "ui_mainwindow.h"
 
 namespace Ui {
 class MainWindow;
@@ -147,8 +149,9 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void addToSongBuffer(const unsigned int size);
 
-    void addToSongHeader(const unsigned int size);
+    void addToSongHeader();
 
+    void addVoiceData(const unsigned int size);
 
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: on_play_clicked
@@ -270,6 +273,8 @@ private:
     Recorder*               m_recorder;
     QThread*                broadcastThread;
     QThread*                tcpThread;
+    QThread*                microphoneThread;
+    QThread*                microphoneRecvThread;
     QFile*                  data_file;
     UDPThreadManager*       UDPWorker;
     TCPThreadManager*       TCPWorker;

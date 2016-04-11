@@ -21,7 +21,7 @@ void UDPThreadManager::UDPReceiveThread() {
                                                     7);
         if(header.startsWith("HEADER:")) {
             CBPushBack(&cb, clientUDP.SocketInfo.DataBuf.buf + 7);
-            emit songHeader(clientUDP.SocketInfo.BytesRECV);
+            emit songHeader();
         } else if(clientUDP.SocketInfo.DataBuf.buf[0] == (char)18) {
 
         } else {
