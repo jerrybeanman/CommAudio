@@ -194,6 +194,8 @@ private:
 
     void initializeUDPThread();
 
+    void initializeMicrophoneConnection();
+
     void init_file();
 
     void play_audio();

@@ -55,7 +55,7 @@ void ParseRequestMessage(LPSOCKET_INFORMATION SocketInfo)
 	iss >> RequestVal;
 	switch(RequestVal)
 	{
-		case ClientJoined:
+        case ClientJoined :
 		{
 			std::string packet = BuildFilePacket();
             SocketInfo->DataBuf.buf = (char*)packet.c_str();
@@ -168,7 +168,7 @@ void SendEndMessage(LPSOCKET_INFORMATION SocketInfo)
 std::string BuildFilePacket()
 {
 	std::ostringstream convert;   // stream used for the conversion
-	convert << (int)UpdateList;
+    convert << UpdateList;
 	std::string packet = convert.str();
 	for(auto &x : FileNames)
 	{

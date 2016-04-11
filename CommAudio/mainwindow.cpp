@@ -20,11 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
     fileExists = false;
     fileLoaded = false;
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected()));
-    data_file = new QFile("output.wav");
-    if(!data_file->open(QIODevice::WriteOnly)) {
-        qDebug() << data_file->errorString();
-        return;
-    }
 
 
 }
@@ -98,6 +93,20 @@ void MainWindow::addToSongHeader(const unsigned int size) {
         prepare_audio_devices(m_generator->readHeader(temp));
         delete temp;
     }
+}
+
+void MainWindow::initializeMicrophoneConnection() {
+    microphoneThread = new QThread();
+    MicrophoneThreadManager* microphoneWorker = new MicrophoneThreadManager();
+
+    microphoneWorker->moveToThread(microphoneThread);
+
+    connect(microphoneWorker, SIGNAL(MicrophoneThreadRequested()), microphoneThread, SLOT(start()));
+    connect(microphoneThread, SIGNAL(started()), microphoneWorker, SLOT(MicrohponeSendThread()));
+    connect(microphoneWorker, SIGNAL(finished()), microphoneThread, SLOT(quit()), Qt::DirectConnection);
+
+    microphoneWorker->MicrophoneThreadRequest();
+
 }
 
 void MainWindow::initializeUDPThread() {
