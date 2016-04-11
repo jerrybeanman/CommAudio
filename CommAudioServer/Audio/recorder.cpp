@@ -12,6 +12,8 @@ Recorder::Recorder()
     }
     size = 0;
     r_data = new char[DATA_BUFSIZE];
+    r_bytes_AVAILABLE = 0;
+    r_buffer.resize(DATA_BUFSIZE);
     CBInitialize(&cb_voice_data, 20, DATA_BUFSIZE);
 }
 
@@ -27,12 +29,6 @@ const QAudioFormat &Recorder::fileFormat() const
 
 void Recorder::start()
 {
-    bool status = r_buffer->open(QIODevice::ReadWrite);
-
-    if(!status)
-    {
-        qDebug() << "Error opening the buffer";
-    }
 
     r_inputInfo = QAudioDeviceInfo::defaultInputDevice();
 
@@ -43,12 +39,10 @@ void Recorder::start()
     }
 
     r_input = new QAudioInput(r_inputInfo, r_format, this);
-    r_input->setNotifyInterval(1000);
-    connect(r_input, SIGNAL(notify()), this, SLOT(notified()));
-    connect(r_input,SIGNAL(stateChanged(QAudio::State)),this, SLOT(handleAudioInputState(QAudio::State)));
 
     inProgress = true;
-    r_input->start(r_buffer);
+    open(QIODevice::WriteOnly);
+    r_input->start(this);
 }
 
 void Recorder::stop()
@@ -61,22 +55,46 @@ void Recorder::stop()
     }
 }
 
+qint64 Recorder::writeData(const char *data, qint64 len)
+{
+    qint64 chunk = 0;
+
+    if(r_bytes_AVAILABLE + (int)len > DATA_BUFSIZE)
+    {
+        chunk = DATA_BUFSIZE - r_bytes_AVAILABLE;
+
+        memcpy(r_buffer.data() + r_bytes_AVAILABLE, data, chunk);
+
+        qDebug() << "Logic:" << r_bytes_AVAILABLE + chunk;
+        qDebug() << "len - chunk:" << len-chunk;
+
+        CBPushBack(&cb_voice_data, r_buffer.data());
+        emit dataAvailable(40000);
+
+        r_bytes_AVAILABLE = len - chunk;
+        memcpy(r_buffer.data(), data + chunk, len-chunk);
+    }
+    else
+    {
+        chunk = len;
+        memcpy(r_buffer.data() + r_bytes_AVAILABLE, data, chunk);
+        r_bytes_AVAILABLE += len;
+    }
+
+    return len;
+}
+
 qint64 Recorder::readData(char *data, qint64 maxlen)
 {
     //qDebug() << "Recorder::readData>>reading";
     qint64 chunk = 0;
-    chunk = r_buffer->readData(data, maxlen);
+    //chunk = r_buffer.readData(data, maxlen);
     return chunk;
-}
-
-const QByteArray Recorder::readAll()
-{
-    return r_buffer->readAll();
 }
 
 int Recorder::bytesWritten()
 {
-    return r_buffer->size();
+    return r_bytes_AVAILABLE;
 }
 
 void Recorder::notified()
@@ -85,7 +103,7 @@ void Recorder::notified()
     r_bytes_AVAILABLE = 0;
     if(audio_state == QAudio::ActiveState)
     {
-        r_bytes_AVAILABLE = (int)r_buffer->size();
+        r_bytes_AVAILABLE = (int)r_buffer.size();
 
         if(r_bytes_AVAILABLE > DATA_BUFSIZE) // Don't exceed max packet size.
             r_bytes_AVAILABLE = DATA_BUFSIZE;
@@ -122,8 +140,6 @@ bool Recorder::SetFormat()
     r_format.setCodec("audio/pcm");
     r_format.setByteOrder(QAudioFormat::LittleEndian);
     r_format.setSampleType(QAudioFormat::UnSignedInt);
-
-    r_buffer = new InputBuffer();
 
     return true;
 }
