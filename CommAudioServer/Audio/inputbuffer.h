@@ -3,6 +3,7 @@
 
 #include <QBuffer>
 #include <QByteArray>
+#include "globals.h"
 
 
 class InputBuffer : public QBuffer
@@ -22,10 +23,8 @@ public:
 
 private:
     QByteArray  i_buffer;
-    QByteArray  i_data;             //used for reading all of the data
-    qint64      i_read_pos;
-    qint64      i_write_pos;
-    qint64      i_buffered_length;
+    qint64      i_size;
+    bool        i_busy;
 };
 
 #endif // INPUTBUFFER_H
