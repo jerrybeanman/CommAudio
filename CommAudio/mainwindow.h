@@ -126,6 +126,25 @@ private slots:
 
     void on_progressBar_actionTriggered(int action);
 
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: addToSongBuffer
+    --
+    -- DATE: March 20, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void addToSongBuffer(const unsigned int size)
+    --                              size: Size of the song data to pass to the audio player
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    ----------------------------------------------------------------------------------------------------------------------*/
     void addToSongBuffer(const unsigned int size);
 
     void addToSongHeader(const unsigned int size);
@@ -151,6 +170,24 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void on_play_clicked();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: on_requestFile_clicked
+    --
+    -- DATE: March 05, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void on_requestFile_clicked()
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    -- Sends the file which was hilighted in the list of songs
+    ----------------------------------------------------------------------------------------------------------------------*/
     void on_requestFile_clicked();
 
 private:
@@ -186,12 +223,31 @@ private:
     --
     -- INTERFACE: void prepare_audio_devices(QAudioFormat format)
     --
-    -- RETURNS: The IP address entered
+    -- RETURNS: void
     --
     -- NOTES:
     ----------------------------------------------------------------------------------------------------------------------*/
     void prepare_audio_devices(QAudioFormat format);
 
+
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: initializeUDPThread
+    --
+    -- DATE: March 08, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void initializeUDPThread()
+    --
+    -- RETURNS: void
+    --
+    -- NOTES:
+    ----------------------------------------------------------------------------------------------------------------------*/
     void initializeUDPThread();
 
     void initializeMicrophoneConnection();

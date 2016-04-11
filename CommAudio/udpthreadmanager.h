@@ -12,7 +12,7 @@ class UDPThreadManager : public QObject
     Q_OBJECT
 public:
     /*------------------------------------------------------------------------------------------------------------------
-    -- FUNCTION: threadRequest
+    -- FUNCTION: UDPThreadRequest
     --
     -- DATE: March 18, 2016
     --
@@ -22,7 +22,7 @@ public:
     --
     -- PROGRAMMER: Scott Plummer
     --
-    -- INTERFACE: void threadRequest()
+    -- INTERFACE: void UDPThreadRequest()
     --
     -- RETURNS: void.
     --
@@ -30,6 +30,24 @@ public:
     -- Emits the signal to start the receive thread.
     ----------------------------------------------------------------------------------------------------------------------*/
     void UDPThreadRequest();
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: closeSocket
+    --
+    -- DATE: April 4, 2016
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void closeSocket()
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    -- Closes the socket and thread
+    ----------------------------------------------------------------------------------------------------------------------*/
     void closeSocket();
 signals:
     void finished();

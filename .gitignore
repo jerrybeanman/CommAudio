@@ -6,7 +6,7 @@ Drafts/build-CommAudio-Desktop_*/*
 CommAudio/debug/
 CommAudio/release/
 CommAudio/object_script*
-*.pro.user
+*/*.pro.user
 *.slo
 *.lo
 *.o
