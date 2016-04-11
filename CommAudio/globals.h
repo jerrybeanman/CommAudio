@@ -29,4 +29,6 @@ typedef struct _SOCKET_INFORMATION
     DWORD          BytesRECV;
 } SOCKET_INFORMATION, *LPSOCKET_INFORMATION;
 extern CircularBuffer cb;
+extern CircularBuffer cbMic;
+extern CircularBuffer cb_voice_data;
 #endif

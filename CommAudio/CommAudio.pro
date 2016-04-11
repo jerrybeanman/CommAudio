@@ -34,7 +34,8 @@ SOURCES += \
     Audio/recorder.cpp \
     Audio/wavfile.cpp \
     microphonethreadmanager.cpp \
-    microphonethreadrecievingmanager.cpp
+    microphonethreadrecievingmanager.cpp \
+    Audio/recordgenerator.cpp
 
 HEADERS  += \
     Client/client.h \
@@ -50,6 +51,8 @@ HEADERS  += \
     Audio/recorder.h \
     Audio/wavfile.h \
     microphonethreadmanager.h \
-    microphonethreadrecievingmanager.h
+    microphonethreadrecievingmanager.h \
+    Audio/recordgenerator.h \
+    Client/completionroutine.h
 
 FORMS    += mainwindow.ui
