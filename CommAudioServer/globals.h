@@ -18,7 +18,7 @@
 
 #define ClientJoined 1
 #define FileRequest  2
-#define UpdateList   3
+#define UpdateList   "UpdaL:"
 #define FileBegin    "FileS:"
 #define FileEnd      "FileE:"
 

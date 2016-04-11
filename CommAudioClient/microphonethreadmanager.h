@@ -5,7 +5,6 @@
 #include <QByteArray>
 #include "circularbuffer.h"
 #include "Client/ClientUDP.h"
-#include "Client/ClientTCP.h"
 
 
 

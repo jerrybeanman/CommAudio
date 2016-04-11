@@ -168,7 +168,7 @@ void SendEndMessage(LPSOCKET_INFORMATION SocketInfo)
 std::string BuildFilePacket()
 {
 	std::ostringstream convert;   // stream used for the conversion
-	convert << (int)UpdateList;
+    convert << UpdateList;
 	std::string packet = convert.str();
 	for(auto &x : FileNames)
 	{

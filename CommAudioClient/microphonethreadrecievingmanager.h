@@ -5,9 +5,7 @@
 #include <QByteArray>
 #include "circularbuffer.h"
 #include "Client/ClientUDP.h"
-#include "Client/ClientTCP.h"
 
-CircularBuffer cbMicrophone;
 class MicrophoneThreadRecvManager : public QObject
 {
     Q_OBJECT

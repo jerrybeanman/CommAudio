@@ -1,7 +1,7 @@
 #include "microphonethreadrecievingmanager.h"
 #include <QDebug>
 
-
+CircularBuffer cbMic;
 void MicrophoneThreadRecvManager::MicrohponeRecvThread()
 {
     QByteArray temp;
