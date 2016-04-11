@@ -1,4 +1,5 @@
 #include "windowadapter.h"
+#include "MicrophoneThreadManager.h"
 #include <iostream>
 #include <QFileDialog>
 #include <QSound>
@@ -64,6 +65,21 @@ void WindowAdapter::on_connectButton_pressed(QString IPAdd)
     connect(TCPWorker, SIGNAL(finished()), tcpThread, SLOT(quit()), Qt::DirectConnection);
 
     TCPWorker->TCPThreadRequest();
+
+}
+
+void WindowAdapter::initializeMicrophoneConnection()
+{
+    microphoneThread = new QThread();
+    MicrophoneThreadManager* microphoneWorker = new MicrophoneThreadManager();
+
+    microphoneWorker->moveToThread(microphoneThread);
+
+    connect(microphoneWorker, SIGNAL(MicrophoneThreadRequested()), microphoneThread, SLOT(start()));
+    connect(microphoneThread, SIGNAL(started()), microphoneWorker, SLOT(MicrohponeSendThread()));
+    connect(microphoneWorker, SIGNAL(finished()), microphoneThread, SLOT(quit()), Qt::DirectConnection);
+
+    microphoneWorker->MicrophoneThreadRequest();
 
 }
 static int count;

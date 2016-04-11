@@ -13,7 +13,8 @@ SOURCES += main.cpp \
     Audio/recorder.cpp \
     Audio/wavfile.cpp \
     Client/ClientTCP.cpp \
-    Client/clientudp.cpp
+    Client/clientudp.cpp \
+    microphonethreadmanager.cpp
 
 RESOURCES += qml.qrc
 
@@ -40,4 +41,5 @@ HEADERS += \
     Audio/wavfile.h \
     Client/client.h \
     Client/ClientTCP.h \
-    Client/clientudp.h
+    Client/clientudp.h \
+    microphonethreadmanager.h

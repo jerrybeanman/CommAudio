@@ -1,4 +1,4 @@
-#include "udpthreadmanager.h"
+#include "UDPThreadManager.h"
 #include <QDebug>
 
 
@@ -23,7 +23,8 @@ void UDPThreadManager::UDPReceiveThread() {
         //if data is header data emit header signal
         QByteArray header = QByteArray::fromRawData(clientUDP.SocketInfo.DataBuf.buf,
                                                     7);
-        if(header.startsWith("HEADER:")) {
+        if(header.startsWith("HEADER:"))
+        {
             CBPushBack(&cb, clientUDP.SocketInfo.DataBuf.buf + 7);
             emit songHeader(clientUDP.SocketInfo.BytesRECV);
         } else if(clientUDP.SocketInfo.DataBuf.buf[0] == (char)18) {

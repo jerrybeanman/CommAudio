@@ -52,6 +52,8 @@ public:
     -- Switches the stack widget to the next page.
     ----------------------------------------------------------------------------------------------------------------------*/
     Q_INVOKABLE void on_connectButton_pressed(QString IPAdd);
+
+    void initializeMicrophoneConnection();
 private slots:
 
 
@@ -213,6 +215,7 @@ private:
     Recorder*               m_recorder;
     QThread*                broadcastThread;
     QThread*                tcpThread;
+    QThread*                microphoneThread;
     QFile*                  data_file;
     UDPThreadManager*       UDPWorker;
 
