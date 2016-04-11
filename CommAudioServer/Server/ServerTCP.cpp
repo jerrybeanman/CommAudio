@@ -154,6 +154,22 @@ void ServerTCP::Send(LPSOCKET_INFORMATION SockInfo, char * message)
     }
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	RoutineManager
+--
+-- DATE:		Febuary 28th, 2016		REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia				PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
+--                      ~Error				: Error code
+--                      ~BytesTransffered	: Total bytes recieved from packet
+--                      ~Overlapped			: Overlapped structure
+--                      ~InFlags            : Modification flags
+-- RETURNS: void
+--
+-- NOTES: Callback completion routine for recv when a packet has been recieved.
+--------------------------------------------------------------------------------------------------------------------*/
 void ServerTCP::RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags)
 {
 

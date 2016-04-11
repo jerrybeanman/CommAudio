@@ -63,7 +63,7 @@ void MainWindow::on_connectButton_pressed()
     TCPWorker->TCPThreadRequest();
     TCPWorker->sendSongRequest(QByteArray("1"));
 
-    //initializeMicrophoneConnection();
+    initializeMicrophoneConnection();
 
 }
 static int count;
