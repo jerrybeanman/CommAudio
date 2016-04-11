@@ -55,7 +55,7 @@ void ParseRequestMessage(LPSOCKET_INFORMATION SocketInfo)
 	iss >> RequestVal;
 	switch(RequestVal)
 	{
-		case ClientJoined:
+        case ClientJoined :
 		{
 			std::string packet = BuildFilePacket();
             SocketInfo->DataBuf.buf = (char*)packet.c_str();

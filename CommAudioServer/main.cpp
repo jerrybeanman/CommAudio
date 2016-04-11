@@ -27,11 +27,11 @@ int main(int argc, char *argv[])
         FileNames.push_back((buf));
     }
 
-    if(!StartSoundManager())
+    /*if(!StartSoundManager())
     {
         std::cout << "StartSoundManager() failed to start" << std::endl;
         return -1;
-    }
+    }*/
    if(!StartFileManager())
     {
         std::cout << "StartFileManager() failed to start" << std::endl;

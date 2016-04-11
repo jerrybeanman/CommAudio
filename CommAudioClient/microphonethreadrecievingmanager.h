@@ -1,0 +1,28 @@
+#ifndef MICROHPONETHREADRECVMANAGER_H
+#define MICROHPONETHREADRECVMANAGER_H
+
+#include <QObject>
+#include <QByteArray>
+#include "circularbuffer.h"
+#include "Client/ClientUDP.h"
+#include "Client/ClientTCP.h"
+
+CircularBuffer cbMicrophone;
+class MicrophoneThreadRecvManager : public QObject
+{
+    Q_OBJECT
+public:
+    void MicrophoneRecvThreadRequest();
+    void closeSocket();
+signals:
+    void finished();
+    void MicrophoneRecvThreadRequested();
+
+public slots:
+    void MicrohponeRecvThread();
+
+private:
+    ClientUDP clientUDP;
+};
+
+#endif

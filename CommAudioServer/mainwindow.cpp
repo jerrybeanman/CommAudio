@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     load_music_files();
-    ready_next_song();
+   // ready_next_song();
 }
 
 MainWindow::~MainWindow()
