@@ -6,6 +6,7 @@ void MicrophoneThreadRecvManager::MicrohponeRecvThread()
 {
     QByteArray temp;
     CBInitialize(&cbMic, 20, 40000);
+
     // TODO:: Grab IP from GUI
     /*if(!clientUDP.InitializeSendingSocket( IP  ,DEFAULT_PORT))
         return;*/

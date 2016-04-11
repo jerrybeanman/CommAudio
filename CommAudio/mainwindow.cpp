@@ -63,7 +63,7 @@ void MainWindow::on_connectButton_pressed()
     TCPWorker->TCPThreadRequest();
     TCPWorker->sendSongRequest(QByteArray("1"));
 
-    //initializeMicrophoneConnection();
+    initializeMicrophoneConnection();
 
 }
 static int count;
@@ -241,9 +241,7 @@ void MainWindow::play_voice()
     if(!ReceivingVoice)
     {
         ReceivingVoice = true;
-        if(!prepare_audio_devices(m_recorder->fileFormat()))
-            return;
-
+        prepare_audio_devices(m_recorder->fileFormat());
         m_voice_generator->start();
 
         m_audioOutput->start(m_voice_generator);
@@ -263,14 +261,10 @@ void MainWindow::on_recordButton_clicked()
         m_recorder = new Recorder();
         m_voice_generator = new RecordGenerator();
 
-        if(prepare_audio_devices(m_recorder->fileFormat()))
-            m_song_generator->setValid();
-        else
-        {
-            qDebug() << "MainWindow::on_recordingButton_clicked>>Can't prepare audio device.";
-            return; //Can't set the format properly, too bad.
-        }
+        prepare_audio_devices(m_recorder->fileFormat());
 
+        //This allows you to hear yourself instead. Have to change a few things to get this to work.
+        //Talk to tyler if you need to record yourself.
         //connect(m_recorder, SIGNAL(dataAvailable(int)), this, SLOT(handleVoiceDataAvailable(int)));
 
         m_recorder->start();
@@ -354,6 +348,12 @@ void MainWindow::on_requestFile_clicked()
 
 void MainWindow::handleVoiceDataAvailable(const unsigned int len)
 {
+    if(m_voice_generator == 0)
+    {
+        m_voice_generator = new RecordGenerator();
+        prepare_audio_devices(m_recorder->fileFormat());
+    }
+
     char* buf = (char*)malloc(DATA_BUFSIZE);
     //std::cerr << "MainWindow::handleVoiceData>>count:" << cb_voice_data.Count << std::endl;
     if(cb_voice_data.Count != 0)

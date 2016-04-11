@@ -22,6 +22,7 @@
 #include "circularbuffer.h"
 #include "tcpthreadmanager.h"
 #include "ui_mainwindow.h"
+#include "Audio/recordgenerator.h"
 
 namespace Ui {
 class MainWindow;
@@ -318,10 +319,12 @@ private:
     TCPThreadManager*       TCPWorker;
 
     DataGenerator*          m_generator;
+    RecordGenerator*        m_voice_generator;
     char*                   data;
-    bool                    m_pullMode;
+    bool                    recording;
     bool                    fileExists;
     bool                    fileLoaded;
+    bool                    ReceivingVoice;
 
     enum tabs {broadcasting, fileTransfer, mic};
 };
