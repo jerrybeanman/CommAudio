@@ -1,6 +1,4 @@
 #include "mainwindow.h"
-#include "microphonethreadmanager.h"
-#include "microphonethreadrecievingmanager.h"
 #include <QFileDialog>
 #include <QSound>
 #include <QMediaPlayer>
@@ -63,8 +61,6 @@ void MainWindow::on_connectButton_pressed()
     TCPWorker->TCPThreadRequest();
     TCPWorker->sendSongRequest(QByteArray("1"));
 
-    initializeMicrophoneConnection();
-
 }
 static int count;
 void MainWindow::addToSongBuffer(const unsigned int size) {
@@ -102,8 +98,8 @@ void MainWindow::initializeMicrophoneConnection()
 {
     microphoneThread      = new QThread();
     microphoneRecvThread  = new QThread();
-    MicrophoneThreadManager* microphoneWorker = new MicrophoneThreadManager();
-    MicrophoneThreadRecvManager* microphoneRecvWorker = new MicrophoneThreadRecvManager();
+    microphoneWorker = new MicrophoneThreadManager();
+    microphoneRecvWorker = new MicrophoneThreadRecvManager();
 
     microphoneWorker->moveToThread(microphoneThread);
     microphoneRecvWorker->moveToThread(microphoneRecvThread);
@@ -112,13 +108,15 @@ void MainWindow::initializeMicrophoneConnection()
     connect(microphoneThread, SIGNAL(started()), microphoneWorker, SLOT(MicrohponeSendThread()));
     connect(microphoneWorker, SIGNAL(finished()), microphoneThread, SLOT(quit()), Qt::DirectConnection);
 
+    microphoneWorker->MicrophoneThreadRequest();
+
     connect(microphoneRecvWorker, SIGNAL(RecievedData(const unsigned int)), this,
             SLOT(handleVoiceDataAvailable(const unsigned int)));
     connect(microphoneRecvWorker, SIGNAL(MicrophoneRecvThreadRequested()), microphoneRecvThread, SLOT(start()));
     connect(microphoneRecvThread, SIGNAL(started()), microphoneRecvWorker, SLOT(MicrohponeRecvThread()));
     connect(microphoneRecvWorker, SIGNAL(finished()), microphoneRecvThread, SLOT(quit()), Qt::DirectConnection);
 
-    microphoneWorker->MicrophoneThreadRequest();
+    microphoneRecvWorker->MicrophoneRecvThreadRequest();
 
 }
 
@@ -149,8 +147,19 @@ void MainWindow::tabSelected() {
         delete(broadcastThread);
         delete(UDPWorker);
         UDPWorker = nullptr;
-        broadcastThread = nullptr;
     }
+
+    if(microphoneWorker != nullptr) {
+        microphoneWorker->closeSocket();
+        microphoneRecvWorker->closeSocket();
+        microphoneRecvThread->wait();
+        microphoneThread->wait();
+        delete(microphoneRecvThread);
+        delete(microphoneThread);
+        microphoneWorker = nullptr;
+
+    }
+
     switch(ui->tabWidget->currentIndex()) {
         case broadcasting:
             initializeUDPThread();
@@ -159,6 +168,7 @@ void MainWindow::tabSelected() {
             TCPWorker->sendSongRequest(QByteArray("1"));
             break;
         case mic:
+            initializeMicrophoneConnection();
             break;
     }
 }

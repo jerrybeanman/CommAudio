@@ -9,20 +9,26 @@ void MicrophoneThreadManager::MicrohponeSendThread()
     // TODO:: Grab IP from GUI
     /*if(!clientUDP.InitializeSendingSocket( IP  ,DEFAULT_PORT))
         return;*/
-    while(1)
+    while(running)
     {
         if(cb_voice_data.Count > 0)
         {
             char * voicedata = (char *)malloc(DATA_BUFSIZE);
             CBPop(&cb_voice_data, voicedata);
-            clientUDP.Send(voicedata, DATA_BUFSIZE);
+            if(!clientUDP.Send(voicedata, DATA_BUFSIZE)) {
+               free(voicedata);
+               break;
+            }
             free(voicedata);
         }
         // TODO::Implement read from microhpone and assign it into voicedata
     }
+
+    qDebug() << "exiting mic send thread";
 }
 
 void MicrophoneThreadManager::closeSocket() {
+    running = false;
     clientUDP.Close();
     this->thread()->exit();
 }

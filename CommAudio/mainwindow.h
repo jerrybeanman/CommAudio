@@ -18,6 +18,7 @@
 #include "Audio/datagenerator.h"
 #include "Audio/wavfile.h"
 #include "udpthreadmanager.h"
+#include "microphonethreadmanager.h"
 #include "microphonethreadrecievingmanager.h"
 #include "circularbuffer.h"
 #include "tcpthreadmanager.h"
@@ -315,8 +316,10 @@ private:
     QThread*                microphoneThread;
     QThread*                microphoneRecvThread;
     QFile*                  data_file;
-    UDPThreadManager*       UDPWorker;
+    UDPThreadManager*       UDPWorker = nullptr;
     TCPThreadManager*       TCPWorker;
+    MicrophoneThreadRecvManager* microphoneRecvWorker;
+    MicrophoneThreadManager* microphoneWorker = nullptr;
 
     DataGenerator*          m_generator;
     RecordGenerator*        m_voice_generator;

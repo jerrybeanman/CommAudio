@@ -104,14 +104,19 @@ bool ClientUDP::Send(char * message, int size)
     return FALSE;
 }
 
-bool ClientUDP::Close()
-{
+bool ClientUDP::leaveMulticast() {
     if(setsockopt(SocketInfo.Socket, IPPROTO_IP, IP_DROP_MEMBERSHIP,
                   (char *)&MulticastInfo, sizeof(MulticastInfo)) == SOCKET_ERROR)
     {
         std::cout << "Close()::setsockopt() failed with error " << WSAGetLastError() << std::endl;
         return false;
     }
+
+    return true;
+}
+
+bool ClientUDP::Close()
+{
     closesocket(SocketInfo.Socket);
     WSACleanup();
     return TRUE;

@@ -18,6 +18,8 @@ class ClientUDP : public Client
 
         char* GetData();
 
+        bool leaveMulticast();
+
     private:
         struct ip_mreq      MulticastInfo;
         SOCKADDR_IN         SourceAddress;

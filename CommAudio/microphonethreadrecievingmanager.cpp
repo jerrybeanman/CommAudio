@@ -15,6 +15,8 @@ void MicrophoneThreadRecvManager::MicrohponeRecvThread()
       CBPushBack(&cbMic, clientUDP.SocketInfo.Buffer);
       emit RecievedData(clientUDP.SocketInfo.BytesRECV);
     }
+    qDebug() << "Exiting mic recv thread";
+    CBFree(&cbMic);
 }
 
 void MicrophoneThreadRecvManager::closeSocket() {

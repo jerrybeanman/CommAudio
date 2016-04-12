@@ -34,6 +34,7 @@ void UDPThreadManager::UDPReceiveThread() {
 }
 
 void UDPThreadManager::closeSocket() {
+    clientUDP.leaveMulticast();
     clientUDP.Close();
     this->thread()->exit();
 }

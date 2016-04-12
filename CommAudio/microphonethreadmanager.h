@@ -22,6 +22,7 @@ public slots:
     void MicrohponeSendThread();
 
 private:
+    bool running = true;
     ClientUDP clientUDP;
 };
 

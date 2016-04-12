@@ -52,7 +52,6 @@ HEADERS  += \
     Audio/wavfile.h \
     microphonethreadmanager.h \
     microphonethreadrecievingmanager.h \
-    Audio/recordgenerator.h \
-    Client/completionroutine.h
+    Audio/recordgenerator.h
 
 FORMS    += mainwindow.ui
