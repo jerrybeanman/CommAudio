@@ -10,6 +10,7 @@ void MicrophoneThreadRecvManager::MicrohponeRecvThread()
     // TODO:: Grab IP from GUI
     if(!clientUDP.InitializeSocket(DEFAULT_PORT))
         return;
+    std::cout << "Whomp" << std::endl;
     while(clientUDP.Recv())
     {
         std::cerr << "Mic data received" << std::endl;

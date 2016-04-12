@@ -65,9 +65,18 @@ bool ClientUDP::InitializeSendingSocket(char * ip, short port)
     }
 
     // Assign the local port number to recieve on
+    memset(&LocalAddr, 0, sizeof(LocalAddr));
     LocalAddr.sin_family		= AF_INET;
-    LocalAddr.sin_addr.s_addr	= inet_addr(ip);
     LocalAddr.sin_port			= htons(port);
+
+    struct hostent	*hp;
+    if ((hp = gethostbyname(ip)) == NULL)
+    {
+
+        return FALSE;
+    }
+
+    memcpy((char *)&LocalAddr.sin_addr, hp->h_addr, hp->h_length);
 
     // Bind local address to socket
     if(bind(SocketInfo.Socket, (struct sockaddr*) &LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)

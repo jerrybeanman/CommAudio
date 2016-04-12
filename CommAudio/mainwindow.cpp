@@ -48,7 +48,7 @@ void MainWindow::on_connectButton_pressed()
     TCPWorker = new TCPThreadManager(serverIP);
     m_generator = new DataGenerator();
 
-    initializeUDPThread();
+    //initializeUDPThread();
 
     TCPWorker->moveToThread(tcpThread);
 
@@ -108,7 +108,7 @@ void MainWindow::initializeMicrophoneConnection()
     connect(microphoneThread, SIGNAL(started()), microphoneWorker, SLOT(MicrohponeSendThread()));
     connect(microphoneWorker, SIGNAL(finished()), microphoneThread, SLOT(quit()), Qt::DirectConnection);
 
-  //  microphoneWorker->MicrophoneThreadRequest();
+    microphoneWorker->MicrophoneThreadRequest();
 
     connect(microphoneRecvWorker, SIGNAL(RecievedData(const unsigned int)), this,
             SLOT(handleVoiceDataAvailable(const unsigned int)));
@@ -116,7 +116,7 @@ void MainWindow::initializeMicrophoneConnection()
     connect(microphoneRecvThread, SIGNAL(started()), microphoneRecvWorker, SLOT(MicrohponeRecvThread()));
     connect(microphoneRecvWorker, SIGNAL(finished()), microphoneRecvThread, SLOT(quit()), Qt::DirectConnection);
 
-    microphoneRecvWorker->MicrophoneRecvThreadRequest();
+   // microphoneRecvWorker->MicrophoneRecvThreadRequest();
 
 }
 
@@ -162,7 +162,7 @@ void MainWindow::tabSelected() {
 
     switch(ui->tabWidget->currentIndex()) {
         case broadcasting:
-            initializeUDPThread();
+            //initializeUDPThread();
             break;
         case fileTransfer:
             TCPWorker->sendSongRequest(QByteArray("1"));

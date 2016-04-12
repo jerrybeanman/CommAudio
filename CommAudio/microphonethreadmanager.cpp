@@ -9,10 +9,14 @@ void MicrophoneThreadManager::MicrohponeSendThread()
     // TODO:: Grab IP from GUI
     if(!clientUDP.InitializeSendingSocket(ipAddr.data(),DEFAULT_PORT))
         return;
+
+    std::cerr << "Stomp" << std::endl;
+    std::cout << "Running:" << running << " count:" << cb_voice_data.Count << std::endl;
     while(running)
     {
         if(cb_voice_data.Count > 0)
         {
+
             char * voicedata = (char *)malloc(DATA_BUFSIZE);
             CBPop(&cb_voice_data, voicedata);
             if(!clientUDP.Send(voicedata, DATA_BUFSIZE)) {
