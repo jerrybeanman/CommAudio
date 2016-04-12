@@ -98,8 +98,8 @@ void MainWindow::initializeMicrophoneConnection()
 {
     microphoneThread      = new QThread();
     microphoneRecvThread  = new QThread();
-    microphoneWorker = new MicrophoneThreadManager();
-    microphoneRecvWorker = new MicrophoneThreadRecvManager();
+    microphoneWorker = new MicrophoneThreadManager(serverIP);
+    microphoneRecvWorker = new MicrophoneThreadRecvManager(serverIP);
 
     microphoneWorker->moveToThread(microphoneThread);
     microphoneRecvWorker->moveToThread(microphoneRecvThread);

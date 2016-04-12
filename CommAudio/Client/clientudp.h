@@ -20,6 +20,7 @@ class ClientUDP : public Client
 
         bool leaveMulticast();
 
+        bool InitializeSendingSocket(char * ip, short port);
     private:
         struct ip_mreq      MulticastInfo;
         SOCKADDR_IN         SourceAddress;

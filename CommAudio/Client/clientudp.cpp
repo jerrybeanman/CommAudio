@@ -39,6 +39,44 @@ bool ClientUDP::InitializeSocket(short port)
     return TRUE;
 }
 
+bool ClientUDP::InitializeSendingSocket(char * ip, short port)
+{
+    BOOL fFlag;
+    // Create a WSA v2.2 session
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+    {
+        std::cout << "WSAStartup failed with error " << WSAGetLastError() << std::endl;
+        return FALSE;
+    }
+
+    // Create socket for writing based on currently selected protocol
+    if ((SocketInfo.Socket = WSASocket(AF_INET,SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET)
+    {
+        std::cout << "WSASocket() failed with error " <<  WSAGetLastError() << std::endl;
+        return FALSE;
+    }
+    fFlag = TRUE;
+
+    // Avoid WSAADDRINUSE erro on bind
+    if(setsockopt(SocketInfo.Socket, SOL_SOCKET, SO_REUSEADDR, (char *)&fFlag, sizeof(fFlag)) == SOCKET_ERROR)
+    {
+        std::cout << "InitializeSocket()::setsockopt() failed with error " << WSAGetLastError() << std::endl;
+        return FALSE;
+    }
+
+    // Assign the local port number to recieve on
+    LocalAddr.sin_family		= AF_INET;
+    LocalAddr.sin_addr.s_addr	= inet_addr(ip);
+    LocalAddr.sin_port			= htons(port);
+
+    // Bind local address to socket
+    if(bind(SocketInfo.Socket, (struct sockaddr*) &LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
+    {
+        std::cout << "bind() failed with error " << WSAGetLastError() << std::endl;
+        return FALSE;
+    }
+    return TRUE;
+}
 
 bool ClientUDP::MulticastSettings(const char * name)
 {

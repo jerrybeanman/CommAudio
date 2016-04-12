@@ -8,8 +8,8 @@ void MicrophoneThreadRecvManager::MicrohponeRecvThread()
     CBInitialize(&cbMic, 20, 40000);
 
     // TODO:: Grab IP from GUI
-    /*if(!clientUDP.InitializeSendingSocket( IP  ,DEFAULT_PORT))
-        return;*/
+    if(!clientUDP.InitializeSocket(DEFAULT_PORT))
+        return;
     while(clientUDP.Recv())
     {
       CBPushBack(&cbMic, clientUDP.SocketInfo.Buffer);

@@ -12,6 +12,7 @@ class MicrophoneThreadManager : public QObject
 {
     Q_OBJECT
 public:
+    MicrophoneThreadManager(QByteArray ip) : ipAddr(ip){}
     void MicrophoneThreadRequest();
     void closeSocket();
 signals:
@@ -23,6 +24,7 @@ public slots:
 
 private:
     bool running = true;
+    QByteArray ipAddr;
     ClientUDP clientUDP;
 };
 

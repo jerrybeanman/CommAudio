@@ -10,6 +10,7 @@ class MicrophoneThreadRecvManager : public QObject
 {
     Q_OBJECT
 public:
+    MicrophoneThreadRecvManager(QByteArray ip) : ipAddr(ip){}
     void MicrophoneRecvThreadRequest();
     void closeSocket();
 signals:
@@ -21,6 +22,7 @@ public slots:
     void MicrohponeRecvThread();
 
 private:
+    QByteArray ipAddr;
     ClientUDP clientUDP;
 };
 
