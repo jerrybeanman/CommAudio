@@ -29,7 +29,8 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    std::string get_all_songs();
+    void get_all_songs();
+    void get_current_song();
     ~MainWindow();
 private slots:
 
@@ -343,6 +344,8 @@ private:
 
 
     void split_songs_from_string(std::string combinedString);
+
+    void prepare_song_header();
 
     bool prepare_stream();
 

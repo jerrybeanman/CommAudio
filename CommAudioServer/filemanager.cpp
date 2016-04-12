@@ -128,11 +128,10 @@ void ParseRequestMessage(LPSOCKET_INFORMATION SocketInfo)
 	switch(RequestVal)
 	{
 		case ClientJoined:
-		{
-			std::string packet = BuildFilePacket();
-            SocketInfo->DataBuf.buf = (char*)packet.c_str();
-            SocketInfo->DataBuf.len = packet.length() + 1;
-			serverTCP.Send(SocketInfo, (char*)packet.c_str());
+        {
+            SendSongList(SocketInfo);
+            SendSongName(SocketInfo);
+            SendSongHeader(SocketInfo);
 		}
 		break;
 		case FileRequest:
@@ -221,6 +220,30 @@ bool OpenFile(std::string name)
 		return false;
 	}
 	return true;
+}
+
+void SendSongList(LPSOCKET_INFORMATION SocketInfo)
+{
+    std::string packet = BuildFilePacket();
+    SocketInfo->DataBuf.buf = (char*)packet.c_str();
+    SocketInfo->DataBuf.len = packet.length() + 1;
+    serverTCP.Send(SocketInfo, (char*)packet.c_str());
+}
+
+void SendSongName(LPSOCKET_INFORMATION SocketInfo)
+{
+    std::string name = SongName + Currentsong;
+    SocketInfo->DataBuf.buf = (char *)name.c_str();
+    SocketInfo->DataBuf.len = name.length() + 1;
+    serverTCP.Send(SocketInfo, (char *)name.c_str());
+}
+
+void SendSongHeader(LPSOCKET_INFORMATION SocketInfo)
+{
+    std::string header = Header + SongHeader;
+    SocketInfo->DataBuf.buf = (char *)header.c_str();
+    SocketInfo->DataBuf.len = header.length() + 1;
+    serverTCP.Send(SocketInfo, (char *)header.c_str());
 }
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -333,7 +356,7 @@ std::string BuildFilePacket()
 	std::string packet = convert.str();
 	for(auto &x : FileNames)
 	{
-		packet += " ";
+        packet += "@";
 		packet += x;
 	}
 	return packet;

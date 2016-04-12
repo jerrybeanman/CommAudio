@@ -30,7 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     load_music_files();
-    //ready_next_song();
+
+    ready_next_song();
 }
 
 MainWindow::~MainWindow()
@@ -263,7 +264,7 @@ bool MainWindow::ready_next_song(bool previous)
         qWarning() << "MainWindow::ready_next_song>>Failed preparing the next song";
         if(m_song_generator->isPlaying())
         {
-            qDebug() << "Pause button clicked.";
+            qDebug() << "Bad song.";
             m_audioOutput->suspend();
         }
 
@@ -362,11 +363,18 @@ void MainWindow::populate_songlist()
             delete temp;
     }
     ui->listWidget_2->addItems(m_music_files);
+
+    get_all_songs(); // Globally sets the Files Names and current
 }
 
-std::string MainWindow::get_all_songs()
+void MainWindow::get_all_songs()
 {
-    return m_music_files.join(' ').toStdString();
+    int total = ui->listWidget_2->count();
+    FileNames.clear();
+    for(int i = 0; i < total; i++)
+    {
+        FileNames.push_back(m_music_files[i].toStdString());
+    }
 }
 
 void MainWindow::split_songs_from_string(std::string combinedString)
@@ -374,7 +382,18 @@ void MainWindow::split_songs_from_string(std::string combinedString)
     QString combo;
     combo.fromStdString(combinedString);
 
-    QStringList server_music_files = combo.split(",", QString::SkipEmptyParts);
+    QStringList server_music_files = combo.split("@", QString::SkipEmptyParts);
+}
+
+void MainWindow::prepare_song_header()
+{
+    qDebug() << "MainWindow::prepare_stream>>Sending Header.";
+    QByteArray temp_header = QByteArray::fromRawData(m_song_generator->getExternalReference()->data(), 44);
+    SongHeader = temp_header.toStdString();
+
+    m_stream_size = 0;
+    song_size = &m_stream_size;
+    *song_stream_data = m_song_generator->getExternalReference()->data();
 }
 
 bool MainWindow::prepare_stream()
@@ -383,18 +402,11 @@ bool MainWindow::prepare_stream()
     {
         streaming = true;
 
-        //disconnect()
         connect(m_song_generator, SIGNAL(dataAvailable(int)), this, SLOT(handleSongDataAvailable(int)));
         connect(m_song_generator, SIGNAL(dataFinished()), this, SLOT(handleSongDataFinished()));
 
-        qDebug() << "MainWindow::prepare_stream>>Sending Header.";
-        QByteArray* header = m_song_generator->getExternalReference();
-        header->prepend(HEADER);
-        *song_stream_data = header->data();
-
-        //*song_stream_data = m_song_generator->getExternalReference()->data();
-        m_stream_size = 51;
-        song_size = &m_stream_size;
+        Currentsong = m_music_files[m_song_index].toStdString();
+        prepare_song_header();
 
         return true;
     }

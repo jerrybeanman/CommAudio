@@ -37,6 +37,8 @@ typedef struct _SOCKET_INFORMATION
 } SOCKET_INFORMATION, *LPSOCKET_INFORMATION;
 
 extern std::vector<std::string> FileNames;
+extern std::string Currentsong;
+extern std::string SongHeader;
 extern char** song_stream_data;
 extern DWORD* song_size;
 extern CircularBuffer cb_voice_data;

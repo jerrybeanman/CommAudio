@@ -125,6 +125,9 @@ std::vector<std::string> GetFileNames(std::string folder, std::string extension)
 --------------------------------------------------------------------------------------------------------------------*/
 bool OpenFile(std::string name);
 
+void SendSongList(LPSOCKET_INFORMATION SocketInfo);
+void SendSongHeader(LPSOCKET_INFORMATION SocketInfo);
+void SendSongName(LPSOCKET_INFORMATION SocketInfo);
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	SendStartMessage
 --

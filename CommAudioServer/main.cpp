@@ -7,6 +7,8 @@
 #define GetCurrentDir _getcwd
 
 std::vector<std::string> FileNames;
+std::string SongHeader;
+std::string Currentsong;
 char** song_stream_data = (char**) malloc(sizeof(char*));
 DWORD* song_size = 0;
 
@@ -20,12 +22,6 @@ int main(int argc, char *argv[])
     if (!GetCurrentDir(current_dir, sizeof(current_dir)))
     {
         return errno;
-    }
-    std::stringstream ss(w->get_all_songs());
-    std::string buf;
-    while(ss >> buf)
-    {
-        FileNames.push_back((buf));
     }
 
     if(!StartSoundManager())
