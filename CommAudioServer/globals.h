@@ -4,7 +4,6 @@
 #define DEAULT_MULTICAST_IP  "234.5.6.7"
 #define DEFAULT_IP           "192.168.0.1"
 #define MUSIC_DIRECTORY      "../Music/"
-#define HEADER               "HEADER:"
 #define MAX_CLIENTS          10
 #define DATA_BUFSIZE         40000
 #define DEFAULT_PORT         7000
@@ -23,6 +22,8 @@
 #define FileBegin    "FileS:"
 #define FileEnd      "FileE:"
 #define Recording    "Recor:"
+#define Header       "HEADER:"
+#define SongName     "SName:"
 
 /* Socket struct for Windows */
 typedef struct _SOCKET_INFORMATION
