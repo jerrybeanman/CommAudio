@@ -58,8 +58,8 @@ void MainWindow::on_connectButton_pressed()
     connect(tcpThread, SIGNAL(started()), TCPWorker, SLOT(TCPReceiveThread()));
     connect(TCPWorker, SIGNAL(finished()), tcpThread, SLOT(quit()), Qt::DirectConnection);
 
-    TCPWorker->TCPThreadRequest();
-    TCPWorker->sendSongRequest(QByteArray("1"));
+    //TCPWorker->TCPThreadRequest();
+    //TCPWorker->sendSongRequest(QByteArray("1"));
 
 }
 static int count;
@@ -108,7 +108,7 @@ void MainWindow::initializeMicrophoneConnection()
     connect(microphoneThread, SIGNAL(started()), microphoneWorker, SLOT(MicrohponeSendThread()));
     connect(microphoneWorker, SIGNAL(finished()), microphoneThread, SLOT(quit()), Qt::DirectConnection);
 
-    microphoneWorker->MicrophoneThreadRequest();
+  //  microphoneWorker->MicrophoneThreadRequest();
 
     connect(microphoneRecvWorker, SIGNAL(RecievedData(const unsigned int)), this,
             SLOT(handleVoiceDataAvailable(const unsigned int)));

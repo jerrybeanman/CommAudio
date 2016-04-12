@@ -137,9 +137,37 @@ bool ClientUDP::Recv()
 }
 bool ClientUDP::Send(char * message, int size)
 {
-    Q_UNUSED(message)
-    Q_UNUSED(size)
-    return FALSE;
+    DWORD flags = 0;
+    SocketInfo.DataBuf.buf = message;
+    SocketInfo.DataBuf.len = size;
+    memset(&SocketInfo.Overlapped, '\0', sizeof(WSAOVERLAPPED));
+    SocketInfo.Overlapped.hEvent = WSACreateEvent();
+    if (WSASendTo(SocketInfo.Socket,
+        &(SocketInfo.DataBuf),
+        1,
+        &SocketInfo.BytesSEND,
+        flags,
+        (SOCKADDR *)&SourceAddress,
+        sizeof(SourceAddress),
+        &SocketInfo.Overlapped,
+        NULL)
+        < 0)
+    {
+        if (WSAGetLastError() == WSA_IO_PENDING)
+        {
+            if(WSAWaitForMultipleEvents(1, &SocketInfo.Overlapped.hEvent, FALSE, 100, FALSE) == WAIT_TIMEOUT)
+            {
+                std::cout << "RecvFrom() Timeout" << std::endl;
+                return FALSE;
+            }
+           if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesSEND, FALSE, &Flags))
+            {
+                std::cout << "ClientUDP::WSAGetOVerlappedResult failed with errno " << WSAGetLastError() << std::endl;
+                return FALSE;
+            }
+        }
+    }
+    return TRUE;
 }
 
 bool ClientUDP::leaveMulticast() {
