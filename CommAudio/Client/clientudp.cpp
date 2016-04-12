@@ -156,8 +156,8 @@ bool ClientUDP::Send(char * message, int size)
         1,
         &SocketInfo.BytesSEND,
         flags,
-        (SOCKADDR *)&SourceAddress,
-        sizeof(SourceAddress),
+        (SOCKADDR *)&LocalAddr,
+        sizeof(LocalAddr),
         &SocketInfo.Overlapped,
         NULL)
         < 0)
