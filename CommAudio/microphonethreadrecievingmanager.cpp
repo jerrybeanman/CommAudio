@@ -12,8 +12,9 @@ void MicrophoneThreadRecvManager::MicrohponeRecvThread()
         return;*/
     while(clientUDP.Recv())
     {
-      CBPushBack(&cbMic, clientUDP.SocketInfo.Buffer);
-      emit RecievedData(clientUDP.SocketInfo.BytesRECV);
+        std::cerr << "Mic data received" << std::endl;
+        CBPushBack(&cbMic, clientUDP.SocketInfo.Buffer);
+        emit RecievedData(clientUDP.SocketInfo.BytesRECV);
     }
     qDebug() << "Exiting mic recv thread";
     CBFree(&cbMic);
