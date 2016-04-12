@@ -3,7 +3,7 @@
 bool ClientUDP::InitializeSocket(short port)
 {
     BOOL fFlag;
-	// Create a WSA v2.2 session
+    // Create a WSA v2.2 session
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
         std::cout << "WSAStartup failed with error " << WSAGetLastError() << std::endl;
@@ -12,10 +12,10 @@ bool ClientUDP::InitializeSocket(short port)
 
     // Create socket for writing based on currently selected protocol
     if ((SocketInfo.Socket = WSASocket(AF_INET,SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET)
-	{
+    {
         std::cout << "WSASocket() failed with error " <<  WSAGetLastError() << std::endl;
         return FALSE;
-	}
+    }
     fFlag = TRUE;
 
     // Avoid WSAADDRINUSE erro on bind
@@ -65,10 +65,8 @@ bool ClientUDP::InitializeSendingSocket(char * ip, short port)
     }
 
     // Assign the local port number to recieve on
-    memset(&LocalAddr, 0, sizeof(LocalAddr));
     LocalAddr.sin_family		= AF_INET;
     LocalAddr.sin_port			= htons(port);
-
     struct hostent	*hp;
     if ((hp = gethostbyname(ip)) == NULL)
     {
@@ -79,11 +77,11 @@ bool ClientUDP::InitializeSendingSocket(char * ip, short port)
     memcpy((char *)&LocalAddr.sin_addr, hp->h_addr, hp->h_length);
 
     // Bind local address to socket
-    if(bind(SocketInfo.Socket, (struct sockaddr*) &LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
+    /*if(bind(SocketInfo.Socket, (struct sockaddr*) &LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
     {
         std::cout << "bind() failed with error " << WSAGetLastError() << std::endl;
         return FALSE;
-    }
+    }*/
     return TRUE;
 }
 
@@ -142,7 +140,11 @@ bool ClientUDP::Recv()
         return FALSE;
     }
    // std::cout << "Bytes Recieved: " << SocketInfo.BytesRECV << std::endl;
-
+    if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesRECV, FALSE, &Flags))
+    {
+        std::cout << "ClientUDP::WSAGetOVerlappedResult failed with errno " << WSAGetLastError() << std::endl;
+        return FALSE;
+    }
     return TRUE;
 }
 bool ClientUDP::Send(char * message, int size)

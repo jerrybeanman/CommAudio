@@ -23,7 +23,7 @@ void MicrophoneThreadManager::MicrohponeSendThread()
                free(voicedata);
                break;
             }
-            std::cerr << "Mic data received" << std::endl;
+            std::cerr << "Mic data sent" << std::endl;
             free(voicedata);
         }
         // TODO::Implement read from microhpone and assign it into voicedata
