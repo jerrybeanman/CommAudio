@@ -7,7 +7,6 @@ void MicrophoneThreadRecvManager::MicrohponeRecvThread()
     QByteArray temp;
     CBInitialize(&cbMic, 20, 40000);
 
-    // TODO:: Grab IP from GUI
     if(!clientUDP.InitializeSocket(DEFAULT_PORT))
         return;
     std::cout << "Whomp" << std::endl;
@@ -21,7 +20,8 @@ void MicrophoneThreadRecvManager::MicrohponeRecvThread()
     CBFree(&cbMic);
 }
 
-void MicrophoneThreadRecvManager::closeSocket() {
+void MicrophoneThreadRecvManager::closeSocket()
+{
     clientUDP.Close();
     this->thread()->exit();
 }

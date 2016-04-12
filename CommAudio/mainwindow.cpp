@@ -248,6 +248,11 @@ void MainWindow::play_voice()
     if(m_recorder == 0)
         m_recorder = new Recorder();
 
+    if(!ReceivingVoice || !recording)
+    {
+        m_recorder = new Recorder();
+    }
+
     if(!ReceivingVoice)
     {
         ReceivingVoice = true;
@@ -361,14 +366,14 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
     if(m_voice_generator == 0)
     {
         m_voice_generator = new RecordGenerator();
-        prepare_audio_devices(m_recorder->fileFormat());
     }
 
-    char* buf = (char*)malloc(DATA_BUFSIZE);
+
     //std::cerr << "MainWindow::handleVoiceData>>count:" << cb_voice_data.Count << std::endl;
-    if(cb_voice_data.Count != 0)
+    char* buf = (char*)malloc(DATA_BUFSIZE);
+    if(cbMic.Count != 0)
     {
-        CBPop(&cb_voice_data, buf);
+        CBPop(&cbMic, buf);
         //emit to TCP that this is available
 
         QByteArray data = QByteArray::fromRawData(buf, len);

@@ -128,17 +128,18 @@ bool ClientUDP::Recv()
                 std::cout << "RecvFrom() Timeout" << std::endl;
                 return FALSE;
             }
-            if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesRECV, FALSE, &Flags))
-            {
-                std::cout << "ClientUDP::WSAGetOVerlappedResult failed with errno " << WSAGetLastError() << std::endl;
-                return FALSE;
-            }
         }else
         {
             std::cout << "RecvFrom() failed with error " << WSAGetLastError() << std::endl;
             return FALSE;
         }
 
+    }
+
+    if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesRECV, FALSE, &Flags))
+    {
+        std::cout << "ClientUDP::WSAGetOVerlappedResult failed with errno " << WSAGetLastError() << std::endl;
+        return FALSE;
     }
    // std::cout << "Bytes Recieved: " << SocketInfo.BytesRECV << std::endl;
 
