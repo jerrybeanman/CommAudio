@@ -7,8 +7,8 @@ void MicrophoneThreadManager::MicrohponeSendThread()
     QByteArray temp;
 
     // TODO:: Grab IP from GUI
-    /*if(!clientUDP.InitializeSendingSocket( IP  ,DEFAULT_PORT))
-        return;*/
+    if(!clientUDP.InitializeSendingSocket(ipAddr.data(),DEFAULT_PORT))
+        return;
     while(running)
     {
         if(cb_voice_data.Count > 0)

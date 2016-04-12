@@ -217,7 +217,7 @@ bool OpenFile(std::string name)
     std::string dir = MUSIC_DIRECTORY + name;
     if ((fp = fopen(dir.c_str(), "rb")) == NULL)
 	{
-        std::cerr << "Errno: " << errno << std::endl;
+        std::cerr << "File open errno: " << errno << std::endl;
 		return false;
 	}
 	return true;
@@ -329,7 +329,7 @@ void SendEndMessage(LPSOCKET_INFORMATION SocketInfo)
 std::string BuildFilePacket()
 {
 	std::ostringstream convert;   // stream used for the conversion
-	convert << (int)UpdateList;
+    convert << UpdateList;
 	std::string packet = convert.str();
 	for(auto &x : FileNames)
 	{
