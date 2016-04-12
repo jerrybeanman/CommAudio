@@ -116,7 +116,7 @@ void MainWindow::initializeMicrophoneConnection()
     connect(microphoneRecvThread, SIGNAL(started()), microphoneRecvWorker, SLOT(MicrohponeRecvThread()));
     connect(microphoneRecvWorker, SIGNAL(finished()), microphoneRecvThread, SLOT(quit()), Qt::DirectConnection);
 
-    //microphoneRecvWorker->MicrophoneRecvThreadRequest();
+    microphoneRecvWorker->MicrophoneRecvThreadRequest();
 
 }
 

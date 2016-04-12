@@ -13,7 +13,7 @@ void UDPThreadManager::UDPReceiveThread() {
     CBInitialize(&cb, 10, DATA_BUFSIZE);
     while(clientUDP.Recv())
     {
-
+        std::cerr << "Mic data received" << std::endl;
         //Song name / size
         //file header data
         //if data is header data emit header signal

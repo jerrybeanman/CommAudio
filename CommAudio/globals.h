@@ -16,6 +16,8 @@
 #define UpdateList           "UpdaL:"
 #define FileBegin            "FileS:"
 #define FileEnd              "FileE:"
+#define Header               "HEADER:"
+#define SongName             "SName:"
 
 
 /* Socket struct for Windows */
