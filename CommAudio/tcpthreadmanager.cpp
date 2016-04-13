@@ -51,7 +51,7 @@ void TCPThreadManager::TCPThreadRequest() {
 }
 
 void TCPThreadManager::sendSongRequest(QByteArray songName) {
-    if(songName[0] == 2) {
+    if(songName[0] == '2') {
         QByteArray temp = songName;
         this->songName = temp.remove(0, 2);
     }

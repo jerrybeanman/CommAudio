@@ -48,7 +48,7 @@ void MainWindow::on_connectButton_pressed()
     TCPWorker = new TCPThreadManager(serverIP);
     m_generator = new DataGenerator();
 
-    initializeUDPThread();
+    //initializeUDPThread();
 
     TCPWorker->moveToThread(tcpThread);
 
@@ -62,8 +62,8 @@ void MainWindow::on_connectButton_pressed()
     connect(tcpThread, SIGNAL(started()), TCPWorker, SLOT(TCPReceiveThread()));
     connect(TCPWorker, SIGNAL(finished()), tcpThread, SLOT(quit()), Qt::DirectConnection);
 
-    TCPWorker->TCPThreadRequest();
-    TCPWorker->sendSongRequest(QByteArray("1"));
+   //TCPWorker->TCPThreadRequest();
+   // TCPWorker->sendSongRequest(QByteArray("1"));
 
 }
 static int count;
