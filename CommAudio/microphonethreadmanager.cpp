@@ -7,7 +7,7 @@ void MicrophoneThreadManager::MicrohponeSendThread()
     QByteArray temp;
 
     // TODO:: Grab IP from GUI
-    if(!clientUDP.InitializeSendingSocket(ipAddr.data(),DEFAULT_PORT))
+    if(!clientUDP.InitializeSendingSocket(ipAddr.data(), MIC_PORT))
         return;
 
     std::cerr << "Stomp" << std::endl;

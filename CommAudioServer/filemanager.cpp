@@ -312,7 +312,7 @@ void SendFile(LPSOCKET_INFORMATION SocketInfo, FILE * fp)
         SocketInfo->DataBuf.buf = pbuf;
         SocketInfo->DataBuf.len = FBytesRead;
         serverTCP.Send(SocketInfo, pbuf);
-        std::cout << "SendFile" << std::endl;
+
         /* zero out memory for next round */
         free(pbuf);
     }while(FBytesRead == DATA_BUFSIZE);

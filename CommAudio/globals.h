@@ -13,6 +13,7 @@
 #define DATA_BUFSIZE         40000
 #define DEFAULT_PORT         7050
 #define TCP_PORT             8000
+#define MIC_PORT             9000
 #define UpdateList           "UpdaL:"
 #define FileBegin            "FileS:"
 #define FileEnd              "FileE:"

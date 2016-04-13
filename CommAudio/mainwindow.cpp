@@ -393,7 +393,7 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
         m_voice_generator = new RecordGenerator();
     }
 
-    std::cerr << "handleVoiceData>>count:" << cb_voice_data.Count << std::endl;
+    std::cerr << "handleVoiceData>>count:" << cbMic.Count << std::endl;
     char* buf = (char*)malloc(DATA_BUFSIZE);
     if(cbMic.Count != 0)
     {
