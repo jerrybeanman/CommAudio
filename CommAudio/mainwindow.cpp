@@ -290,6 +290,11 @@ void MainWindow::play_voice()
     }
     else
     {
+        if(m_voice_generator->isPlaying())
+        {
+            m_audioOutput->resume();
+        }
+
         //Data is being received here, handle lag here.
     }
 }
@@ -372,7 +377,6 @@ void MainWindow::on_requestFile_clicked()
 {
     QString song = ui->serverSongList->currentItem()->text();
     song.prepend("2 ");
-    qDebug() << song;
     TCPWorker->sendSongRequest(song.toLocal8Bit());
 
 }
@@ -384,10 +388,10 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
         m_voice_generator = new RecordGenerator();
     }
 
-    if(!m_voice_generator->isPlaying())
+    /*if(!m_voice_generator->isPlaying())
     {
         m_voice_generator->resetData();
-    }
+    }*/
 
     //std::cerr << "MainWindow::handleVoiceData>>count:" << cb_voice_data.Count << std::endl;
     char* buf = (char*)malloc(DATA_BUFSIZE);
@@ -398,7 +402,7 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
 
         QByteArray data = QByteArray::fromRawData(buf, len);
 
-        //qDebug() << "Voice size: " << data.size();
+        qDebug() << "Voice size: " << len;
         m_voice_generator->AddMoreDataToBufferFromQByteArray(data, data.size());
         play_voice();
     }

@@ -331,7 +331,7 @@ void MainWindow::song_selected_update(bool previous)
 }
 
 bool MainWindow::delete_old_song()
-{   
+{
     if(m_file != 0) // File must exist
     {
         while(*song_size != 0) // Allow the remaining piece of the song to send.
