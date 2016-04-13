@@ -17,11 +17,6 @@ bool ServerUDP::InitializeSocket(short port)
         return false;
     }
 
-    if (setsockopt(SocketInfo.Socket, IPPROTO_TCP, TCP_NODELAY, (const char *)&flags, sizeof(int)) < 0)
-    {
-        std::cout << "setsockopt() failed with error " << WSAGetLastError() << std::endl;
-        return FALSE;
-    }
 
     // Initialize address structure
     LocalAddr.sin_family         = AF_INET;
@@ -142,7 +137,7 @@ bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
         std::cout << "SeverUDP::WSAGetOverlappedResult failed with errno" << WSAGetLastError() << std::endl;
         return FALSE;
     }
-    std::cerr << "ServerUDP::Broadcast>>Bytes Sent:[" << SocketInfo.BytesSEND << "]" << std::endl;
+    //std::cerr << "ServerUDP::Broadcast>>Bytes Sent:[" << SocketInfo.BytesSEND << "]" << std::endl;
     return true;
 }
 
