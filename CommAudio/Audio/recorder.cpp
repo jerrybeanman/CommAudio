@@ -69,7 +69,7 @@ qint64 Recorder::writeData(const char *data, qint64 len)
         qDebug() << "len - chunk:" << len-chunk;
 
         CBPushBack(&cb_voice_data, r_buffer.data());
-        emit dataAvailable(40000);
+        emit dataAvailable(DATA_BUFSIZE);
 
         r_bytes_AVAILABLE = len - chunk;
         memcpy(r_buffer.data(), data + chunk, len-chunk);

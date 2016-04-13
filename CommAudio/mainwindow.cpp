@@ -309,11 +309,21 @@ void MainWindow::on_recordButton_clicked()
 
         prepare_audio_devices(m_recorder->fileFormat());
 
+        //This allows you to hear yourself instead. Have to change a few things to get this to work.
+        //Talk to tyler if you need to record yourself.
+        //connect(m_recorder, SIGNAL(dataAvailable(int)), this, SLOT(handleVoiceDataAvailable(int)));
+
         m_recorder->start();
         recording = true;
     }
     else
     {
+        /*
+         * TODO:
+         * When button is clicked, turn recording on and off. This will continously "play"
+         * the recording until it is clicked off. There will probably be an issue where
+         * it will record itself but that's fine.
+         */
         m_recorder->stop();
         recording = false;
     }
@@ -387,11 +397,6 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
     {
         m_voice_generator = new RecordGenerator();
     }
-
-    /*if(!m_voice_generator->isPlaying())
-    {
-        m_voice_generator->resetData();
-    }*/
 
     //std::cerr << "MainWindow::handleVoiceData>>count:" << cb_voice_data.Count << std::endl;
     char* buf = (char*)malloc(DATA_BUFSIZE);
