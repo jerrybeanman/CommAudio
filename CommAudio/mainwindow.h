@@ -126,8 +126,6 @@ private slots:
 
     void on_recordButton_clicked();
 
-    void on_playRecordingButton_clicked();
-
     void on_progressBar_actionTriggered(int action);
 
 
@@ -151,7 +149,24 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void addToSongBuffer(const unsigned int size);
 
-    void addToSongHeader();
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: addToSongHeader
+    --
+    -- DATE: March 20, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void addToSongBuffer()
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    ----------------------------------------------------------------------------------------------------------------------*/
+    void addSongHeader();
 
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: on_play_clicked
@@ -212,6 +227,8 @@ private slots:
     -- Handles any incoming microphone data and populates the m_voice_generator with this data
     ----------------------------------------------------------------------------------------------------------------------*/
     void handleVoiceDataAvailable(const unsigned int);
+
+    void on_peerConnect_clicked();
 
 private:
     /*------------------------------------------------------------------------------------------------------------------
@@ -301,6 +318,7 @@ private:
 
     Ui::MainWindow*         ui;
     QByteArray              serverIP;
+    QByteArray              peerIP;
     QMediaPlayer*           player;
     QByteArray              m_buffer;
     QBuffer*                mediaStream;

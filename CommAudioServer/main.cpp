@@ -6,6 +6,8 @@
 #include <sstream>
 #define GetCurrentDir _getcwd
 
+void loadStyleSheet();
+
 std::vector<std::string> FileNames;
 std::string SongHeader;
 std::string Currentsong;
@@ -18,6 +20,9 @@ int main(int argc, char *argv[])
     QApplication program(argc, argv);
     MainWindow* w = new MainWindow();
     w->show();
+
+    loadStyleSheet();
+
     char current_dir[200];
     if (!GetCurrentDir(current_dir, sizeof(current_dir)))
     {
@@ -36,3 +41,19 @@ int main(int argc, char *argv[])
 
     return program.exec();
 }
+
+void loadStyleSheet() {
+    QFile f(":qdarkstyle/style.qss");
+    if (!f.exists())
+    {
+        printf("Unable to set stylesheet, file not found\n");
+        exit(1);
+    }
+    else
+    {
+        f.open(QFile::ReadOnly | QFile::Text);
+        QTextStream ts(&f);
+        qApp->setStyleSheet(ts.readAll());
+    }
+}
+

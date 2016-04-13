@@ -55,3 +55,5 @@ HEADERS  += \
     Audio/recordgenerator.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += qdarkstyle/style.qrc

@@ -1,9 +1,7 @@
 #include "mainwindow.h"
 #include "Client/ClientTCP.h"
 #include <QApplication>
-void StartServer();
-DWORD WINAPI UDPThread(LPVOID lpParameter);
-DWORD WINAPI AcceptThread(LPVOID lpParam);
+void loadStyleSheet();
 
 int main(int argc, char *argv[])
 {
@@ -11,5 +9,23 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
+    loadStyleSheet();
+
     return program.exec();;
+}
+
+
+void loadStyleSheet() {
+    QFile f(":qdarkstyle/style.qss");
+    if (!f.exists())
+    {
+        printf("Unable to set stylesheet, file not found\n");
+        exit(1);
+    }
+    else
+    {
+        f.open(QFile::ReadOnly | QFile::Text);
+        QTextStream ts(&f);
+        qApp->setStyleSheet(ts.readAll());
+    }
 }

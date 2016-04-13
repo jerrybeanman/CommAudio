@@ -8,6 +8,7 @@
 #include <QAudioOutput>
 #include <QAudioDeviceInfo>
 #include <QSlider>
+#include <QInputDialog>
 CircularBuffer cb;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -48,7 +49,7 @@ void MainWindow::on_connectButton_pressed()
     TCPWorker = new TCPThreadManager(serverIP);
     m_generator = new DataGenerator();
 
-    //initializeUDPThread();
+    initializeUDPThread();
 
     TCPWorker->moveToThread(tcpThread);
 
@@ -58,8 +59,8 @@ void MainWindow::on_connectButton_pressed()
     connect(tcpThread, SIGNAL(started()), TCPWorker, SLOT(TCPReceiveThread()));
     connect(TCPWorker, SIGNAL(finished()), tcpThread, SLOT(quit()), Qt::DirectConnection);
 
-    //TCPWorker->TCPThreadRequest();
-    //TCPWorker->sendSongRequest(QByteArray("1"));
+    TCPWorker->TCPThreadRequest();
+    TCPWorker->sendSongRequest(QByteArray("1"));
 
 }
 static int count;
@@ -78,7 +79,7 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
     }
 }
 
-void MainWindow::addToSongHeader() {
+void MainWindow::addSongHeader() {
     if(cb.Count != 0) {
         if(m_audioOutput != nullptr) {
             m_generator->resetPosition();
@@ -98,8 +99,8 @@ void MainWindow::initializeMicrophoneConnection()
 {
     microphoneThread      = new QThread();
     microphoneRecvThread  = new QThread();
-    microphoneWorker = new MicrophoneThreadManager(serverIP);
-    microphoneRecvWorker = new MicrophoneThreadRecvManager(serverIP);
+    microphoneWorker = new MicrophoneThreadManager(peerIP);
+    microphoneRecvWorker = new MicrophoneThreadRecvManager(peerIP);
 
     microphoneWorker->moveToThread(microphoneThread);
     microphoneRecvWorker->moveToThread(microphoneRecvThread);
@@ -130,7 +131,7 @@ void MainWindow::initializeUDPThread() {
     connect(UDPWorker, SIGNAL(songDataReceived(const unsigned int)), this,
             SLOT(addToSongBuffer(const unsigned int)));
     connect(UDPWorker, SIGNAL(songHeader()), this,
-            SLOT(addToSongHeader()));
+            SLOT(addSongHeader()));
     connect(UDPWorker, SIGNAL(UDPThreadRequested()), broadcastThread, SLOT(start()));
     connect(broadcastThread, SIGNAL(started()), UDPWorker, SLOT(UDPReceiveThread()));
     connect(UDPWorker, SIGNAL(finished()), broadcastThread, SLOT(quit()), Qt::DirectConnection);
@@ -140,7 +141,9 @@ void MainWindow::initializeUDPThread() {
 
 void MainWindow::tabSelected() {
     qDebug() << "Tab changed to: " << ui->tabWidget->currentIndex();
-
+    ui->serverPlayList->clear();
+    ui->serverSongList->clear();
+    ui->peerIP->clear();
     if(UDPWorker != nullptr) {
         UDPWorker->closeSocket();
         broadcastThread->wait();
@@ -168,7 +171,7 @@ void MainWindow::tabSelected() {
             TCPWorker->sendSongRequest(QByteArray("1"));
             break;
         case mic:
-            initializeMicrophoneConnection();
+            ui->recordButton->setEnabled(false);
             break;
     }
 }
@@ -298,7 +301,7 @@ void MainWindow::on_recordButton_clicked()
     }
 }
 
-void MainWindow::on_playRecordingButton_clicked()
+/*void MainWindow::on_playRecordingButton_clicked()
 {
     m_recorder->stop();
 
@@ -312,7 +315,7 @@ void MainWindow::on_playRecordingButton_clicked()
     m_generator->AddMoreDataToBufferFromQByteArray(array, size);
 
     play_audio();
-}
+} */
 
 void MainWindow::on_progressBar_actionTriggered(int progress)
 {
@@ -383,4 +386,12 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
         play_voice();
     }
     free(buf);
+}
+
+void MainWindow::on_peerConnect_clicked()
+{
+    peerIP = ui->peerIP->text().toLocal8Bit();
+    ui->recordButton->setEnabled(true);
+
+    initializeMicrophoneConnection();
 }

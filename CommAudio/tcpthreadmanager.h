@@ -10,6 +10,23 @@ class TCPThreadManager : public QObject
     Q_OBJECT
 
 public:
+    /*------------------------------------------------------------------------------------------------------------------
+    -- CTOR: TCPThreadManager
+    --
+    -- DATE: April 4, 2016
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE:   TCPThreadManager(QByteArray& ip)
+    --                      ip: The ipAddress of the server.
+    --
+    -- NOTES:
+    --
+    ----------------------------------------------------------------------------------------------------------------------*/
     TCPThreadManager(QByteArray& ip) : ipAddr(ip){}
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: TCPThreadRequest
