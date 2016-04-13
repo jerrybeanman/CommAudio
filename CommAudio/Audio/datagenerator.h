@@ -30,6 +30,7 @@ public:
     qint64 bytesAvailable() const;
     QByteArray* getExternalReference();
     bool isPlaying();
+    void RestartPlaying();
     void RemoveBufferedData();
     void AddMoreDataToBufferFromFile(QFile* file, qint64 len);
     void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);

@@ -52,7 +52,7 @@ qint64 DataGenerator::readData(char *data, qint64 len)
         dg_readpos = (dg_readpos + chunk) % dg_buffer.size();
 
         externChunk = chunk;
-        progress = (int)((dg_readpos * 100) / ((qint64)dg_buffer.size()));
+        //progress = (int)((dg_readpos * 100) / ((qint64)dg_buffer.size()));
 
         if(dg_readpos == ZERO)
         {
@@ -64,6 +64,9 @@ qint64 DataGenerator::readData(char *data, qint64 len)
         emit audioProgressChanged(progress);
         emit dataAvailable(externChunk);
     }
+
+    /*if(chunk == 0)
+        playing = false;*/
     return chunk;
 }
 
@@ -84,6 +87,11 @@ qint64 DataGenerator::bytesAvailable() const
 bool DataGenerator::isPlaying()
 {
     return playing;
+}
+
+void DataGenerator::RestartPlaying()
+{
+    dg_readpos = dg_max;
 }
 
 void DataGenerator::RemoveBufferedData()

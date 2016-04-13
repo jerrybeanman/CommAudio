@@ -71,6 +71,10 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
     if(!headerReceived) {
         return;
     }
+    if((count >= 0) && !(m_generator->isPlaying())) {
+        m_generator->RestartPlaying();
+        play_audio();
+    }
     while(cb.Count != 0)
     {
         char* temp = new char[DATA_BUFSIZE];
@@ -80,19 +84,22 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
         count++;
         delete temp;
     }
-    if((count <= 10) && !(m_generator->isPlaying())) {
-        play_audio();
-    }
 }
 
 void MainWindow::addToSongHeader() {
     if(cbControl.Count != 0) {
         if(m_audioOutput != nullptr) {
             m_generator->resetPosition();
+            m_generator->RemoveBufferedData();
             m_audioOutput->reset();
             delete(m_audioOutput);
         }
         headerReceived = true;
+
+        if(m_generator == 0)
+        {
+            m_generator = new DataGenerator();
+        }
         m_generator->RemoveBufferedData();
         count = 0;
         char* temp = new char[DATA_BUFSIZE];
@@ -170,12 +177,12 @@ void MainWindow::tabSelected() {
 
     }
 
-    if(m_audioOutput != nullptr) {
+    if(m_audioOutput != 0) {
         m_generator->resetPosition();
         m_audioOutput->reset();
         m_generator->RemoveBufferedData();
-        delete(m_audioOutput);
-        m_audioOutput = nullptr;
+        m_generator = 0;
+        m_audioOutput = 0;
     }
 
     switch(ui->tabWidget->currentIndex()) {

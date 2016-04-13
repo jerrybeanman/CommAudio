@@ -16,7 +16,7 @@ void TCPThreadManager::TCPReceiveThread() {
         while(clientTCP.Recv()) {
             QByteArray data(clientTCP.SocketInfo.Buffer);
             if(data.startsWith(Header)) {
-                CBPushBack(&cbControl, clientTCP.SocketInfo.DataBuf.buf + 7);
+                CBPushBack(&cbControl, clientTCP.SocketInfo.Buffer + 7);
                 emit songHeader();
             }else if(data.startsWith(UpdateList)) {
                 QList<QByteArray> uiInfo = data.split('%');
