@@ -65,8 +65,6 @@ qint64 DataGenerator::readData(char *data, qint64 len)
         emit dataAvailable(externChunk);
     }
 
-    /*if(chunk == 0)
-        playing = false;*/
     return chunk;
 }
 
