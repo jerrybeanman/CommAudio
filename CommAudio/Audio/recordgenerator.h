@@ -20,7 +20,9 @@ public:
     void start();
     void stop();
     void resume();
+    void resetData();
     bool isPlaying();
+    qint64 bytesAvailable() const;
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
     void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);

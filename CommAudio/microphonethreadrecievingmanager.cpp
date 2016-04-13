@@ -7,7 +7,7 @@ void MicrophoneThreadRecvManager::MicrohponeRecvThread()
     QByteArray temp;
     CBInitialize(&cbMic, 20, 40000);
 
-    if(!clientUDP.InitializeSocket(DEFAULT_PORT))
+    if(!clientUDP.InitializeSocket(MIC_PORT))
         return;
     std::cout << "Whomp" << std::endl;
     while(clientUDP.Recv())

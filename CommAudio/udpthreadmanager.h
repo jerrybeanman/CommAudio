@@ -52,9 +52,7 @@ public:
 signals:
     void finished();
     void songDataReceived(const unsigned int);
-    void songHeader();
     void UDPThreadRequested();
-    void playlistReceived(const QByteArray& playlist);
 
 public slots:
     /*------------------------------------------------------------------------------------------------------------------

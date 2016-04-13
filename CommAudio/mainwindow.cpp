@@ -53,6 +53,10 @@ void MainWindow::on_connectButton_pressed()
 
     TCPWorker->moveToThread(tcpThread);
 
+    connect(TCPWorker, SIGNAL(songHeader()), this,
+            SLOT(addSongHeader()));
+    connect(TCPWorker, SIGNAL(songNameReceived(const QByteArray)), this,
+            SLOT(setSong(const QByteArray)));
     connect(TCPWorker, SIGNAL(songList(const QByteArray&)), this,
             SLOT(generatePlaylist(const QByteArray&)));
     connect(TCPWorker, SIGNAL(TCPThreadRequested()), tcpThread, SLOT(start()));
@@ -65,6 +69,13 @@ void MainWindow::on_connectButton_pressed()
 }
 static int count;
 void MainWindow::addToSongBuffer(const unsigned int size) {
+    if(!headerReceived) {
+        return;
+    }
+    if((count >= 0) && !(m_generator->isPlaying())) {
+        m_generator->RestartPlaying();
+        play_audio();
+    }
     while(cb.Count != 0)
     {
         char* temp = new char[DATA_BUFSIZE];
@@ -74,25 +85,34 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
         count++;
         delete temp;
     }
-    if((count >= 10 )&& !(m_generator->isPlaying())) {
-        play_audio();
-    }
 }
 
+
 void MainWindow::addSongHeader() {
-    if(cb.Count != 0) {
+    if(cbControl.Count != 0) {
         if(m_audioOutput != nullptr) {
             m_generator->resetPosition();
+            m_generator->RemoveBufferedData();
             m_audioOutput->reset();
             delete(m_audioOutput);
+        }
+        headerReceived = true;
+
+        if(m_generator == 0)
+        {
+            m_generator = new DataGenerator();
         }
         m_generator->RemoveBufferedData();
         count = 0;
         char* temp = new char[DATA_BUFSIZE];
-        CBPop(&cb, temp);
+        CBPop(&cbControl, temp);
         prepare_audio_devices(m_generator->readHeader(temp));
         delete temp;
     }
+}
+
+void MainWindow::setSong(const QByteArray name) {
+    ui->songName->setText(QString(name));
 }
 
 void MainWindow::initializeMicrophoneConnection()
@@ -130,8 +150,6 @@ void MainWindow::initializeUDPThread() {
 
     connect(UDPWorker, SIGNAL(songDataReceived(const unsigned int)), this,
             SLOT(addToSongBuffer(const unsigned int)));
-    connect(UDPWorker, SIGNAL(songHeader()), this,
-            SLOT(addSongHeader()));
     connect(UDPWorker, SIGNAL(UDPThreadRequested()), broadcastThread, SLOT(start()));
     connect(broadcastThread, SIGNAL(started()), UDPWorker, SLOT(UDPReceiveThread()));
     connect(UDPWorker, SIGNAL(finished()), broadcastThread, SLOT(quit()), Qt::DirectConnection);
@@ -163,12 +181,21 @@ void MainWindow::tabSelected() {
 
     }
 
+    if(m_audioOutput != 0) {
+        m_generator->resetPosition();
+        m_audioOutput->reset();
+        m_generator->RemoveBufferedData();
+        m_generator = 0;
+        m_audioOutput = 0;
+    }
+
     switch(ui->tabWidget->currentIndex()) {
         case broadcasting:
-            //initializeUDPThread();
+            initializeUDPThread();
+            TCPWorker->sendSongRequest(QByteArray("1"));
             break;
         case fileTransfer:
-            TCPWorker->sendSongRequest(QByteArray("1"));
+            TCPWorker->sendSongRequest(QByteArray("3"));
             break;
         case mic:
             ui->recordButton->setEnabled(false);
@@ -185,7 +212,7 @@ void MainWindow::generatePlaylist(const QByteArray& songs) {
     } else {
         return;
     }
-    QList<QByteArray> songList = songs.split(' ');
+    QList<QByteArray> songList = songs.split('@');
     foreach (const QString& song, songList) {
         playList->addItem(song);
     }
@@ -251,13 +278,14 @@ void MainWindow::play_voice()
     if(m_recorder == 0)
         m_recorder = new Recorder();
 
-    if(!ReceivingVoice || !recording)
+    if(!ReceivingVoice && !recording)
     {
         m_recorder = new Recorder();
     }
 
     if(!ReceivingVoice)
     {
+        qDebug() << "Hit";
         ReceivingVoice = true;
         prepare_audio_devices(m_recorder->fileFormat());
         m_voice_generator->start();
@@ -267,23 +295,22 @@ void MainWindow::play_voice()
     }
     else
     {
+        if(m_voice_generator->isPlaying())
+        {
+            m_audioOutput->resume();
+        }
+
         //Data is being received here, handle lag here.
     }
 }
 
 void MainWindow::on_recordButton_clicked()
 {
+
     if(!recording)
     {
         qDebug() << "recording starts.";
         m_recorder = new Recorder();
-        m_voice_generator = new RecordGenerator();
-
-        prepare_audio_devices(m_recorder->fileFormat());
-
-        //This allows you to hear yourself instead. Have to change a few things to get this to work.
-        //Talk to tyler if you need to record yourself.
-        //connect(m_recorder, SIGNAL(dataAvailable(int)), this, SLOT(handleVoiceDataAvailable(int)));
 
         m_recorder->start();
         recording = true;
@@ -359,7 +386,6 @@ void MainWindow::on_requestFile_clicked()
 {
     QString song = ui->serverSongList->currentItem()->text();
     song.prepend("2 ");
-    qDebug() << song;
     TCPWorker->sendSongRequest(song.toLocal8Bit());
 
 }
@@ -371,8 +397,7 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
         m_voice_generator = new RecordGenerator();
     }
 
-
-    //std::cerr << "MainWindow::handleVoiceData>>count:" << cb_voice_data.Count << std::endl;
+    std::cerr << "MainWindow::handleVoiceData>>count:" << cbMic.Count << std::endl;
     char* buf = (char*)malloc(DATA_BUFSIZE);
     if(cbMic.Count != 0)
     {
@@ -381,7 +406,7 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
 
         QByteArray data = QByteArray::fromRawData(buf, len);
 
-        //qDebug() << "Voice size: " << data.size();
+        qDebug() << "Voice size: " << len;
         m_voice_generator->AddMoreDataToBufferFromQByteArray(data, data.size());
         play_voice();
     }

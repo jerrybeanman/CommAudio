@@ -168,6 +168,8 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void addSongHeader();
 
+    void setSong(const QByteArray name);
+
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: on_play_clicked
     --
@@ -346,6 +348,7 @@ private:
     bool                    fileExists;
     bool                    fileLoaded;
     bool                    ReceivingVoice;
+    bool                    headerReceived;
 
     enum tabs {broadcasting, fileTransfer, mic};
 };

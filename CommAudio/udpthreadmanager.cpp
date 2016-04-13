@@ -13,21 +13,10 @@ void UDPThreadManager::UDPReceiveThread() {
     CBInitialize(&cb, 10, DATA_BUFSIZE);
     while(clientUDP.Recv())
     {
-        std::cerr << "Mic data received" << std::endl;
-        //Song name / size
-        //file header data
-        //if data is header data emit header signal
-        QByteArray header = QByteArray::fromRawData(clientUDP.SocketInfo.DataBuf.buf,
-                                                    7);
-        if(header.startsWith("HEADER:")) {
-            CBPushBack(&cb, clientUDP.SocketInfo.DataBuf.buf + 7);
-            emit songHeader();
-        } else if(clientUDP.SocketInfo.DataBuf.buf[0] == (char)18) {
+        std::cerr << "Song data received" << std::endl;
 
-        } else {
-            CBPushBack(&cb, clientUDP.SocketInfo.DataBuf.buf);
-            emit songDataReceived(clientUDP.SocketInfo.BytesRECV);
-        }
+        CBPushBack(&cb, clientUDP.SocketInfo.DataBuf.buf);
+        emit songDataReceived(clientUDP.SocketInfo.BytesRECV);
     }
     qDebug() << "UDP Thread exiting";
     CBFree(&cb);

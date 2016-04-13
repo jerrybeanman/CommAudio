@@ -139,12 +139,6 @@ bool ClientUDP::Recv()
         std::cout << "ClientUDP::WSAGetOVerlappedResult failed with errno " << WSAGetLastError() << std::endl;
         return FALSE;
     }
-   // std::cout << "Bytes Recieved: " << SocketInfo.BytesRECV << std::endl;
-    if(!WSAGetOverlappedResult(SocketInfo.Socket, &(SocketInfo.Overlapped), &SocketInfo.BytesRECV, FALSE, &Flags))
-    {
-        std::cout << "ClientUDP::WSAGetOVerlappedResult failed with errno " << WSAGetLastError() << std::endl;
-        return FALSE;
-    }
     return TRUE;
 }
 bool ClientUDP::Send(char * message, int size)

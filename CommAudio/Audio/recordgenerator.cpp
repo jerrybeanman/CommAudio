@@ -25,9 +25,19 @@ void RecordGenerator::resume()
     open(QIODevice::ReadOnly);
 }
 
+void RecordGenerator::resetData()
+{
+    rg_readpos = rg_max;
+}
+
 bool RecordGenerator::isPlaying()
 {
     return playing;
+}
+
+qint64 RecordGenerator::bytesAvailable() const
+{
+    return rg_max;
 }
 
 qint64 RecordGenerator::readData(char *data, qint64 maxlen)
@@ -46,8 +56,10 @@ qint64 RecordGenerator::readData(char *data, qint64 maxlen)
         //qDebug() << "RecordGenerator::readData>>dataAvailable[" << chunk << "]";
 
         RemoveBufferedData(chunk);
+        qDebug() << "Data size:" << rg_buffer.size();
 
     }
+
     return chunk;
 }
 
@@ -64,11 +76,12 @@ void RecordGenerator::RemoveBufferedData(int len)
 {
     rg_buffer.remove(0, len);
     rg_readpos = 0;
-    rg_max = 0;
+    rg_max -= len;
 }
 
 void RecordGenerator::AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len)
 {
+    qDebug() << "Added data";
     rg_buffer.append(array);
     rg_max += len;
 }
