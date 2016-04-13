@@ -48,22 +48,33 @@ void MainWindow::on_connectButton_pressed()
     TCPWorker = new TCPThreadManager(serverIP);
     m_generator = new DataGenerator();
 
-    //initializeUDPThread();
+    initializeUDPThread();
 
     TCPWorker->moveToThread(tcpThread);
 
+    connect(TCPWorker, SIGNAL(songHeader()), this,
+            SLOT(addToSongHeader()));
+    connect(TCPWorker, SIGNAL(songNameReceived(const QByteArray)), this,
+            SLOT(setSong(const QByteArray)));
     connect(TCPWorker, SIGNAL(songList(const QByteArray&)), this,
             SLOT(generatePlaylist(const QByteArray&)));
     connect(TCPWorker, SIGNAL(TCPThreadRequested()), tcpThread, SLOT(start()));
     connect(tcpThread, SIGNAL(started()), TCPWorker, SLOT(TCPReceiveThread()));
     connect(TCPWorker, SIGNAL(finished()), tcpThread, SLOT(quit()), Qt::DirectConnection);
 
-    //TCPWorker->TCPThreadRequest();
-    //TCPWorker->sendSongRequest(QByteArray("1"));
+    TCPWorker->TCPThreadRequest();
+    TCPWorker->sendSongRequest(QByteArray("1"));
 
 }
 static int count;
 void MainWindow::addToSongBuffer(const unsigned int size) {
+    if(!headerReceived) {
+        return;
+    }
+    if((count >= 0) && !(m_generator->isPlaying())) {
+        m_generator->RestartPlaying();
+        play_audio();
+    }
     while(cb.Count != 0)
     {
         char* temp = new char[DATA_BUFSIZE];
@@ -73,25 +84,33 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
         count++;
         delete temp;
     }
-    if((count >= 10 )&& !(m_generator->isPlaying())) {
-        play_audio();
-    }
 }
 
 void MainWindow::addToSongHeader() {
-    if(cb.Count != 0) {
+    if(cbControl.Count != 0) {
         if(m_audioOutput != nullptr) {
             m_generator->resetPosition();
+            m_generator->RemoveBufferedData();
             m_audioOutput->reset();
             delete(m_audioOutput);
+        }
+        headerReceived = true;
+
+        if(m_generator == 0)
+        {
+            m_generator = new DataGenerator();
         }
         m_generator->RemoveBufferedData();
         count = 0;
         char* temp = new char[DATA_BUFSIZE];
-        CBPop(&cb, temp);
+        CBPop(&cbControl, temp);
         prepare_audio_devices(m_generator->readHeader(temp));
         delete temp;
     }
+}
+
+void MainWindow::setSong(const QByteArray name) {
+    ui->songName->setText(QString(name));
 }
 
 void MainWindow::initializeMicrophoneConnection()
@@ -129,8 +148,6 @@ void MainWindow::initializeUDPThread() {
 
     connect(UDPWorker, SIGNAL(songDataReceived(const unsigned int)), this,
             SLOT(addToSongBuffer(const unsigned int)));
-    connect(UDPWorker, SIGNAL(songHeader()), this,
-            SLOT(addToSongHeader()));
     connect(UDPWorker, SIGNAL(UDPThreadRequested()), broadcastThread, SLOT(start()));
     connect(broadcastThread, SIGNAL(started()), UDPWorker, SLOT(UDPReceiveThread()));
     connect(UDPWorker, SIGNAL(finished()), broadcastThread, SLOT(quit()), Qt::DirectConnection);
@@ -160,12 +177,21 @@ void MainWindow::tabSelected() {
 
     }
 
+    if(m_audioOutput != 0) {
+        m_generator->resetPosition();
+        m_audioOutput->reset();
+        m_generator->RemoveBufferedData();
+        m_generator = 0;
+        m_audioOutput = 0;
+    }
+
     switch(ui->tabWidget->currentIndex()) {
         case broadcasting:
-            //initializeUDPThread();
+            initializeUDPThread();
+            TCPWorker->sendSongRequest(QByteArray("1"));
             break;
         case fileTransfer:
-            TCPWorker->sendSongRequest(QByteArray("1"));
+            TCPWorker->sendSongRequest(QByteArray("3"));
             break;
         case mic:
             initializeMicrophoneConnection();
@@ -182,7 +208,7 @@ void MainWindow::generatePlaylist(const QByteArray& songs) {
     } else {
         return;
     }
-    QList<QByteArray> songList = songs.split(' ');
+    QList<QByteArray> songList = songs.split('@');
     foreach (const QString& song, songList) {
         playList->addItem(song);
     }

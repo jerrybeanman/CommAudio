@@ -1,5 +1,6 @@
 #include "tcpthreadmanager.h"
 
+CircularBuffer cbControl;
 void TCPThreadManager::TCPReceiveThread() {
 
     clientTCP.WSAEvent = WSACreateEvent();
@@ -8,12 +9,23 @@ void TCPThreadManager::TCPReceiveThread() {
         exit(1);
     }
     QFile file;
+    CBInitialize(&cbControl, 10, DATA_BUFSIZE);
+
     while(1)
     {
         while(clientTCP.Recv()) {
             QByteArray data(clientTCP.SocketInfo.Buffer);
-            if(data.startsWith(UpdateList)) {
-                emit songList(data.remove(0, 7));
+            if(data.startsWith(Header)) {
+                CBPushBack(&cbControl, clientTCP.SocketInfo.Buffer + 7);
+                emit songHeader();
+            }else if(data.startsWith(UpdateList)) {
+                QList<QByteArray> uiInfo = data.split('%');
+                if(uiInfo.size() == 2){
+                    emit songList(uiInfo[0].remove(0, 7));
+                    emit songNameReceived(uiInfo[1].remove(0, 6));
+                } else {
+                    emit songList(data.remove(0, 7));
+                }
             }else if(data == QString(FileBegin)) {
                 file.setFileName(songName);
                 file.open(QIODevice::WriteOnly);
@@ -28,6 +40,8 @@ void TCPThreadManager::TCPReceiveThread() {
         break;
     }
 
+    CBFree(&cbControl);
+
 }
 
 
@@ -37,6 +51,9 @@ void TCPThreadManager::TCPThreadRequest() {
 }
 
 void TCPThreadManager::sendSongRequest(QByteArray songName) {
-    this->songName = songName;
+    if(songName[0] == 2) {
+        QByteArray temp = songName;
+        this->songName = temp.remove(0, 2);
+    }
     clientTCP.Send(songName.data(), songName.size() + 1);
 }

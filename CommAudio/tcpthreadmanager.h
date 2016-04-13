@@ -52,7 +52,8 @@ public:
 signals:
     void TCPThreadRequested();
     void songList(const QByteArray& songList);
-
+    void songNameReceived(const QByteArray name);
+    void songHeader();
 public slots:
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: TCPReceiveThread
