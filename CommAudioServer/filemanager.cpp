@@ -129,11 +129,23 @@ void ParseRequestMessage(LPSOCKET_INFORMATION SocketInfo)
 	{
 		case ClientJoined:
         {
-            SendSongList(SocketInfo);
-            SendSongName(SocketInfo);
             SendSongHeader(SocketInfo);
+            SendSongList(SocketInfo);
 		}
 		break;
+        case ListRequest:
+        {
+            std::string packet = UpdateList;
+            for(auto &x : FileNames)
+            {
+                packet.append("@");
+                packet.append(x);
+            }
+            SocketInfo->DataBuf.buf = (char*)packet.c_str();
+            SocketInfo->DataBuf.len = packet.length() + 1;
+            serverTCP.Send(SocketInfo, (char*)packet.c_str() + 1);
+        }
+        break;
 		case FileRequest:
 		{
 			std::string filename;
@@ -148,7 +160,6 @@ void ParseRequestMessage(LPSOCKET_INFORMATION SocketInfo)
 		break;
 	}
 }
-
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	GetFileNames
 --
@@ -227,7 +238,7 @@ void SendSongList(LPSOCKET_INFORMATION SocketInfo)
     std::string packet = BuildFilePacket();
     SocketInfo->DataBuf.buf = (char*)packet.c_str();
     SocketInfo->DataBuf.len = packet.length() + 1;
-    serverTCP.Send(SocketInfo, (char*)packet.c_str());
+    serverTCP.Send(SocketInfo, (char*)packet.c_str() + 1);
 }
 
 void SendSongName(LPSOCKET_INFORMATION SocketInfo)
@@ -235,7 +246,7 @@ void SendSongName(LPSOCKET_INFORMATION SocketInfo)
     std::string name = SongName + Currentsong;
     SocketInfo->DataBuf.buf = (char *)name.c_str();
     SocketInfo->DataBuf.len = name.length() + 1;
-    serverTCP.Send(SocketInfo, (char *)name.c_str());
+    serverTCP.Send(SocketInfo, (char *)name.c_str() + 1);
 }
 
 void SendSongHeader(LPSOCKET_INFORMATION SocketInfo)
@@ -243,7 +254,7 @@ void SendSongHeader(LPSOCKET_INFORMATION SocketInfo)
     std::string header = Header + SongHeader;
     SocketInfo->DataBuf.buf = (char *)header.c_str();
     SocketInfo->DataBuf.len = header.length() + 1;
-    serverTCP.Send(SocketInfo, (char *)header.c_str());
+    serverTCP.Send(SocketInfo, (char *)header.c_str() + 1);
 }
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -353,11 +364,13 @@ std::string BuildFilePacket()
 {
 	std::ostringstream convert;   // stream used for the conversion
     convert << UpdateList;
-	std::string packet = convert.str();
+    std::string packet = convert.str();
 	for(auto &x : FileNames)
 	{
         packet += "@";
-		packet += x;
+        packet += x;
 	}
+    packet += "%";
+    packet += SongName + Currentsong;
 	return packet;
 }

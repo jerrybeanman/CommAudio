@@ -12,6 +12,7 @@ bool ClientTCP::InitializeSocket(short port, char *ip)
         std::cout << "ClientTCP WSASocket() failed with error " <<  WSAGetLastError() << std::endl;
         return FALSE;
     }
+
     LocalAddr.sin_family = AF_INET;
     LocalAddr.sin_port = htons(port);
 
