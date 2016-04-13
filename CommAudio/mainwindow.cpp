@@ -62,7 +62,7 @@ void MainWindow::on_connectButton_pressed()
     connect(tcpThread, SIGNAL(started()), TCPWorker, SLOT(TCPReceiveThread()));
     connect(TCPWorker, SIGNAL(finished()), tcpThread, SLOT(quit()), Qt::DirectConnection);
 
-   //TCPWorker->TCPThreadRequest();
+   // TCPWorker->TCPThreadRequest();
    // TCPWorker->sendSongRequest(QByteArray("1"));
 
 }
@@ -274,13 +274,14 @@ void MainWindow::play_voice()
     if(m_recorder == 0)
         m_recorder = new Recorder();
 
-    if(!ReceivingVoice || !recording)
+    if(!ReceivingVoice && !recording)
     {
         m_recorder = new Recorder();
     }
 
     if(!ReceivingVoice)
     {
+        qDebug() << "Hit";
         ReceivingVoice = true;
         prepare_audio_devices(m_recorder->fileFormat());
         m_voice_generator->start();
@@ -301,17 +302,11 @@ void MainWindow::play_voice()
 
 void MainWindow::on_recordButton_clicked()
 {
+
     if(!recording)
     {
         qDebug() << "recording starts.";
         m_recorder = new Recorder();
-        m_voice_generator = new RecordGenerator();
-
-        prepare_audio_devices(m_recorder->fileFormat());
-
-        //This allows you to hear yourself instead. Have to change a few things to get this to work.
-        //Talk to tyler if you need to record yourself.
-        //connect(m_recorder, SIGNAL(dataAvailable(int)), this, SLOT(handleVoiceDataAvailable(int)));
 
         m_recorder->start();
         recording = true;

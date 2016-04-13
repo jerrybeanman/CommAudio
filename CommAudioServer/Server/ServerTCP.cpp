@@ -30,6 +30,13 @@ bool ServerTCP::InitializeSocket(short port)
         return false;
     }
 
+
+    if (setsockopt(SocketInfo.Socket, IPPROTO_TCP, TCP_NODELAY, (const char *)&flags, sizeof(int)) < 0)
+    {
+        std::cout << "setsockopt() failed with error " << WSAGetLastError() << std::endl;
+        return FALSE;
+    }
+
     // Initialize address structure
     LocalAddr.sin_family = AF_INET;
     LocalAddr.sin_addr.s_addr = htonl(INADDR_ANY);

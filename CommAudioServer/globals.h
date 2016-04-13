@@ -6,7 +6,7 @@
 #define MUSIC_DIRECTORY      "../Music/"
 #define MAX_CLIENTS          10
 #define DATA_BUFSIZE         40000
-#define DEFAULT_PORT         7000
+#define DEFAULT_PORT         7050
 #define DEFAULT_PORT_TCP     8000
 
 #include <iostream>

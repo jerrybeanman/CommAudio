@@ -1,5 +1,5 @@
 #include "CircularBuffer.h"
-
+#include <iostream>
 
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	CBInitialize
@@ -48,6 +48,7 @@ void CBInitialize(CircularBuffer * CBuff, const size_t MaxElements, const size_t
 --------------------------------------------------------------------------------------------------------------------*/
 void CBFree(CircularBuffer * CBuff)
 {
+    std::cout << "CBFree " << std::endl;
     free(CBuff->buffer);
 }
 

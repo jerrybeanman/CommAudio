@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     recording = false;
     m_pos = 0;
     m_song_index = 0;
+    m_audioOutput = 0;
 
 
 
@@ -122,7 +123,13 @@ bool MainWindow::prepare_audio_devices(QAudioFormat format)
         return false;
     }
 
-    //delete m_audioOutput;
+    if(m_audioOutput != 0)
+    {
+        qDebug() << "prepare_audio_devices::delete m_audioOutput";
+        delete m_audioOutput;
+    }
+
+
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
     qDebug() << "Properly set the media";
     return true;
@@ -234,6 +241,7 @@ bool MainWindow::ready_next_song(bool previous)
 {
     if(fileExists)
     {
+        qDebug() << "ready_next_song>>delete_old_song";
         delete_old_song();
     }
 
@@ -343,7 +351,9 @@ bool MainWindow::delete_old_song()
         qDebug() << "Disposing of old song.";
 
         // Required, disconnects old signals and stops sending old data.
+        qDebug() << "delete_old_song::deleting m_file";
         delete m_file;
+        qDebug() << "delete_old_song::removeBufferedData";
         m_song_generator->RemoveBufferedData();
         fileLoaded = false;
         fileFinished = false;
@@ -360,7 +370,11 @@ void MainWindow::populate_songlist()
     {
         QListWidgetItem* temp = ui->listWidget_2->takeItem(0);
         if(temp != 0)
+        {
+            qDebug() << "populate_songlist::delete temp";
             delete temp;
+        }
+
     }
     ui->listWidget_2->addItems(m_music_files);
 
@@ -370,6 +384,7 @@ void MainWindow::populate_songlist()
 void MainWindow::get_all_songs()
 {
     int total = ui->listWidget_2->count();
+    qDebug() << "get_all_songs::FileNames cleared";
     FileNames.clear();
     for(int i = 0; i < total; i++)
     {
@@ -515,6 +530,7 @@ void MainWindow::handleVoiceDataAvailable(int len)
         m_voice_generator->AddMoreDataToBufferFromQByteArray(data, data.size());
     }
     play_voice();
+    std::cout << "handleVoiceDataAvailable() " << std::endl;
     free(buf);
 }
 

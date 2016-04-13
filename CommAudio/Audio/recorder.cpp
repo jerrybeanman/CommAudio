@@ -49,6 +49,7 @@ void Recorder::stop()
 {
     if(inProgress)
     {
+        qDebug() << "Recorder stopped";
         r_input->stop();
         delete r_input;
         inProgress = false;
