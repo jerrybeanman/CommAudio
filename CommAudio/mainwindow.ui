@@ -155,7 +155,7 @@
                 <item>
                  <widget class="QLabel" name="songName">
                   <property name="text">
-                   <string>TextLabel</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
