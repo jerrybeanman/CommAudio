@@ -25,6 +25,11 @@ void RecordGenerator::resume()
     open(QIODevice::ReadOnly);
 }
 
+void RecordGenerator::resetData()
+{
+    RemoveBufferedData((int)rg_max);
+}
+
 bool RecordGenerator::isPlaying()
 {
     return playing;
@@ -48,6 +53,10 @@ qint64 RecordGenerator::readData(char *data, qint64 maxlen)
         RemoveBufferedData(chunk);
 
     }
+
+    if(chunk == 0)
+        playing = false;
+
     return chunk;
 }
 
