@@ -109,12 +109,6 @@ void DataGenerator::stop()
     close();
 }
 
-void DataGenerator::resume()
-{
-    qDebug() << "DataGenerator resumed.";
-    open(QIODevice::ReadOnly);
-}
-
 void DataGenerator::resetPosition()
 {
     playing = false;

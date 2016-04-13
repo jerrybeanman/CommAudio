@@ -98,18 +98,15 @@ std::string ServerTCP::Accept(void)
 --
 -- NOTES: Broadcast a message to all connected clients in ClientList
 --------------------------------------------------------------------------------------------------------------------*/
-bool ServerTCP::Broadcast(char *message, LPDWORD lpNumberOfBytesSent)
+bool ServerTCP::Broadcast(char *message, DWORD lpNumberOfBytesSent)
 {
     Client tmpClient;
     for(const auto &pair : ClientList)
     {
         tmpClient = pair.second;
-        if(send(tmpClient.SocketInfo.Socket, message, DATA_BUFSIZE, 0) == -1)
-        {
-            std::cerr << "Broadcast() failed for player id: " << pair.first << std::endl;
-            std::cerr << "errno: " << WSAGetLastError() << std::endl;
-            return false;
-        }
+        tmpClient.SocketInfo.DataBuf.buf = message;
+        tmpClient.SocketInfo.DataBuf.len = lpNumberOfBytesSent;
+        this->Send(&tmpClient.SocketInfo, message);
     }
     return true;
 }

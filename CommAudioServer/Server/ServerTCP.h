@@ -60,7 +60,7 @@ class ServerTCP : public Server
             --
             -- NOTES: Broadcast a message to all connected clients in ClientList
             --------------------------------------------------------------------------------------------------------------------*/
-            bool Broadcast(char * message, LPDWORD lpNumberOfBytesSent);
+            bool Broadcast(char * message, DWORD lpNumberOfBytesSent);
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send

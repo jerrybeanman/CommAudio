@@ -12,6 +12,7 @@
 #include "Audio/wavfile.h"
 #include "globals.h"
 #include "soundmanager.h"
+#include "filemanager.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -380,7 +381,7 @@ void MainWindow::split_songs_from_string(std::string combinedString)
 void MainWindow::prepare_song_header()
 {
     qDebug() << "MainWindow::prepare_stream>>Sending Header.";
-    QByteArray temp_header = QByteArray::fromRawData(m_song_generator->getExternalReference()->data(), 44);
+    QByteArray temp_header = QByteArray::fromRawData(m_song_generator->getExternalReference()->data(), 500);
     SongHeader = temp_header.toStdString();
 
     m_stream_size = 0;
@@ -398,7 +399,15 @@ bool MainWindow::prepare_stream()
         connect(m_song_generator, SIGNAL(dataFinished()), this, SLOT(handleSongDataFinished()));
 
         Currentsong = m_music_files[m_song_index].toStdString();
+
         prepare_song_header();
+
+        std::string packet = SongName + Currentsong;
+        serverTCP.Broadcast((char *)packet.c_str(), packet.size() + 1);
+
+        packet.clear();
+        packet = SongHeader;
+        serverTCP.Broadcast((char *)packet.c_str(), packet.size() + 1);
 
         return true;
     }

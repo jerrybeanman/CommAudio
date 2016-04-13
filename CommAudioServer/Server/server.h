@@ -41,7 +41,7 @@ class Server
             --
             -- NOTES: Sends a message to all the connected clients
             --------------------------------------------------------------------------------------------------------------------*/
-            virtual bool Broadcast(char * message, LPDWORD lpNumberOfBtyesSent) = 0;
+            virtual bool Broadcast(char * message, DWORD lpNumberOfBtyesSent) = 0;
 
             /*------------------------------------------------------------------------------------------------------------------
             -- FUNCTION:	Send

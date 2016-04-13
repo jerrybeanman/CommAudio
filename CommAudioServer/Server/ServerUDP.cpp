@@ -99,11 +99,11 @@ bool ServerUDP::Broadcast(char *message)
 --
 -- NOTES: Sends a message to all the connected clients
 --------------------------------------------------------------------------------------------------------------------*/
-bool ServerUDP::Broadcast(char * message, LPDWORD lpNumberOfBytesSent)
+bool ServerUDP::Broadcast(char * message, DWORD lpNumberOfBytesSent)
 {
 
     SocketInfo.DataBuf.buf = message;
-    SocketInfo.DataBuf.len = *lpNumberOfBytesSent;
+    SocketInfo.DataBuf.len = lpNumberOfBytesSent;
 
     ZeroMemory(&SocketInfo.Overlapped, sizeof(WSAOVERLAPPED));
     SocketInfo.Overlapped.hEvent =  WSACreateEvent();

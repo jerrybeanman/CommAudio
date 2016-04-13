@@ -69,7 +69,7 @@ DWORD WINAPI BroadcastMusic(LPVOID lpParameter)
             }
 
             //Make extra sure that we don't send garbage data
-            if(song_stream_data != 0 && !serverUDP->Broadcast(*song_stream_data, &bytes_to_SEND))
+            if(song_stream_data != 0 && !serverUDP->Broadcast(*song_stream_data, bytes_to_SEND))
             {
                 return -1;
             }

@@ -5,6 +5,7 @@
 #include "Server/ServerTCP.h"
 #include "globals.h"
 
+extern ServerTCP serverTCP;
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	StartFileManager
 --

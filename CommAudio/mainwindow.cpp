@@ -238,6 +238,7 @@ void MainWindow::prepare_audio_devices(QAudioFormat format)
         return;
     }
 
+    std::cerr << "Changed m_audioOuput (prepare)\n";
     m_audioOutput = 0;
     m_audioOutput = new QAudioOutput(m_device, m_format, this);
 
@@ -280,16 +281,17 @@ void MainWindow::play_voice()
 
     if(!ReceivingVoice && !recording)
     {
+        std::cerr << "play_voice::new recorder\n";
         m_recorder = new Recorder();
+        prepare_audio_devices(m_recorder->fileFormat());
     }
 
     if(!ReceivingVoice)
     {
         qDebug() << "Hit";
         ReceivingVoice = true;
-        prepare_audio_devices(m_recorder->fileFormat());
-        m_voice_generator->start();
 
+        m_voice_generator->start();
         m_audioOutput->start(m_voice_generator);
         m_audioOutput->setVolume(qreal(100.0f/100.0f));
     }
@@ -313,6 +315,7 @@ void MainWindow::on_recordButton_clicked()
         m_recorder = new Recorder();
 
         m_recorder->start();
+
         recording = true;
     }
     else
@@ -396,11 +399,11 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
     {
         m_voice_generator = new RecordGenerator();
     }
-
-    std::cerr << "MainWindow::handleVoiceData>>count:" << cbMic.Count << std::endl;
+    std::cerr << "handleVoiceData>>count:" << cbMic.Count << std::endl;
     char* buf = (char*)malloc(DATA_BUFSIZE);
     if(cbMic.Count != 0)
     {
+
         CBPop(&cbMic, buf);
         //emit to TCP that this is available
 

@@ -20,9 +20,35 @@ public:
     DataGenerator(QObject *parent);
     ~DataGenerator();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Start
+    --
+    -- DATE:		March 9th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER: Tyler Trepanier
+    --
+    -- INTERFACE:	void start();
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: Opens the DataGenerator to allow for music streaming.
+    --------------------------------------------------------------------------------------------------------------------*/
     void start();
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Stop
+    --
+    -- DATE:		March 9th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Ruoqi Jia
+    --
+    -- INTERFACE:	void stop();
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: Stops the DataGenerator from music streaming
+    --------------------------------------------------------------------------------------------------------------------*/
     void stop();
-    void resume();
 
     qint64 readData(char *data, qint64 maxlen);
     qint64 readExternalData(char *data, qint64 maxlen);
