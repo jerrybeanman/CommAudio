@@ -1,5 +1,18 @@
 #include "ServerUDP.h"
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	InitializeSocket
+--
+-- DATE:		Febuary 28th, 2016          REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia, Scott Plummer	PROGRAMMER:	Ruoqi Jia, Scott Plummer
+--
+-- INTERFACE:	virtual int MulticastSettings(short port) = 0;
+--
+-- RETURNS: void
+--
+-- NOTES: Initialize server udp socket
+--------------------------------------------------------------------------------------------------------------------*/
 bool ServerUDP::InitializeSocket(short port)
 {
     int opt = 1;

@@ -2,6 +2,26 @@
 #define SERVERUDP_H
 #include "Server.h"
 
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE:	ServerUDP.h - Contains logical functionalities for TCP control channel connections
+--
+-- PROGRAM:		Comm Audio
+--
+-- FUNCTIONS:	bool InitializeSocket(short port);
+--              bool Broadcast(char * message);
+--              bool MulticastSettings(const char * name);
+--              bool Broadcast(char * message, DWORD lpNumberOfBytesSent);
+--              void Send(LPSOCKET_INFORMATION SocketInfo, char * message);
+--              void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
+--
+-- DATE:		April 12th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--------------------------------------------------------------------------------------------------------------------*/
 class ServerUDP : public Server
 {
 

@@ -354,7 +354,7 @@ void MainWindow::on_requestFile_clicked()
 
 void MainWindow::handleVoiceDataAvailable(const unsigned int len)
 {
-    if(m_voice_generator == 0)
+    if(m_voice_generator == nullptr)
     {
         m_voice_generator = new RecordGenerator();
     }
