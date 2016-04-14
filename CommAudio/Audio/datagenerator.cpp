@@ -52,7 +52,7 @@ qint64 DataGenerator::readData(char *data, qint64 len)
         dg_readpos = (dg_readpos + chunk) % dg_buffer.size();
 
         externChunk = chunk;
-        //progress = (int)((dg_readpos * 100) / ((qint64)dg_buffer.size()));
+        progress = (int)((dg_readpos * 100) / ((qint64)dg_buffer.size()));
 
         if(dg_readpos == ZERO)
         {

@@ -12,7 +12,7 @@ void MicrophoneThreadRecvManager::MicrohponeRecvThread()
     std::cout << "Whomp" << std::endl;
     while(clientUDP.Recv())
     {
-        //std::cerr << "Mic data received" << std::endl;
+        std::cerr << "Mic data received" << std::endl;
         CBPushBack(&cbMic, clientUDP.SocketInfo.Buffer);
         emit RecievedData(clientUDP.SocketInfo.BytesRECV);
     }

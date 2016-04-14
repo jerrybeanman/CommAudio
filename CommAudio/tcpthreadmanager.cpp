@@ -14,7 +14,7 @@ void TCPThreadManager::TCPReceiveThread() {
     while(1)
     {
         while(clientTCP.Recv()) {
-            QByteArray data(clientTCP.SocketInfo.Buffer);
+            QByteArray data = QByteArray::fromRawData(clientTCP.SocketInfo.Buffer, clientTCP.SocketInfo.BytesRECV);
             if(data.startsWith(Header)) {
                 CBPushBack(&cbControl, clientTCP.SocketInfo.Buffer + 7);
                 emit songHeader();
@@ -26,7 +26,9 @@ void TCPThreadManager::TCPReceiveThread() {
                 } else {
                     emit songList(data.remove(0, 7));
                 }
-            }else if(data == QString(FileBegin)) {
+            }else if(data.startsWith(SongName)) {
+                emit songNameReceived(data.remove(0, 6));
+            } else if(data == QString(FileBegin)) {
                 file.setFileName(songName);
                 file.open(QIODevice::WriteOnly);
             }else if(data.contains(FileEnd)) {

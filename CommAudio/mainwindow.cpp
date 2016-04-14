@@ -162,6 +162,7 @@ void MainWindow::tabSelected() {
     ui->serverPlayList->clear();
     ui->serverSongList->clear();
     ui->peerIP->clear();
+    ui->songName->clear();
     if(UDPWorker != nullptr) {
         UDPWorker->closeSocket();
         broadcastThread->wait();
@@ -189,6 +190,15 @@ void MainWindow::tabSelected() {
         m_audioOutput = 0;
     }
 
+    if(recording) {
+        m_recorder->stop();
+        delete(m_recorder);
+        delete(m_voice_generator);
+        m_recorder = nullptr;
+        m_voice_generator = nullptr;
+        recording = false;
+    }
+
     switch(ui->tabWidget->currentIndex()) {
         case broadcasting:
             initializeUDPThread();
@@ -198,7 +208,6 @@ void MainWindow::tabSelected() {
             TCPWorker->sendSongRequest(QByteArray("3"));
             break;
         case mic:
-            ui->recordButton->setEnabled(false);
             break;
     }
 }
@@ -216,15 +225,6 @@ void MainWindow::generatePlaylist(const QByteArray& songs) {
     foreach (const QString& song, songList) {
         playList->addItem(song);
     }
-}
-
-void MainWindow::updateFileProgress(const int progress) {
-//    if(ui->tabWidget->currentIndex() == 0) {
-//        ui->songProgress->setValue(progress);
-//    } else if(ui->tabWidget->currentIndex() == 1) {
-//        ui->fileProgress->setValue(progress);
-//    }
-    Q_UNUSED(progress)
 }
 
 void MainWindow::prepare_audio_devices(QAudioFormat format)
@@ -306,46 +306,6 @@ void MainWindow::play_voice()
     }
 }
 
-void MainWindow::on_recordButton_clicked()
-{
-
-    if(!recording)
-    {
-        qDebug() << "recording starts.";
-        m_recorder = new Recorder();
-
-        m_recorder->start();
-
-        recording = true;
-    }
-    else
-    {
-        /*
-         * TODO:
-         * When button is clicked, turn recording on and off. This will continously "play"
-         * the recording until it is clicked off. There will probably be an issue where
-         * it will record itself but that's fine.
-         */
-        m_recorder->stop();
-        recording = false;
-    }
-}
-
-/*void MainWindow::on_playRecordingButton_clicked()
-{
-    m_recorder->stop();
-
-    QByteArray array = m_recorder->readAll();
-    int size = m_recorder->bytesWritten();
-
-    prepare_audio_devices(m_recorder->fileFormat());
-
-    m_generator = new DataGenerator();
-
-    m_generator->AddMoreDataToBufferFromQByteArray(array, size);
-
-    play_audio();
-} */
 
 void MainWindow::on_progressBar_actionTriggered(int progress)
 {
@@ -370,8 +330,6 @@ void MainWindow::on_play_clicked()
     fileExists = true;
     QFileInfo fileInfo(m_file->fileName());
     QString filename(fileInfo.fileName());
-
-    updateFileProgress(0);
 
     qDebug() << "Play button clicked.";
     if(!fileLoaded)
@@ -419,7 +377,13 @@ void MainWindow::handleVoiceDataAvailable(const unsigned int len)
 void MainWindow::on_peerConnect_clicked()
 {
     peerIP = ui->peerIP->text().toLocal8Bit();
-    ui->recordButton->setEnabled(true);
 
     initializeMicrophoneConnection();
+
+    qDebug() << "recording starts.";
+    m_recorder = new Recorder();
+
+    m_recorder->start();
+
+    recording = true;
 }

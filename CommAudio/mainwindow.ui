@@ -204,13 +204,6 @@
                 </item>
                </layout>
               </item>
-              <item>
-               <widget class="QProgressBar" name="songProgress">
-                <property name="value">
-                 <number>24</number>
-                </property>
-               </widget>
-              </item>
              </layout>
             </item>
            </layout>
@@ -341,13 +334,6 @@
                </widget>
               </item>
              </layout>
-            </item>
-            <item>
-             <widget class="QPushButton" name="recordButton">
-              <property name="text">
-               <string>Record Audio</string>
-              </property>
-             </widget>
             </item>
            </layout>
           </widget>

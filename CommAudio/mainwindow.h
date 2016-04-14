@@ -100,31 +100,7 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void generatePlaylist(const QByteArray& songs);
 
-    /*------------------------------------------------------------------------------------------------------------------
-    -- FUNCTION: updateFileProgress
-    --
-    -- DATE: March 05, 2015
-    --
-    -- REVISIONS: (Date and Description)
-    --
-    -- DESIGNER: Scott Plummer
-    --
-    -- PROGRAMMER: Scott Plummer
-    --
-    -- INTERFACE: void updateFileProgress(const int progress)
-    --                      progress - the progress to update the progress bar with
-    --                                  this is a number between 0 and 100
-    --
-    -- RETURNS: void.
-    --
-    -- NOTES:
-    -- Displays a dialog for the user to select a file
-    ----------------------------------------------------------------------------------------------------------------------*/
-    void updateFileProgress(const int progress);
-
 private slots:
-
-    void on_recordButton_clicked();
 
     void on_progressBar_actionTriggered(int action);
 
@@ -344,7 +320,7 @@ private:
     DataGenerator*          m_generator;
     RecordGenerator*        m_voice_generator;
     char*                   data;
-    bool                    recording;
+    bool                    recording = false;
     bool                    fileExists;
     bool                    fileLoaded;
     bool                    ReceivingVoice;

@@ -34,7 +34,7 @@ void Recorder::start()
 
     if(!r_inputInfo.isFormatSupported(r_format))
     {
-        qDebug() <<"Default format not supported, try to use nearest format";
+        qDebug() <<"Recorder::Default format not supported, try to use nearest format";
         r_format = r_inputInfo.nearestFormat(r_format);
     }
 
@@ -67,7 +67,7 @@ qint64 Recorder::writeData(const char *data, qint64 len)
         memcpy(r_buffer.data() + r_bytes_AVAILABLE, data, chunk);
 
         qDebug() << "Logic:" << r_bytes_AVAILABLE + chunk;
-        qDebug() << "len - chunk:" << len-chunk;
+        //qDebug() << "len - chunk:" << len-chunk;
 
         CBPushBack(&cb_voice_data, r_buffer.data());
         emit dataAvailable(DATA_BUFSIZE);
