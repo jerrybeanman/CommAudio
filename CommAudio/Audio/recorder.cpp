@@ -34,7 +34,6 @@ void Recorder::start()
 
     if(!r_inputInfo.isFormatSupported(r_format))
     {
-        qDebug() <<"Recorder::Default format not supported, try to use nearest format";
         r_format = r_inputInfo.nearestFormat(r_format);
     }
 
@@ -49,7 +48,6 @@ void Recorder::stop()
 {
     if(inProgress)
     {
-        qDebug() << "Recorder stopped";
         r_input->stop();
         delete r_input;
         inProgress = false;
@@ -65,9 +63,6 @@ qint64 Recorder::writeData(const char *data, qint64 len)
         chunk = DATA_BUFSIZE - r_bytes_AVAILABLE;
 
         memcpy(r_buffer.data() + r_bytes_AVAILABLE, data, chunk);
-
-        qDebug() << "Logic:" << r_bytes_AVAILABLE + chunk;
-        //qDebug() << "len - chunk:" << len-chunk;
 
         CBPushBack(&cb_voice_data, r_buffer.data());
         emit dataAvailable(DATA_BUFSIZE);
@@ -87,9 +82,7 @@ qint64 Recorder::writeData(const char *data, qint64 len)
 
 qint64 Recorder::readData(char *data, qint64 maxlen)
 {
-    //qDebug() << "Recorder::readData>>reading";
     qint64 chunk = 0;
-    //chunk = r_buffer.readData(data, maxlen);
     return chunk;
 }
 
@@ -100,7 +93,6 @@ int Recorder::bytesWritten()
 
 void Recorder::notified()
 {
-    qDebug() << "Notified";
     r_bytes_AVAILABLE = 0;
     if(audio_state == QAudio::ActiveState)
     {
@@ -118,13 +110,11 @@ void Recorder::notified()
 
 void Recorder::handleAudioInputState(QAudio::State state)
 {
-    //qDebug() << "Audio State:" << state;
 
     audio_state = state;
 
     if(state == QAudio::StoppedState)
     {
-        qDebug() << "Error State:" << r_input->error();
 
         if(r_input->error() != QAudio::NoError)
         {

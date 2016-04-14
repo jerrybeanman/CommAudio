@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_device = QAudioDeviceInfo::defaultOutputDevice();
     fileExists = false;
     fileLoaded = false;
+    ui->volumeSlider->hide();
+    ui->volumeLabel->hide();
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected()));
     volume = 100;
 
@@ -43,7 +45,8 @@ void MainWindow::on_connectButton_pressed()
     ui->serverIPAddr->clear();
     ui->stackedWidget->setCurrentIndex(1);
     ui->volumeSlider->setSliderPosition(volume);
-
+    ui->volumeLabel->show();
+    ui->volumeSlider->show();
     tcpThread = new QThread();
 
     TCPWorker = new TCPThreadManager(serverIP);
@@ -386,13 +389,12 @@ void MainWindow::on_peerConnect_clicked()
     recording = true;
 }
 
-void MainWindow::on_volumeSlider_sliderMoved(int position)
+void MainWindow::on_volumeSlider_valueChanged(int value)
 {
-    volume = position;
-    //qDebug() << "Howdy";
+    volume = value;
 
     if(m_audioOutput != nullptr)
     {
-        m_audioOutput->setVolume(qreal(((float)position)/100.0f));
+        m_audioOutput->setVolume(qreal(((float)value)/100.0f));
     }
 }

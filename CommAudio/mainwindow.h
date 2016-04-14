@@ -208,7 +208,7 @@ private slots:
 
     void on_peerConnect_clicked();
 
-    void on_volumeSlider_sliderMoved(int position);
+    void on_volumeSlider_valueChanged(int value);
 
 private:
     /*------------------------------------------------------------------------------------------------------------------

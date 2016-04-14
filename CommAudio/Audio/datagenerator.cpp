@@ -21,13 +21,11 @@ void DataGenerator::start()
 
 void DataGenerator::stop()
 {
-    qDebug() << "DataGenerator stopped.";
     close();
 }
 
 void DataGenerator::resume()
 {
-    qDebug() << "DataGenerator resumed.";
     open(QIODevice::ReadOnly);
 }
 
@@ -198,10 +196,8 @@ QAudioFormat DataGenerator::readHeader(char* data)
         format.setSampleSize(qFromLittleEndian<quint16>(header.wave.bitsPerSample));
         format.setSampleType(bps == 8 ? QAudioFormat::UnSignedInt : QAudioFormat::SignedInt);
 
-        qDebug() << "Successfully read the file header";
 
         return format;
     }
-    qDebug() << "READING THE HEADER INSIDE OF THE DATAGENERATOR SCREWED UP";
     return format;
 }
