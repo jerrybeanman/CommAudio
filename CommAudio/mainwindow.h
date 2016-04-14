@@ -320,7 +320,7 @@ private:
     MicrophoneThreadManager* microphoneWorker = nullptr;
 
     DataGenerator*          m_generator;
-    RecordGenerator*        m_voice_generator;
+    RecordGenerator*        m_voice_generator = nullptr;
     char*                   data;
     bool                    recording = false;
     bool                    fileExists;

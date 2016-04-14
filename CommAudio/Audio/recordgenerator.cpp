@@ -5,6 +5,8 @@ RecordGenerator::RecordGenerator()
     rg_readpos = 0;
     rg_max = 0;
     playing = false;
+    rg_buffer.clear();
+    rg_buffer.resize(0);
 }
 
 void RecordGenerator::start()
