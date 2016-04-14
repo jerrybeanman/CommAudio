@@ -208,6 +208,8 @@ private slots:
 
     void on_peerConnect_clicked();
 
+    void on_volumeSlider_sliderMoved(int position);
+
 private:
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: getServerAddress
@@ -325,7 +327,7 @@ private:
     bool                    fileLoaded;
     bool                    ReceivingVoice;
     bool                    headerReceived;
-
+    int                     volume;
     enum tabs {broadcasting, fileTransfer, mic};
 };
 

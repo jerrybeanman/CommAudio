@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     fileExists = false;
     fileLoaded = false;
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected()));
-
+    volume = 100;
 
 }
 
@@ -42,7 +42,7 @@ void MainWindow::on_connectButton_pressed()
     serverIP = getServerAddress();
     ui->serverIPAddr->clear();
     ui->stackedWidget->setCurrentIndex(1);
-
+    ui->volumeSlider->setSliderPosition(volume);
 
     tcpThread = new QThread();
 
@@ -112,7 +112,7 @@ void MainWindow::addSongHeader() {
 }
 
 void MainWindow::setSong(const QByteArray name) {
-    ui->songName->setText(QString(name));
+    ui->songName->setText(QString(name).prepend("Song Name: "));
 }
 
 void MainWindow::initializeMicrophoneConnection()
@@ -270,7 +270,8 @@ void MainWindow::play_audio()
         m_generator->start();
 
         m_audioOutput->start(m_generator);
-        m_audioOutput->setVolume(qreal(100.0f/100.0f));
+
+        m_audioOutput->setVolume(qreal(volume/100.0f));
     }
 }
 
@@ -290,7 +291,7 @@ void MainWindow::play_voice()
 
         m_voice_generator->start();
         m_audioOutput->start(m_voice_generator);
-        m_audioOutput->setVolume(qreal(100.0f/100.0f));
+        m_audioOutput->setVolume(qreal(volume/100.0f));
     }
     else
     {
@@ -383,4 +384,15 @@ void MainWindow::on_peerConnect_clicked()
     m_recorder->start();
 
     recording = true;
+}
+
+void MainWindow::on_volumeSlider_sliderMoved(int position)
+{
+    volume = position;
+    //qDebug() << "Howdy";
+
+    if(m_audioOutput != nullptr)
+    {
+        m_audioOutput->setVolume(qreal(((float)position)/100.0f));
+    }
 }
