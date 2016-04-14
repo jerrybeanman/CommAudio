@@ -400,11 +400,11 @@ private:
     QBuffer*                mediaStream;
     QAudioDecoder*          m_decoder;
     QAudioFormat            m_format;
-    QAudioOutput*           m_audioOutput = 0;
+    QAudioOutput*           m_audioOutput = nullptr;
     QAudioDeviceInfo        m_device;
     QSlider*                m_volumeSlider;
     WavFile*                m_file;
-    Recorder*               m_recorder;
+    Recorder*               m_recorder = nullptr;
     QThread*                broadcastThread;
     QThread*                tcpThread;
     QThread*                microphoneThread;
@@ -415,7 +415,7 @@ private:
     MicrophoneThreadRecvManager* microphoneRecvWorker;
     MicrophoneThreadManager* microphoneWorker = nullptr;
 
-    DataGenerator*          m_generator;
+    DataGenerator*          m_generator = nullptr;
     RecordGenerator*        m_voice_generator = nullptr;
     char*                   data;
     bool                    recording = false;

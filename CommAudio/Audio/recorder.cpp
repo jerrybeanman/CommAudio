@@ -19,7 +19,7 @@ Recorder::Recorder()
 
 Recorder::~Recorder()
 {
-
+    stop();
 }
 
 const QAudioFormat &Recorder::fileFormat() const
@@ -46,10 +46,14 @@ void Recorder::start()
 
 void Recorder::stop()
 {
-    if(inProgress)
+    if(r_input != nullptr)
     {
         r_input->stop();
         delete r_input;
+    }
+
+    if(inProgress)
+    {
         inProgress = false;
     }
 }

@@ -178,7 +178,8 @@ void MainWindow::tabSelected() {
     }
 
     if(microphoneWorker != nullptr) {
-        microphoneWorker->closeSocket();
+
+         microphoneWorker->closeSocket();
         microphoneRecvWorker->closeSocket();
         microphoneRecvThread->wait();
         microphoneThread->wait();
@@ -203,13 +204,25 @@ void MainWindow::tabSelected() {
         m_generator = nullptr;
     }
 
-    if(recording) {
+    if(recording)
+    {
         m_recorder->stop();
-        delete(m_recorder);
-        delete(m_voice_generator);
-        m_recorder = nullptr;
-        m_voice_generator = nullptr;
+        m_voice_generator->stop();
         recording = false;
+        ReceivingVoice = false;
+    }
+
+    if(m_recorder != nullptr)
+    {
+        delete(m_recorder);
+        m_recorder = nullptr;
+    }
+
+    if(m_voice_generator != nullptr)
+    {
+        m_voice_generator->stop();
+        delete(m_voice_generator);
+        m_voice_generator = nullptr;
     }
     test.unlock();
     switch(ui->tabWidget->currentIndex()) {
@@ -290,7 +303,7 @@ void MainWindow::play_audio()
 
 void MainWindow::play_voice()
 {
-    if(m_recorder == 0)
+    if(m_recorder == nullptr)
         m_recorder = new Recorder();
 
     if(!ReceivingVoice)
