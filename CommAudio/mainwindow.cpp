@@ -279,17 +279,14 @@ void MainWindow::play_voice()
     if(m_recorder == 0)
         m_recorder = new Recorder();
 
-    if(!ReceivingVoice && !recording)
-    {
-        std::cerr << "play_voice::new recorder\n";
-        m_recorder = new Recorder();
-        prepare_audio_devices(m_recorder->fileFormat());
-    }
-
     if(!ReceivingVoice)
     {
         qDebug() << "Hit";
         ReceivingVoice = true;
+
+        std::cerr << "play_voice::new recorder\n";
+        m_recorder = new Recorder();
+        prepare_audio_devices(m_recorder->fileFormat());
 
         m_voice_generator->start();
         m_audioOutput->start(m_voice_generator);
