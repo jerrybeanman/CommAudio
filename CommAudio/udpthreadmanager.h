@@ -1,3 +1,23 @@
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE: UDPThreadManager.h - the thread for the udp connection
+--
+-- PROGRAM: commAudio
+--
+-- FUNCTIONS:
+--  void UDPThreadRequest();
+--  void closeSocket();
+--  void UDPReceiveThread();
+-- DATE: April 13, 2016
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Scott Plummer
+--
+-- PROGRAMMER: Scott Plummer
+--
+-- NOTES:
+-- The UDP backend of the program. The udp handles the song data multicasted out from the server.
+----------------------------------------------------------------------------------------------------------------------*/
 #ifndef THREADMANAGER_H
 #define THREADMANAGER_H
 

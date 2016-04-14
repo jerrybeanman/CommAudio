@@ -1,17 +1,30 @@
 #include "MicrophoneThreadManager.h"
 #include <QDebug>
 
-
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	MicrohponeSendThread
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	void MicrophoneThreadManager::MicrohponeSendThread()
+--
+-- RETURNS: void
+--
+-- NOTES: main logic for microhpone thread to send audio data
+--------------------------------------------------------------------------------------------------------------------*/
 void MicrophoneThreadManager::MicrohponeSendThread()
 {
     QByteArray temp;
 
-    // TODO:: Grab IP from GUI
     if(!clientUDP.InitializeSendingSocket(ipAddr.data(), MIC_PORT))
         return;
 
-    std::cerr << "Stomp" << std::endl;
-    std::cout << "Running:" << running << " count:" << cb_voice_data.Count << std::endl;
     while(running)
     {
         if(cb_voice_data.Count > 0)
@@ -26,18 +39,50 @@ void MicrophoneThreadManager::MicrohponeSendThread()
             std::cerr << "Mic data sent" << std::endl;
             free(voicedata);
         }
-        // TODO::Implement read from microhpone and assign it into voicedata
     }
-
-    qDebug() << "exiting mic send thread";
 }
 
-void MicrophoneThreadManager::closeSocket() {
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	closeSocket
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	void MicrophoneThreadManager::closeSocket()
+--
+-- RETURNS: void
+--
+-- NOTES: close socket for microphone
+--------------------------------------------------------------------------------------------------------------------*/
+void MicrophoneThreadManager::closeSocket()
+{
     running = false;
     clientUDP.Close();
     this->thread()->exit();
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	MicrophoneThreadRequest
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	void MicrophoneThreadManager::closeSocket()
+--
+-- RETURNS: void
+--
+-- NOTES: slot that emites a signal
+--------------------------------------------------------------------------------------------------------------------*/
 void MicrophoneThreadManager::MicrophoneThreadRequest() {
     emit MicrophoneThreadRequested();
 }

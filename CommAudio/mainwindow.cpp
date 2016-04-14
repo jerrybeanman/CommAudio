@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_device = QAudioDeviceInfo::defaultOutputDevice();
     fileExists = false;
     fileLoaded = false;
+    ui->volumeSlider->hide();
+    ui->volumeLabel->hide();
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected()));
     volume = 100;
 
@@ -43,7 +45,8 @@ void MainWindow::on_connectButton_pressed()
     ui->serverIPAddr->clear();
     ui->stackedWidget->setCurrentIndex(1);
     ui->volumeSlider->setSliderPosition(volume);
-
+    ui->volumeLabel->show();
+    ui->volumeSlider->show();
     tcpThread = new QThread();
 
     TCPWorker = new TCPThreadManager(serverIP);
@@ -72,6 +75,7 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
     if(!headerReceived) {
         return;
     }
+    test.lock();
     if((count >= 0) && !(m_generator->isPlaying())) {
         m_generator->RestartPlaying();
         play_audio();
@@ -85,6 +89,7 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
         count++;
         delete temp;
     }
+    test.unlock();
 }
 
 
@@ -159,6 +164,7 @@ void MainWindow::initializeUDPThread() {
 
 void MainWindow::tabSelected() {
     qDebug() << "Tab changed to: " << ui->tabWidget->currentIndex();
+    test.lock();
     ui->serverPlayList->clear();
     ui->serverSongList->clear();
     ui->peerIP->clear();
@@ -172,7 +178,8 @@ void MainWindow::tabSelected() {
     }
 
     if(microphoneWorker != nullptr) {
-        microphoneWorker->closeSocket();
+
+         microphoneWorker->closeSocket();
         microphoneRecvWorker->closeSocket();
         microphoneRecvThread->wait();
         microphoneThread->wait();
@@ -182,23 +189,35 @@ void MainWindow::tabSelected() {
 
     }
 
-    if(m_audioOutput != 0) {
-        m_generator->resetPosition();
+    if(m_audioOutput != nullptr)
+    {
         m_audioOutput->reset();
+        delete(m_audioOutput);
+        m_audioOutput = nullptr;
+    }
+
+    if(m_generator != nullptr)
+    {
+        m_generator->resetPosition();
         m_generator->RemoveBufferedData();
-        m_generator = 0;
-        m_audioOutput = 0;
+        delete(m_generator);
+        m_generator = nullptr;
     }
 
-    if(recording) {
+    if(recording)
+    {
         m_recorder->stop();
-        delete(m_recorder);
-        delete(m_voice_generator);
-        m_recorder = nullptr;
-        m_voice_generator = nullptr;
+        m_voice_generator->stop();
         recording = false;
+        ReceivingVoice = false;
     }
 
+    if(m_voice_generator != nullptr)
+    {
+        delete(m_voice_generator);
+        m_voice_generator = nullptr;
+    }
+    test.unlock();
     switch(ui->tabWidget->currentIndex()) {
         case broadcasting:
             initializeUDPThread();
@@ -277,7 +296,7 @@ void MainWindow::play_audio()
 
 void MainWindow::play_voice()
 {
-    if(m_recorder == 0)
+    if(m_recorder == nullptr)
         m_recorder = new Recorder();
 
     if(!ReceivingVoice)
@@ -286,7 +305,6 @@ void MainWindow::play_voice()
         ReceivingVoice = true;
 
         std::cerr << "play_voice::new recorder\n";
-        m_recorder = new Recorder();
         prepare_audio_devices(m_recorder->fileFormat());
 
         m_voice_generator->start();
@@ -351,7 +369,7 @@ void MainWindow::on_requestFile_clicked()
 
 void MainWindow::handleVoiceDataAvailable(const unsigned int len)
 {
-    if(m_voice_generator == 0)
+    if(m_voice_generator == nullptr)
     {
         m_voice_generator = new RecordGenerator();
     }
@@ -386,13 +404,12 @@ void MainWindow::on_peerConnect_clicked()
     recording = true;
 }
 
-void MainWindow::on_volumeSlider_sliderMoved(int position)
+void MainWindow::on_volumeSlider_valueChanged(int value)
 {
-    volume = position;
-    //qDebug() << "Howdy";
+    volume = value;
 
     if(m_audioOutput != nullptr)
     {
-        m_audioOutput->setVolume(qreal(((float)position)/100.0f));
+        m_audioOutput->setVolume(qreal(((float)value)/100.0f));
     }
 }

@@ -3,6 +3,25 @@
 #include <map>
 #include "Server.h"
 
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE:	ServerTCP.h - Contains logical functionalities for TCP control channel connections
+--
+-- PROGRAM:		Comm Audio
+--
+-- FUNCTIONS:	bool InitializeSocket(short port);
+--              std::string Accept(void);
+--              bool Broadcast(char * message, DWORD lpNumberOfBytesSent);
+--              void Send(LPSOCKET_INFORMATION sockinfo, char * message);
+--              void RoutineManager(DWORD Error, DWORD BytesTransferred, LPWSAOVERLAPPED Overlapped, DWORD InFlags);
+--              void AssignID(Client client);
+-- DATE:		April 12th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--------------------------------------------------------------------------------------------------------------------*/
 struct Client
 {
       SOCKET_INFORMATION SocketInfo;

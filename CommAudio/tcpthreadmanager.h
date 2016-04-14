@@ -1,3 +1,24 @@
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE: TCPThreadManager.h - the thread for the tcp connection
+--
+-- PROGRAM: commAudio
+--
+-- FUNCTIONS:
+--  TCPThreadManager(QByteArray& ip) : ipAddr(ip){}
+--  void TCPThreadRequest();
+--  void sendSongRequest(QByteArray songName);
+--  void TCPReceiveThread();
+-- DATE: April 13, 2016
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Scott Plummer
+--
+-- PROGRAMMER: Scott Plummer
+--
+-- NOTES:
+-- The TCP backend of the program. The tcp handles the file transfer and control data sent between the server and the client.
+----------------------------------------------------------------------------------------------------------------------*/
 #ifndef TCPTHREADMANAGER_H
 #define TCPTHREADMANAGER_H
 

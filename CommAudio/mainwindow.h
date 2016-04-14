@@ -1,3 +1,44 @@
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE: mainwindow.h - GUI file used to communicate with the back end and front end
+--
+-- PROGRAM: commAudio
+--
+-- FUNCTIONS:
+-- explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+    void on_connectButton_pressed();
+    void tabSelected();
+    void generatePlaylist(const QByteArray& songs);
+    void on_progressBar_actionTriggered(int action);
+    void addToSongBuffer(const unsigned int size);
+    void addSongHeader();
+    void setSong(const QByteArray name);
+    void on_play_clicked();
+    void on_requestFile_clicked();
+    void handleVoiceDataAvailable(const unsigned int);
+    void on_peerConnect_clicked();
+    void on_volumeSlider_valueChanged(int value);
+    QByteArray getServerAddress();
+    void prepare_audio_devices(QAudioFormat format);
+    void initializeUDPThread();
+    void initializeMicrophoneConnection()
+    void init_file();
+    void play_audio();
+    void play_voice();
+--
+--
+-- DATE: April 13, 2016
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Scott Plummer
+--
+-- PROGRAMMER: Scott Plummer, Tyler Trepanier-Bracken, Vivek Kalia
+--
+-- NOTES:
+-- The client side of the comm audio project. The client side receives music from the multicasted server, it can request
+-- a file and play it locally, and connect to a peer and
+----------------------------------------------------------------------------------------------------------------------*/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -13,6 +54,7 @@
 #include <QAudioDeviceInfo>
 #include <QSlider>
 #include <atomic>
+#include <QMutex>
 #include <QThread>
 #include "Audio/recorder.h"
 #include "Audio/datagenerator.h"
@@ -144,6 +186,24 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void addSongHeader();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: setSong
+    --
+    -- DATE: April 13, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void setSong(const QByteArray name)
+    --                          name: Name of the current song
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    ----------------------------------------------------------------------------------------------------------------------*/
     void setSong(const QByteArray name);
 
     /*------------------------------------------------------------------------------------------------------------------
@@ -206,9 +266,27 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void handleVoiceDataAvailable(const unsigned int);
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: on_peerConnect_clicked
+    --
+    -- DATE: March 05, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void on_peerConnect_clicked();
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    -- Starts the microphone communications
+    ----------------------------------------------------------------------------------------------------------------------*/
     void on_peerConnect_clicked();
 
-    void on_volumeSlider_sliderMoved(int position);
+    void on_volumeSlider_valueChanged(int value);
 
 private:
     /*------------------------------------------------------------------------------------------------------------------
@@ -270,6 +348,23 @@ private:
     ----------------------------------------------------------------------------------------------------------------------*/
     void initializeUDPThread();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: initializeMicrophoneConnection
+    --
+    -- DATE: March 08, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void initializeMicrophoneConnection()
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: connects the micorphone signals to slots
+    ----------------------------------------------------------------------------------------------------------------------*/
     void initializeMicrophoneConnection();
 
     void init_file();
@@ -299,16 +394,17 @@ private:
     Ui::MainWindow*         ui;
     QByteArray              serverIP;
     QByteArray              peerIP;
+    QMutex                  test;
     QMediaPlayer*           player;
     QByteArray              m_buffer;
     QBuffer*                mediaStream;
     QAudioDecoder*          m_decoder;
     QAudioFormat            m_format;
-    QAudioOutput*           m_audioOutput = 0;
+    QAudioOutput*           m_audioOutput = nullptr;
     QAudioDeviceInfo        m_device;
     QSlider*                m_volumeSlider;
     WavFile*                m_file;
-    Recorder*               m_recorder;
+    Recorder*               m_recorder = nullptr;
     QThread*                broadcastThread;
     QThread*                tcpThread;
     QThread*                microphoneThread;
@@ -319,8 +415,8 @@ private:
     MicrophoneThreadRecvManager* microphoneRecvWorker;
     MicrophoneThreadManager* microphoneWorker = nullptr;
 
-    DataGenerator*          m_generator;
-    RecordGenerator*        m_voice_generator;
+    DataGenerator*          m_generator = nullptr;
+    RecordGenerator*        m_voice_generator = nullptr;
     char*                   data;
     bool                    recording = false;
     bool                    fileExists;

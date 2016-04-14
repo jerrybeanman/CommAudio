@@ -233,6 +233,23 @@ bool OpenFile(std::string name)
 	return true;
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	SendSongList
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	void SendSongList(LPSOCKET_INFORMATION SocketInfo)
+--
+-- RETURNS: void
+--
+-- NOTES: Send the list of songs curently stored on the server
+--------------------------------------------------------------------------------------------------------------------*/
 void SendSongList(LPSOCKET_INFORMATION SocketInfo)
 {
     std::string packet = BuildFilePacket();
@@ -241,6 +258,23 @@ void SendSongList(LPSOCKET_INFORMATION SocketInfo)
     serverTCP.Send(SocketInfo, (char*)packet.c_str() + 1);
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	SendSongName
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	void SendSongName(LPSOCKET_INFORMATION SocketInfo)
+--
+-- RETURNS: void
+--
+-- NOTES: Send the name of the song currently streaming
+--------------------------------------------------------------------------------------------------------------------*/
 void SendSongName(LPSOCKET_INFORMATION SocketInfo)
 {
     std::string name = SongName + Currentsong;
@@ -249,6 +283,23 @@ void SendSongName(LPSOCKET_INFORMATION SocketInfo)
     serverTCP.Send(SocketInfo, (char *)name.c_str() + 1);
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	SendSongName
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	void SendSongName(LPSOCKET_INFORMATION SocketInfo)
+--
+-- RETURNS: void
+--
+-- NOTES: Send the name of the song currently streaming
+--------------------------------------------------------------------------------------------------------------------*/
 void SendSongHeader(LPSOCKET_INFORMATION SocketInfo)
 {
     std::string header = Header + SongHeader;

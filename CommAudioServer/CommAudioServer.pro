@@ -49,6 +49,5 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 CONFIG   += c++11
-CONFIG   += debug
 
 RESOURCES += qdarkstyle/style.qrc
