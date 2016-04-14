@@ -4,10 +4,27 @@
 -- PROGRAM: commAudio
 --
 -- FUNCTIONS:
--- void daemonize (void)
--- int initialize_inotify_watch (int fd, char pathname[MAXPATHLEN])
--- int ProcessFiles (char pathname[MAXPATHLEN])
--- unsigned int GetProcessID (char *process)
+-- explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+    void on_connectButton_pressed();
+    void tabSelected();
+    void generatePlaylist(const QByteArray& songs);
+    void on_progressBar_actionTriggered(int action);
+    void addToSongBuffer(const unsigned int size);
+    void addSongHeader();
+    void setSong(const QByteArray name);
+    void on_play_clicked();
+    void on_requestFile_clicked();
+    void handleVoiceDataAvailable(const unsigned int);
+    void on_peerConnect_clicked();
+    void on_volumeSlider_valueChanged(int value);
+    QByteArray getServerAddress();
+    void prepare_audio_devices(QAudioFormat format);
+    void initializeUDPThread();
+    void initializeMicrophoneConnection()
+    void init_file();
+    void play_audio();
+    void play_voice();
 --
 --
 -- DATE: April 13, 2016
@@ -37,6 +54,7 @@
 #include <QAudioDeviceInfo>
 #include <QSlider>
 #include <atomic>
+#include <QMutex>
 #include <QThread>
 #include "Audio/recorder.h"
 #include "Audio/datagenerator.h"
@@ -376,6 +394,7 @@ private:
     Ui::MainWindow*         ui;
     QByteArray              serverIP;
     QByteArray              peerIP;
+    QMutex                  test;
     QMediaPlayer*           player;
     QByteArray              m_buffer;
     QBuffer*                mediaStream;

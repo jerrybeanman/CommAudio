@@ -75,6 +75,7 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
     if(!headerReceived) {
         return;
     }
+    test.lock();
     if((count >= 0) && !(m_generator->isPlaying())) {
         m_generator->RestartPlaying();
         play_audio();
@@ -88,6 +89,7 @@ void MainWindow::addToSongBuffer(const unsigned int size) {
         count++;
         delete temp;
     }
+    test.unlock();
 }
 
 
@@ -162,6 +164,7 @@ void MainWindow::initializeUDPThread() {
 
 void MainWindow::tabSelected() {
     qDebug() << "Tab changed to: " << ui->tabWidget->currentIndex();
+    test.lock();
     ui->serverPlayList->clear();
     ui->serverSongList->clear();
     ui->peerIP->clear();
@@ -185,12 +188,19 @@ void MainWindow::tabSelected() {
 
     }
 
-    if(m_audioOutput != 0) {
-        m_generator->resetPosition();
+    if(m_audioOutput != nullptr)
+    {
         m_audioOutput->reset();
+        delete(m_audioOutput);
+        m_audioOutput = nullptr;
+    }
+
+    if(m_generator != nullptr)
+    {
+        m_generator->resetPosition();
         m_generator->RemoveBufferedData();
-        m_generator = 0;
-        m_audioOutput = 0;
+        delete(m_generator);
+        m_generator = nullptr;
     }
 
     if(recording) {
@@ -201,7 +211,7 @@ void MainWindow::tabSelected() {
         m_voice_generator = nullptr;
         recording = false;
     }
-
+    test.unlock();
     switch(ui->tabWidget->currentIndex()) {
         case broadcasting:
             initializeUDPThread();
