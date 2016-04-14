@@ -1,3 +1,27 @@
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE: mainwindow.h - GUI file used to communicate with the back end and front end
+--
+-- PROGRAM: commAudio
+--
+-- FUNCTIONS:
+-- void daemonize (void)
+-- int initialize_inotify_watch (int fd, char pathname[MAXPATHLEN])
+-- int ProcessFiles (char pathname[MAXPATHLEN])
+-- unsigned int GetProcessID (char *process)
+--
+--
+-- DATE: April 13, 2016
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Scott Plummer
+--
+-- PROGRAMMER: Scott Plummer, Tyler Trepanier-Bracken, Vivek Kalia
+--
+-- NOTES:
+-- The client side of the comm audio project. The client side receives music from the multicasted server, it can request
+-- a file and play it locally, and connect to a peer and
+----------------------------------------------------------------------------------------------------------------------*/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -144,6 +168,24 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void addSongHeader();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: setSong
+    --
+    -- DATE: April 13, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void setSong(const QByteArray name)
+    --                          name: Name of the current song
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    ----------------------------------------------------------------------------------------------------------------------*/
     void setSong(const QByteArray name);
 
     /*------------------------------------------------------------------------------------------------------------------
@@ -206,6 +248,24 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void handleVoiceDataAvailable(const unsigned int);
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: on_peerConnect_clicked
+    --
+    -- DATE: March 05, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void on_peerConnect_clicked();
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    -- Starts the microphone communications
+    ----------------------------------------------------------------------------------------------------------------------*/
     void on_peerConnect_clicked();
 
     void on_volumeSlider_valueChanged(int value);
@@ -270,6 +330,23 @@ private:
     ----------------------------------------------------------------------------------------------------------------------*/
     void initializeUDPThread();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: initializeMicrophoneConnection
+    --
+    -- DATE: March 08, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void initializeMicrophoneConnection()
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: connects the micorphone signals to slots
+    ----------------------------------------------------------------------------------------------------------------------*/
     void initializeMicrophoneConnection();
 
     void init_file();
