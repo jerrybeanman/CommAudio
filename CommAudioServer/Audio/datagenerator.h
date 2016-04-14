@@ -46,9 +46,10 @@ public:
     --
     -- RETURNS: void
     --
-    -- NOTES: Stops the DataGenerator from music streaming
+    -- NOTES: Stops the DataGenerator from streaming music
     --------------------------------------------------------------------------------------------------------------------*/
     void stop();
+
 
     qint64 readData(char *data, qint64 maxlen);
     qint64 readExternalData(char *data, qint64 maxlen);

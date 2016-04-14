@@ -30,7 +30,6 @@ SOURCES += main.cpp\
     soundmanager.cpp \
     filemanager.cpp \
     Audio/datagenerator.cpp \
-    Audio/inputbuffer.cpp \
     Audio/recorder.cpp \
     Audio/wavfile.cpp \
     Audio/recordgenerator.cpp
@@ -44,7 +43,6 @@ HEADERS  += mainwindow.h \
     soundmanager.h \
     filemanager.h \
     Audio/datagenerator.h \
-    Audio/inputbuffer.h \
     Audio/recorder.h \
     Audio/wavfile.h \
     Audio/recordgenerator.h

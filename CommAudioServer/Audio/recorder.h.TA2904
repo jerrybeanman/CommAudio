@@ -120,26 +120,17 @@ private:
     bool SetFormat();
 
 private:
-    QAudioFormat        r_format;           // Recorder's audio format
-    QAudioInput         *r_input;           // Input device to record voice data
-    QByteArray          r_buffer;           // Voice data container
-    bool                inProgress;         // Flag to indicate if the device is operating or not.
-    int                 r_bytes_AVAILABLE;  // Integer used to signal the quantity of data available after writing.
+    QAudioFormat        r_format;
+    QAudioInput         *r_input;
+    QAudioDeviceInfo    r_inputInfo;
+    QByteArray          r_buffer;
+    bool                inProgress;
+    bool                ready;
+    int                 audio_state;
+    int                 r_bytes_AVAILABLE;
+    int                 size;
+    char*               r_data;
 signals:
-
-    /*------------------------------------------------------------------------------------------------------------------
-    -- FUNCTION:	dataAvailable
-    --
-    -- DATE:		April 11th, 2016            REVISIONS:
-    --
-    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
-    --
-    -- INTERFACE:	void dataAvailable(int len);
-    --
-    -- RETURNS:     void
-    --
-    -- NOTES: Signal sent to indicate that there was voice data collected and ready for processing.
-    --------------------------------------------------------------------------------------------------------------------*/
     void dataAvailable(int len);
 
 };

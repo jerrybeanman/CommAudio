@@ -8,10 +8,8 @@ Recorder::Recorder()
     {
         //CRITICAL ERROR
         inProgress = false;
-        ready = false;
     }
-    size = 0;
-    r_data = new char[DATA_BUFSIZE];
+
     r_bytes_AVAILABLE = 0;
     r_buffer.resize(DATA_BUFSIZE);
     CBInitialize(&cb_voice_data, 20, DATA_BUFSIZE);
@@ -90,46 +88,6 @@ qint64 Recorder::readData(char *data, qint64 maxlen)
     qint64 chunk = 0;
     //chunk = r_buffer.readData(data, maxlen);
     return chunk;
-}
-
-int Recorder::bytesWritten()
-{
-    return r_bytes_AVAILABLE;
-}
-
-void Recorder::notified()
-{
-    qDebug() << "Notified";
-    r_bytes_AVAILABLE = 0;
-    if(audio_state == QAudio::ActiveState)
-    {
-        r_bytes_AVAILABLE = (int)r_buffer.size();
-
-        if(r_bytes_AVAILABLE > DATA_BUFSIZE) // Don't exceed max packet size.
-            r_bytes_AVAILABLE = DATA_BUFSIZE;
-
-        readData(r_data, r_bytes_AVAILABLE);
-
-        CBPushBack(&cb_voice_data, (void*)r_data);
-        emit dataAvailable(r_bytes_AVAILABLE);
-    }
-}
-
-void Recorder::handleAudioInputState(QAudio::State state)
-{
-    //qDebug() << "Audio State:" << state;
-
-    audio_state = state;
-
-    if(state == QAudio::StoppedState)
-    {
-        qDebug() << "Error State:" << r_input->error();
-
-        if(r_input->error() != QAudio::NoError)
-        {
-            qDebug() << "QAudioInput error:" << r_input->error();
-        }
-    }
 }
 
 bool Recorder::SetFormat()
