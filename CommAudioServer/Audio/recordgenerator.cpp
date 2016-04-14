@@ -19,12 +19,6 @@ void RecordGenerator::stop()
     close();
 }
 
-void RecordGenerator::resume()
-{
-    //qDebug() << "DataGenerator resumed.";
-    open(QIODevice::ReadOnly);
-}
-
 bool RecordGenerator::isPlaying()
 {
     return playing;

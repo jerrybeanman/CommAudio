@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QAudioInput>
+#include <QAudioDeviceInfo>
 #include <QDebug>
 #include "globals.h"
 
@@ -121,6 +122,7 @@ private:
 
 private:
     QAudioFormat        r_format;           // Recorder's audio format
+    QAudioDeviceInfo    r_inputInfo;        // Verifies the r_input's format is acceptable
     QAudioInput         *r_input;           // Input device to record voice data
     QByteArray          r_buffer;           // Voice data container
     bool                inProgress;         // Flag to indicate if the device is operating or not.

@@ -84,10 +84,10 @@ qint64 Recorder::writeData(const char *data, qint64 len)
 
 qint64 Recorder::readData(char *data, qint64 maxlen)
 {
-    //qDebug() << "Recorder::readData>>reading";
-    qint64 chunk = 0;
-    //chunk = r_buffer.readData(data, maxlen);
-    return chunk;
+    Q_UNUSED(data);
+    Q_UNUSED(maxlen);
+
+    return ((qint64)0);
 }
 
 bool Recorder::SetFormat()

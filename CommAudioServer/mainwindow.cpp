@@ -435,14 +435,14 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_recordButton_clicked()
 {
-    if(!recording)
+    /*if(!recording)
     {
         qDebug() << "recording starts.";
         m_recorder = new Recorder();
         m_voice_generator = new RecordGenerator();
 
         if(prepare_audio_devices(m_recorder->fileFormat()))
-            m_song_generator->setValid();
+
         else
         {
             qDebug() << "MainWindow::on_recordingButton_clicked>>Can't prepare audio device.";
@@ -456,15 +456,9 @@ void MainWindow::on_recordButton_clicked()
     }
     else
     {
-        /*
-         * TODO:
-         * When button is clicked, turn recording on and off. This will continously "play"
-         * the recording until it is clicked off. There will probably be an issue where
-         * it will record itself but that's fine.
-         */
         m_recorder->stop();
         recording = false;
-    }
+    }*/
 
 }
 
