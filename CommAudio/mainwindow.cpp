@@ -212,15 +212,8 @@ void MainWindow::tabSelected() {
         ReceivingVoice = false;
     }
 
-    if(m_recorder != nullptr)
-    {
-        delete(m_recorder);
-        m_recorder = nullptr;
-    }
-
     if(m_voice_generator != nullptr)
     {
-        m_voice_generator->stop();
         delete(m_voice_generator);
         m_voice_generator = nullptr;
     }
@@ -312,7 +305,6 @@ void MainWindow::play_voice()
         ReceivingVoice = true;
 
         std::cerr << "play_voice::new recorder\n";
-        m_recorder = new Recorder();
         prepare_audio_devices(m_recorder->fileFormat());
 
         m_voice_generator->start();

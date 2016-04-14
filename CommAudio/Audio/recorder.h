@@ -14,7 +14,6 @@ class Recorder : public QIODevice
     Q_OBJECT
 public:
     Recorder();
-    ~Recorder();
     const QAudioFormat &fileFormat() const;
     void start();
     void stop();

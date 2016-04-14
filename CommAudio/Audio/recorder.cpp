@@ -17,11 +17,6 @@ Recorder::Recorder()
     CBInitialize(&cb_voice_data, 20, DATA_BUFSIZE);
 }
 
-Recorder::~Recorder()
-{
-    stop();
-}
-
 const QAudioFormat &Recorder::fileFormat() const
 {
     return r_format;
