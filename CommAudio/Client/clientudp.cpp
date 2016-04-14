@@ -1,5 +1,22 @@
 #include "ClientUDP.h"
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	InitializeSocket
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	bool ClientUDP::InitializeSocket(short port)
+--
+-- RETURNS: void
+--
+-- NOTES: initialize a udp recieveing socket
+--------------------------------------------------------------------------------------------------------------------*/
 bool ClientUDP::InitializeSocket(short port)
 {
     BOOL fFlag;
@@ -39,6 +56,23 @@ bool ClientUDP::InitializeSocket(short port)
     return TRUE;
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	InitializeSendingSocket
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	bool ClientUDP::InitializeSendingSocket(char * ip, short port)
+--
+-- RETURNS: void
+--
+-- NOTES: initialize a udp sending socket to a specific address
+--------------------------------------------------------------------------------------------------------------------*/
 bool ClientUDP::InitializeSendingSocket(char * ip, short port)
 {
     BOOL fFlag;
@@ -76,15 +110,26 @@ bool ClientUDP::InitializeSendingSocket(char * ip, short port)
 
     memcpy((char *)&LocalAddr.sin_addr, hp->h_addr, hp->h_length);
 
-    // Bind local address to socket
-    /*if(bind(SocketInfo.Socket, (struct sockaddr*) &LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
-    {
-        std::cout << "bind() failed with error " << WSAGetLastError() << std::endl;
-        return FALSE;
-    }*/
     return TRUE;
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	MulticastSettings
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	bool ClientUDP::MulticastSettings(const char * name)
+--
+-- RETURNS: void
+--
+-- NOTES: Set UDP recieving socket to a multicast channel
+--------------------------------------------------------------------------------------------------------------------*/
 bool ClientUDP::MulticastSettings(const char * name)
 {
     MulticastInfo.imr_multiaddr.s_addr = inet_addr(name);
@@ -100,6 +145,23 @@ bool ClientUDP::MulticastSettings(const char * name)
     return TRUE;
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	Recv
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	bool ClientUDP::Recv()
+--
+-- RETURNS: true on success, false otherwise
+--
+-- NOTES: Recieves UDP datagram from socket
+--------------------------------------------------------------------------------------------------------------------*/
 bool ClientUDP::Recv()
 {
     memset(SocketInfo.Buffer, '\0', DATA_BUFSIZE);
@@ -141,6 +203,24 @@ bool ClientUDP::Recv()
     }
     return TRUE;
 }
+
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	Send
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	bool ClientUDP::Send(char * message, int size)
+--
+-- RETURNS: true on success, false otherwise
+--
+-- NOTES: Send a message to the sending socket
+--------------------------------------------------------------------------------------------------------------------*/
 bool ClientUDP::Send(char * message, int size)
 {
     DWORD flags = 0;
@@ -176,6 +256,23 @@ bool ClientUDP::Send(char * message, int size)
     return TRUE;
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	leaveMulticast
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	bool ClientUDP::leaveMulticast()
+--
+-- RETURNS: true on success, false otherwise
+--
+-- NOTES: leave multicast group
+--------------------------------------------------------------------------------------------------------------------*/
 bool ClientUDP::leaveMulticast() {
     if(setsockopt(SocketInfo.Socket, IPPROTO_IP, IP_DROP_MEMBERSHIP,
                   (char *)&MulticastInfo, sizeof(MulticastInfo)) == SOCKET_ERROR)
@@ -187,6 +284,23 @@ bool ClientUDP::leaveMulticast() {
     return true;
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION:	Close
+--
+-- DATE:		April 11th, 2016
+--
+-- REVISIONS:
+--
+-- DESIGNER:	Ruoqi Jia
+--
+-- PROGRAMMER:	Ruoqi Jia
+--
+-- INTERFACE:	bool ClientUDP::Close()
+--
+-- RETURNS: true on success, false otherwise
+--
+-- NOTES: close socket
+--------------------------------------------------------------------------------------------------------------------*/
 bool ClientUDP::Close()
 {
     closesocket(SocketInfo.Socket);
