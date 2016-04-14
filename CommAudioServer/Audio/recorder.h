@@ -17,7 +17,7 @@ public:
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION:	File Format
     --
-    -- DATE:		March 9th, 2016             REVISIONS:
+    -- DATE:		March 18th, 2016             REVISIONS:
     --
     -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
     --

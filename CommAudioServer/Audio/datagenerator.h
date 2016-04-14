@@ -167,26 +167,113 @@ public:
     -- NOTES:       Add in a portion
     --------------------------------------------------------------------------------------------------------------------*/
     void AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 len);
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Reset Position
+    --
+    -- DATE:		April 9th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void resetPosition();
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: Resets the song position to the end of the stream.
+    --------------------------------------------------------------------------------------------------------------------*/
     void resetPosition();
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Read Header
+    --
+    -- DATE:		March 28th, 2016    REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier		PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	QAudioFormat readHeader(char* data);
+    --
+    -- PARAMETERS:			char * data
+    --							data that contains the potential song header info.
+    --
+    -- RETURNS:     The recommended song playback format.
+    --
+    -- NOTES: Reads the song header information from the data and returns a formatted audio playback format.
+    --------------------------------------------------------------------------------------------------------------------*/
     QAudioFormat readHeader(char* data);
-    void setValid();
 
 signals:
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Audio Progress Changed
+    --
+    -- DATE:		March 9th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void audioProgressChanged(int progress);
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES: Emits the current song progress to whatever QObject that catches it.
+    --------------------------------------------------------------------------------------------------------------------*/
     void audioProgressChanged(int progress);
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Data Avaiable
+    --
+    -- DATE:		March 9th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void dataAvailable(int len);
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES: Emits a signal containing the current song data available to send.
+    --------------------------------------------------------------------------------------------------------------------*/
     void dataAvailable(int len);
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Data Finished
+    --
+    -- DATE:		March 18th, 2016            REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void dataFinished();
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES: A song has finished playing and emits the signal.
+    --------------------------------------------------------------------------------------------------------------------*/
     void dataFinished();
 
 public:
-    float progress;
-    int externChunk;
+    float progress;     // Current song progress.
+    int externChunk;    // Size of the song data available to send.
 
 
 private:
-    qint64      dg_readpos;
-    qint64      dg_max;
-    QByteArray  dg_buffer;
-    QByteArray  dg_externBuf;
-    bool        playing;
-    bool        validFormat;
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Set Valid
+    --
+    -- DATE:		March 18th, 2016            REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void Set Valid();
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES: A song header has been read successfully and the validity will be set to true.
+    --------------------------------------------------------------------------------------------------------------------*/
+    void setValid();
+
+
+    qint64      dg_readpos;     // Current read position
+    qint64      dg_max;         // Maximum buffer size
+    QByteArray  dg_buffer;      // Primary song container
+    QByteArray  dg_externBuf;   // Secondary song container used for transmission
+    bool        playing;        // Flag that checks if the song generator is in use.
+    bool        validFormat;    // Verification flag to see if the song header is proper.
 };
 #endif // DATAGENERATOR_H

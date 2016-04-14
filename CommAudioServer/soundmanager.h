@@ -4,16 +4,6 @@
 #include "Audio/datagenerator.h"
 #include "Server/ServerUDP.h"
 
-struct UDPBroadcast
-{
-    ServerUDP serverUDP;
-    DWORD bytes_to_send;
-    char* source;
-};
-
-bool SetDataSource(DataGenerator* generator);
-
-
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	StartSoundManagers
 --
@@ -32,6 +22,7 @@ bool SetDataSource(DataGenerator* generator);
 -- NOTES: Initialize socket and creates the accepting thread
 --------------------------------------------------------------------------------------------------------------------*/
 bool StartSoundManager();
+
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION:	BroadcastMusic
 --
@@ -48,6 +39,7 @@ bool StartSoundManager();
 -- RETURNS: Thread exit code
 --
 -- NOTES: Initialize thread for broacasting music data to the multicast channel
+
 --------------------------------------------------------------------------------------------------------------------*/
 DWORD WINAPI BroadcastMusic(LPVOID lpParameter);
 

@@ -25,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent) :
     fileLoaded = false;
     fileFinished = false;
     recording = false;
-    m_pos = 0;
     m_song_index = 0;
     m_audioOutput = 0;
 
@@ -416,67 +415,6 @@ bool MainWindow::prepare_stream()
     return false;
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    if(!fileExists)
-        return;
-
-    qDebug() << "Play button clicked.";
-    if(!fileLoaded)
-    {
-        qDebug() << "Loading file contents.";
-        load_file();
-        qDebug() << "After init";
-        fileLoaded = true;
-    }
-
-    play_audio();
-}
-
-void MainWindow::on_recordButton_clicked()
-{
-    /*if(!recording)
-    {
-        qDebug() << "recording starts.";
-        m_recorder = new Recorder();
-        m_voice_generator = new RecordGenerator();
-
-        if(prepare_audio_devices(m_recorder->fileFormat()))
-
-        else
-        {
-            qDebug() << "MainWindow::on_recordingButton_clicked>>Can't prepare audio device.";
-            return; //Can't set the format properly, too bad.
-        }
-
-        connect(m_recorder, SIGNAL(dataAvailable(int)), this, SLOT(handleVoiceDataAvailable(int)));
-
-        m_recorder->start();
-        recording = true;
-    }
-    else
-    {
-        m_recorder->stop();
-        recording = false;
-    }*/
-
-}
-
-void MainWindow::on_playRecordingButton_clicked()
-{
-    /*m_recorder->stop();
-
-    QByteArray array = m_recorder->readAll();
-
-    m_song_generator = new DataGenerator(this);
-    m_song_generator->AddMoreDataToBufferFromQByteArray(array, array.size());
-
-    if(prepare_audio_devices(m_recorder->fileFormat()))
-        m_song_generator->setValid();
-
-    play_audio();*/
-}
-
 void MainWindow::on_progressBar_actionTriggered(int progress)
 {
     ui->progressBar->setValue(progress);
@@ -519,27 +457,6 @@ void MainWindow::handleSongDataFinished()
     qDebug() << "Data has finished sending.";
     fileFinished = true;
     streaming = false;
-}
-
-void MainWindow::on_pauseBtn_clicked()
-{
-    if(!fileExists)
-        return;
-
-    if(m_song_generator->isPlaying())
-    {
-        if(streaming)
-        {
-            qDebug() << "Pause button clicked.";
-            m_audioOutput->suspend();
-            streaming = false;
-        }
-        else {
-            streaming = true;
-            play_audio();
-        }
-
-    }
 }
 
 void MainWindow::on_nextsongBtn_clicked()
