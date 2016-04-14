@@ -144,8 +144,8 @@ private slots:
 
 private slots:
 
-    void on_progressBar_actionTriggered(int action);
 
+    void on_progressBar_actionTriggered(int action);
 
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: addToSongBuffer
@@ -286,6 +286,24 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void on_peerConnect_clicked();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: on_volumeSlider_valueChanged
+    --
+    -- DATE: April 13th, 2016
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Tyler Trepanier
+    --
+    -- PROGRAMMER: Tyler Trepanier
+    --
+    -- INTERFACE: void on_volumeSlider_valueChanged();
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    -- Changes the volume based on the position of the volumn slider.
+    ----------------------------------------------------------------------------------------------------------------------*/
     void on_volumeSlider_valueChanged(int value);
 
 private:
@@ -367,8 +385,45 @@ private:
     ----------------------------------------------------------------------------------------------------------------------*/
     void initializeMicrophoneConnection();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Initilize File
+    --
+    -- DATE:        March 13, 2015
+    --
+    -- REVISIONS:   (Date and Description)
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   void init_file()
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES:
+    -- Grabs the file's contents and adds its to the Data Generator's data buffer.
+    ----------------------------------------------------------------------------------------------------------------------*/
     void init_file();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Play Audio
+    --
+    -- DATE:        March 13, 2015
+    --
+    -- REVISIONS:   (Date and Description)
+    --
+    -- DESIGNER:    Tyler Trepanier-Bracken
+    --
+    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    --
+    -- INTERFACE:   void play_audio()
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES:
+    -- Checks to see if Audio is currently playing. If it is playing, it is assumed to be paused and will resume playing
+    -- the song. Otherwise, this must be a NEW song to be played. As such, it begin to play the new song.
+    ----------------------------------------------------------------------------------------------------------------------*/
     void play_audio();
 
     /*------------------------------------------------------------------------------------------------------------------

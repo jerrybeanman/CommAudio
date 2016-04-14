@@ -3,7 +3,7 @@
 const qint64 ZERO   = 0;
 
 DataGenerator::DataGenerator()
-    :   QIODevice(), dg_readpos(0), dg_max(0), dg_streampos(0)
+    :   QIODevice(), dg_readpos(0), dg_max(0)
 {
     playing = false;
 }
@@ -27,6 +27,11 @@ void DataGenerator::stop()
 void DataGenerator::resume()
 {
     open(QIODevice::ReadOnly);
+}
+
+void DataGenerator::RestartPlaying()
+{
+    dg_readpos = dg_max;
 }
 
 void DataGenerator::resetPosition()
@@ -85,11 +90,6 @@ bool DataGenerator::isPlaying()
     return playing;
 }
 
-void DataGenerator::RestartPlaying()
-{
-    dg_readpos = dg_max;
-}
-
 void DataGenerator::RemoveBufferedData()
 {
     dg_buffer.resize(0);
@@ -98,9 +98,6 @@ void DataGenerator::RemoveBufferedData()
     dg_max = 0;
 }
 
-/*
- *  Adds in Data from a file.
- */
 void DataGenerator::AddMoreDataToBufferFromFile(QFile *file, qint64 len)
 {
     if(file->isOpen())
@@ -119,8 +116,6 @@ void DataGenerator::AddMoreDataToBufferFromQByteArray(QByteArray array, qint64 l
     memcpy(dg_externBuf.data() + dg_max, dg_buffer.constData() + dg_max, len);
     dg_max += len;
 }
-
-
 
 struct chunk
 {
@@ -160,7 +155,6 @@ QAudioFormat DataGenerator::readHeader(char* data)
 {
     QAudioFormat format;
     CombinedHeader header;
-    bool result = false;
 
     memcpy(reinterpret_cast<char *>(&header), data, sizeof(CombinedHeader));
     data += sizeof(WAVEHeader);
@@ -195,7 +189,6 @@ QAudioFormat DataGenerator::readHeader(char* data)
         format.setSampleRate(qFromLittleEndian<quint32>(header.wave.sampleRate));
         format.setSampleSize(qFromLittleEndian<quint16>(header.wave.bitsPerSample));
         format.setSampleType(bps == 8 ? QAudioFormat::UnSignedInt : QAudioFormat::SignedInt);
-
 
         return format;
     }

@@ -59,6 +59,7 @@ public:
     -- NOTES: Resets the global CurrentSong to be the current song that is playing.
     --------------------------------------------------------------------------------------------------------------------*/
     void get_current_song();
+
     ~MainWindow();
 private slots:
 
@@ -105,16 +106,101 @@ private slots:
 
 private slots:
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION: on progressBar actionTriggered
+    --
+    -- DATE: April 05, 2015
+    --
+    -- REVISIONS: (Date and Description)
+    --
+    -- DESIGNER: Scott Plummer
+    --
+    -- PROGRAMMER: Scott Plummer
+    --
+    -- INTERFACE: void on_progressBar_actionTriggered(int action);
+    --
+    -- RETURNS: void.
+    --
+    -- NOTES:
+    -- Updates the progress bar to visually show a song's playback progress.
+    ----------------------------------------------------------------------------------------------------------------------*/
     void on_progressBar_actionTriggered(int action);
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Handle Song Data Available
+    --
+    -- DATE:		April 2th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void handleSongDataAvailable(int len);
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES: Gets the length of available data gathered from the circular buffer and stores it into the data
+    --        generator.
+    --------------------------------------------------------------------------------------------------------------------*/
     void handleSongDataAvailable(int len);
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Handle Voice Data Available
+    --
+    -- DATE:		April 9th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void handleVoiceDataAvailable(int len);
+    --
+    -- RETURNS:     void
+    --
+    -- NOTES: Gets the length of the voice data gathered from the circular buffer dedicated to mic data and stores it
+    --        into the record generator.
+    --------------------------------------------------------------------------------------------------------------------*/
     void handleVoiceDataAvailable(int len);
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	Handle Song Data Finished
+    --
+    -- DATE:		April 9th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void handleSongDataFinished();
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: Sets flags to indicate that the next song is ready to be played.
+    --------------------------------------------------------------------------------------------------------------------*/
     void handleSongDataFinished();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	On next song button clicked
+    --
+    -- DATE:		April 2th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void on_nextsongBtn_clicked();
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: Drops the currently played song from the buffer, and prepares for the next song to be played.
+    --------------------------------------------------------------------------------------------------------------------*/
     void on_nextsongBtn_clicked();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:	On Previous Song Button Clicked
+    --
+    -- DATE:		April 2th, 2016             REVISIONS:
+    --
+    -- DESIGNER:	Tyler Trepanier				PROGRAMMER:	Tyler Trepanier
+    --
+    -- INTERFACE:	void on_prevsongBtn_clicked();
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: Drops the currently played song from the buffer, and selects the previous song to be played.
+    --------------------------------------------------------------------------------------------------------------------*/
     void on_prevsongBtn_clicked();
 
 private:
@@ -184,7 +270,7 @@ private:
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION:    Play Audio
     --
-    -- DATE:        March 13, 2015
+    -- DATE:        March 18, 2015
     --
     -- REVISIONS:   (Date and Description)
     --
@@ -203,23 +289,22 @@ private:
     void play_audio();
 
     /*------------------------------------------------------------------------------------------------------------------
-    -- FUNCTION:    Play Voice
+    -- FUNCTION: Play Voice
     --
-    -- DATE:        March 13, 2015
+    -- DATE: April 11, 2016
     --
-    -- REVISIONS:   (Date and Description)
+    -- REVISIONS: (Date and Description)
     --
-    -- DESIGNER:    Tyler Trepanier-Bracken
+    -- DESIGNER: Tyler Trepanier
     --
-    -- PROGRAMMER:  Tyler Trepanier-Bracken
+    -- PROGRAMMER: Tyler Trepanier
     --
-    -- INTERFACE:   void play_voice()
+    -- INTERFACE: void play_voice()
     --
-    -- RETURNS:     void
+    -- RETURNS: void
     --
     -- NOTES:
-    -- Checks to see if Voice is currently playing. If it is playing, it is assumed to be paused and will resume playing
-    -- the song. Otherwise, this must be a NEW song to be played. As such, it begin to play the new song.
+    -- Reads from the m_voice_generator and plays the microphone data received from the peer.
     ----------------------------------------------------------------------------------------------------------------------*/
     void play_voice();
 

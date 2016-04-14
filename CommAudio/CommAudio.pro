@@ -30,7 +30,6 @@ SOURCES += \
     tcpthreadmanager.cpp \
     udpthreadmanager.cpp \
     Audio/datagenerator.cpp \
-    Audio/inputbuffer.cpp \
     Audio/recorder.cpp \
     Audio/wavfile.cpp \
     microphonethreadmanager.cpp \
@@ -47,7 +46,6 @@ HEADERS  += \
     tcpthreadmanager.h \
     udpthreadmanager.h \
     Audio/datagenerator.h \
-    Audio/inputbuffer.h \
     Audio/recorder.h \
     Audio/wavfile.h \
     microphonethreadmanager.h \

@@ -20,8 +20,50 @@ public:
     DataGenerator(QObject *parent);
     ~DataGenerator();
 
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Start
+    --
+    -- DATE:        March 18th, 2016            REVISIONS:  April 9th, 2016 (Tyler Trepanier)
+    --                                                          -Implemented network functionality
+    --
+    -- DESIGNER:    Tyler Trepanier             PROGRAMMER: Tyler Trepanier
+    --
+    -- INTERFACE:   void start();
+    --
+    -- RETURNS:     Opens the generator
+    --
+    -- NOTES: This prepares the Generator to being streaming from the input device.
+    --------------------------------------------------------------------------------------------------------------------*/
     void start();
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Stop
+    --
+    -- DATE:        March 18th, 2016            REVISIONS:
+    --
+    -- DESIGNER:    Tyler Trepanier             PROGRAMMER: Tyler Trepanier
+    --
+    -- INTERFACE:   void stop();
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: Stops the Generator from reading
+    --------------------------------------------------------------------------------------------------------------------*/
     void stop();
+
+    /*------------------------------------------------------------------------------------------------------------------
+    -- FUNCTION:    Resume
+    --
+    -- DATE:        March 18th, 2016            REVISIONS:
+    --
+    -- DESIGNER:    Tyler Trepanier             PROGRAMMER: Tyler Trepanier
+    --
+    -- INTERFACE:   void resume();
+    --
+    -- RETURNS: void
+    --
+    -- NOTES: Stops the Generator from reading
+    --------------------------------------------------------------------------------------------------------------------*/
     void resume();
 
     /*------------------------------------------------------------------------------------------------------------------

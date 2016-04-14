@@ -21,25 +21,9 @@ void RecordGenerator::stop()
     close();
 }
 
-void RecordGenerator::resume()
-{
-    //qDebug() << "DataGenerator resumed.";
-    open(QIODevice::ReadOnly);
-}
-
-void RecordGenerator::resetData()
-{
-    rg_readpos = rg_max;
-}
-
 bool RecordGenerator::isPlaying()
 {
     return playing;
-}
-
-qint64 RecordGenerator::bytesAvailable() const
-{
-    return rg_max;
 }
 
 qint64 RecordGenerator::readData(char *data, qint64 maxlen)
